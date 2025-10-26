@@ -19,6 +19,8 @@ import Onboarding03 from './src/onboarding/Onboarding03';
 import Login from './src/authentication/Login';
 import SignUp from './src/authentication/SignUp';
 import Home from './src/main/Home';
+import CreateForm from './src/forms/CreateForm';
+import FormBuilder from './src/forms/FormBuilder';
 
 // Define navigation types
 export type RootStackParamList = {
@@ -30,6 +32,8 @@ export type RootStackParamList = {
   SignUp: undefined;
   Home: undefined;
   MainScreen: undefined;
+  CreateForm: undefined;
+  FormBuilder: { answers?: any };
 };
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
@@ -54,7 +58,8 @@ function App() {
           <Stack.Screen name="Login" component={Login} />
           <Stack.Screen name="SignUp" component={SignUp} />
           <Stack.Screen name="Home" component={Home} />
-          {/* <Stack.Screen name="" component={Home} /> */}
+          <Stack.Screen name="CreateForm" component={CreateForm} />
+          <Stack.Screen name="FormBuilder" component={FormBuilder} />
         </Stack.Navigator>
       </NavigationContainer>
     </SafeAreaProvider>

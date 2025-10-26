@@ -35,6 +35,51 @@ const SettingsIcon = ({ size = 24, color = '#A060FF' }) => (
   </Svg>
 );
 
+// Form Type Icons
+const ClipboardIcon = ({ size = 24, color = '#666' }) => (
+  <Svg width={size} height={size} viewBox="0 0 24 24" fill="none">
+    <Path d="M9 5H7C5.89543 5 5 5.89543 5 7V19C5 20.1046 5.89543 21 7 21H17C18.1046 21 19 20.1046 19 19V7C19 5.89543 18.1046 5 17 5H15" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+    <Path d="M9 5C9 6.10457 9.89543 7 11 7H13C14.1046 7 15 6.10457 15 5C15 3.89543 14.1046 3 13 3H11C9.89543 3 9 3.89543 9 5Z" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+  </Svg>
+);
+
+const StarIcon = ({ size = 24, color = '#666' }) => (
+  <Svg width={size} height={size} viewBox="0 0 24 24" fill="none">
+    <Path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+  </Svg>
+);
+
+const MessageIcon = ({ size = 24, color = '#666' }) => (
+  <Svg width={size} height={size} viewBox="0 0 24 24" fill="none">
+    <Path d="M21 15C21 15.5304 20.7893 16.0391 20.4142 16.4142C20.0391 16.7893 19.5304 17 19 17H7L3 21V5C3 4.46957 3.21071 3.96086 3.58579 3.58579C3.96086 3.21071 4.46957 3 5 3H19C19.5304 3 20.0391 3.21071 20.4142 3.58579C20.7893 3.96086 21 4.46957 21 5V15Z" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+  </Svg>
+);
+
+const ChartIcon = ({ size = 24, color = '#666' }) => (
+  <Svg width={size} height={size} viewBox="0 0 24 24" fill="none">
+    <Path d="M3 3V21H21" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+    <Path d="M7 16L10 13L14 17L21 10" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+    <Path d="M18 16H21V13" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+  </Svg>
+);
+
+const TargetIcon = ({ size = 24, color = '#666' }) => (
+  <Svg width={size} height={size} viewBox="0 0 24 24" fill="none">
+    <Path d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22Z" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+    <Path d="M12 18C15.3137 18 18 15.3137 18 12C18 8.68629 15.3137 6 12 6C8.68629 6 6 8.68629 6 12C6 15.3137 8.68629 18 12 18Z" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+    <Path d="M12 14C13.1046 14 14 13.1046 14 12C14 10.8954 13.1046 10 12 10C10.8954 10 10 10.8954 10 12C10 13.1046 10.8954 14 12 14Z" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+  </Svg>
+);
+
+const TrophyIcon = ({ size = 24, color = '#666' }) => (
+  <Svg width={size} height={size} viewBox="0 0 24 24" fill="none">
+    <Path d="M6 9H18C18 9 20 9.5 20 13C20 16 18 17 16 17H8C6 17 4 16 4 13C4 9.5 6 9 6 9Z" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+    <Path d="M7 9V7C7 5.89543 7.89543 5 9 5H15C16.1046 5 17 5.89543 17 7V9" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+    <Path d="M12 17V21" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+    <Path d="M8 21H16" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+  </Svg>
+);
+
 const Home: React.FC<Props> = ({ navigation }) => {
   return (
     <SafeAreaView style={styles.container}>
@@ -61,7 +106,7 @@ const Home: React.FC<Props> = ({ navigation }) => {
             <Text style={styles.descriptionText}>Create forms that your customers will love</Text>
             
             {/* Animated Stats */}
-            <View style={styles.animatedStats}>
+            {/* <View style={styles.animatedStats}>
               <View style={styles.statCard}>
                 <View style={styles.statIcon}>
                   <Text style={styles.statEmoji}>📝</Text>
@@ -91,7 +136,7 @@ const Home: React.FC<Props> = ({ navigation }) => {
                   <Text style={styles.statLabel}>This Week</Text>
                 </View>
               </View>
-            </View>
+            </View> */}
           </View>
           
           {/* Animated Profile */}
@@ -109,7 +154,7 @@ const Home: React.FC<Props> = ({ navigation }) => {
         </View>
         
         {/* Quick Action Button */}
-        <View style={styles.quickActionContainer}>
+        {/* <View style={styles.quickActionContainer}>
           <Pressable style={styles.quickActionBtn} android_ripple={{ color: 'rgba(160,96,255,0.2)' }}>
             <View style={styles.actionIcon}>
               <Text style={styles.actionIconText}>+</Text>
@@ -119,7 +164,7 @@ const Home: React.FC<Props> = ({ navigation }) => {
               <Text style={styles.arrowText}>→</Text>
             </View>
           </Pressable>
-        </View>
+        </View> */}
       </View>
 
       {/* White Content Area */}
@@ -132,7 +177,11 @@ const Home: React.FC<Props> = ({ navigation }) => {
           </View>
 
           {/* Create New Form Button */}
-          <Pressable style={styles.createFormBtn} android_ripple={{ color: 'rgba(160,96,255,0.1)' }}>
+          <Pressable 
+            style={styles.createFormBtn} 
+            android_ripple={{ color: 'rgba(160,96,255,0.1)' }}
+            onPress={() => navigation.navigate('CreateForm')}
+          >
             <View style={styles.createFormContent}>
               <View style={styles.plusIcon}>
                 <Text style={styles.plusText}>+</Text>
@@ -147,75 +196,88 @@ const Home: React.FC<Props> = ({ navigation }) => {
           {/* Forms List */}
           <View style={styles.formsSection}>
             <Text style={styles.sectionTitle}>Recent Forms</Text>
+            <Text style={styles.createNewFormDesc}>Your Newly Published Forms will be shown Here. You can click on it to Review and Edit them</Text>
             
-            {/* Redesigned Form Items */}
-            <View style={styles.formItem}>
-              <View style={styles.formItemLeft}>
-                <View style={styles.formIcon}>
-                  <Text style={styles.formIconText}>1</Text>
+            {/* Forms Container */}
+            <View style={styles.formsContainer}>
+              {/* Card-Based Form Items */}
+              <Pressable style={styles.formCard} android_ripple={{ color: 'rgba(0,0,0,0.05)' }}>
+                <View style={styles.formCardIcon}>
+                  <ClipboardIcon size={24} color="#666" />
                 </View>
-                <View style={styles.formInfo}>
-                  <Text style={styles.formTitle}>Customer Feedback</Text>
-                  <Text style={styles.formDescription}>Collect customer satisfaction ratings</Text>
-                  <View style={styles.formMeta}>
-                    <Text style={styles.formMetaText}>24 responses • 3 questions</Text>
-                    <Text style={styles.formMetaText}>Updated 2 days ago</Text>
-                  </View>
+                <View style={styles.formCardContent}>
+                  <Text style={styles.formCardTitle}>Customer Feedback</Text>
+                  <Text style={styles.formCardSubtitle}>Collect customer satisfaction ratings</Text>
                 </View>
-              </View>
-              <View style={styles.formItemRight}>
-                <View style={styles.statusBadge}>
-                  <View style={styles.statusDot} />
-                  <Text style={styles.statusText}>Active</Text>
+                <View style={styles.formCardAction}>
+                  <Text style={styles.formCardActionIcon}>+</Text>
                 </View>
-                <Text style={styles.chevron}>›</Text>
-              </View>
-            </View>
+              </Pressable>
 
-            <View style={styles.formItem}>
-              <View style={styles.formItemLeft}>
-                <View style={styles.formIcon}>
-                  <Text style={styles.formIconText}>2</Text>
+              <Pressable style={styles.formCard} android_ripple={{ color: 'rgba(0,0,0,0.05)' }}>
+                <View style={styles.formCardIcon}>
+                  <StarIcon size={24} color="#666" />
                 </View>
-                <View style={styles.formInfo}>
-                  <Text style={styles.formTitle}>Service Quality</Text>
-                  <Text style={styles.formDescription}>Rate our service quality</Text>
-                  <View style={styles.formMeta}>
-                    <Text style={styles.formMetaText}>0 responses • 5 questions</Text>
-                    <Text style={styles.formMetaText}>Updated 1 week ago</Text>
-                  </View>
+                <View style={styles.formCardContent}>
+                  <Text style={styles.formCardTitle}>Service Quality</Text>
+                  <Text style={styles.formCardSubtitle}>Rate our service quality</Text>
                 </View>
-              </View>
-              <View style={styles.formItemRight}>
-                <View style={styles.statusBadge}>
-                  <View style={[styles.statusDot, { backgroundColor: '#FF6B6B' }]} />
-                  <Text style={styles.statusText}>Draft</Text>
+                <View style={styles.formCardAction}>
+                  <Text style={styles.formCardActionIcon}>+</Text>
                 </View>
-                <Text style={styles.chevron}>›</Text>
-              </View>
-            </View>
+              </Pressable>
 
-            <View style={styles.formItem}>
-              <View style={styles.formItemLeft}>
-                <View style={styles.formIcon}>
-                  <Text style={styles.formIconText}>3</Text>
+              <Pressable style={styles.formCard} android_ripple={{ color: 'rgba(0,0,0,0.05)' }}>
+                <View style={styles.formCardIcon}>
+                  <MessageIcon size={24} color="#666" />
                 </View>
-                <View style={styles.formInfo}>
-                  <Text style={styles.formTitle}>Product Review</Text>
-                  <Text style={styles.formDescription}>Share your product experience</Text>
-                  <View style={styles.formMeta}>
-                    <Text style={styles.formMetaText}>12 responses • 4 questions</Text>
-                    <Text style={styles.formMetaText}>Updated 5 days ago</Text>
-                  </View>
+                <View style={styles.formCardContent}>
+                  <Text style={styles.formCardTitle}>Product Review</Text>
+                  <Text style={styles.formCardSubtitle}>Share your product experience</Text>
                 </View>
-              </View>
-              <View style={styles.formItemRight}>
-                <View style={styles.statusBadge}>
-                  <View style={styles.statusDot} />
-                  <Text style={styles.statusText}>Active</Text>
+                <View style={styles.formCardAction}>
+                  <Text style={styles.formCardActionIcon}>+</Text>
                 </View>
-                <Text style={styles.chevron}>›</Text>
-              </View>
+              </Pressable>
+
+              <Pressable style={styles.formCard} android_ripple={{ color: 'rgba(0,0,0,0.05)' }}>
+                <View style={styles.formCardIcon}>
+                  <ChartIcon size={24} color="#666" />
+                </View>
+                <View style={styles.formCardContent}>
+                  <Text style={styles.formCardTitle}>Market Research</Text>
+                  <Text style={styles.formCardSubtitle}>Gather market insights and trends</Text>
+                </View>
+                <View style={styles.formCardAction}>
+                  <Text style={styles.formCardActionIcon}>+</Text>
+                </View>
+              </Pressable>
+
+              <Pressable style={styles.formCard} android_ripple={{ color: 'rgba(0,0,0,0.05)' }}>
+                <View style={styles.formCardIcon}>
+                  <TargetIcon size={24} color="#666" />
+                </View>
+                <View style={styles.formCardContent}>
+                  <Text style={styles.formCardTitle}>Event Feedback</Text>
+                  <Text style={styles.formCardSubtitle}>Rate your event experience</Text>
+                </View>
+                <View style={styles.formCardAction}>
+                  <Text style={styles.formCardActionIcon}>+</Text>
+                </View>
+              </Pressable>
+
+              <Pressable style={[styles.formCard, styles.formCardLast]} android_ripple={{ color: 'rgba(0,0,0,0.05)' }}>
+                <View style={styles.formCardIcon}>
+                  <TrophyIcon size={24} color="#666" />
+                </View>
+                <View style={styles.formCardContent}>
+                  <Text style={styles.formCardTitle}>Satisfaction Survey</Text>
+                  <Text style={styles.formCardSubtitle}>Overall customer satisfaction</Text>
+                </View>
+                <View style={styles.formCardAction}>
+                  <Text style={styles.formCardActionIcon}>+</Text>
+                </View>
+              </Pressable>
             </View>
           </View>
         </ScrollView>
@@ -565,101 +627,86 @@ const styles = StyleSheet.create({
     fontFamily: 'Poppins-Regular',
     color: '#666666',
   },
+  createNewFormDesc: {
+    fontSize: 14,
+    fontFamily: 'Poppins-Regular',
+    color: '#666666',
+    marginBottom: 4,
+    paddingBottom: 10
+  },
   // Forms Section
   formsSection: {
     marginBottom: 20,
   },
   sectionTitle: {
-    fontSize: 18,
-    fontWeight: '600',
-    fontFamily: 'Poppins-Medium',
-    color: '#000000',
-    marginBottom: 16,
-  },
-  // Redesigned Form Items
-  formItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingVertical: 20,
-    paddingHorizontal: 0,
-    borderBottomWidth: 1,
-    borderBottomColor: '#F0F0F0',
-    marginBottom: 4,
-  },
-  formItemLeft: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    flex: 1,
-  },
-  formIcon: {
-    width: 52,
-    height: 52,
-    borderRadius: 26,
-    backgroundColor: '#A060FF',
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginRight: 20,
-  },
-  formIconText: {
     fontSize: 20,
     fontWeight: '700',
     fontFamily: 'Poppins-Bold',
-    color: '#FFFFFF',
+    color: '#000000',
+    marginBottom: 4,
   },
-  formInfo: {
+  // Forms Container
+  formsContainer: {
+    backgroundColor: '#F8F8F8',
+    borderRadius: 16,
+    padding: 12,
+    marginBottom: 20,
+  },
+  // Card-Based Form Items
+  formCard: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#FFFFFF',
+    borderRadius: 12,
+    paddingHorizontal: 16,
+    paddingVertical: 16,
+    marginBottom: 12,
+  },
+  formCardLast: {
+    marginBottom: 0,
+  },
+  formCardIcon: {
+    width: 48,
+    height: 48,
+    borderRadius: 8,
+    backgroundColor: '#F5F5F5',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginRight: 16,
+  },
+  formCardIconText: {
+    fontSize: 24,
+  },
+  formCardContent: {
     flex: 1,
-    paddingRight: 16,
   },
-  formTitle: {
-    fontSize: 17,
+  formCardTitle: {
+    fontSize: 16,
     fontWeight: '600',
     fontFamily: 'Poppins-Medium',
     color: '#000000',
-    marginBottom: 6,
-    lineHeight: 22,
+    marginBottom: 4,
   },
-  formDescription: {
-    fontSize: 14,
+  formCardSubtitle: {
+    fontSize: 13,
     fontFamily: 'Poppins-Regular',
     color: '#666666',
-    marginBottom: 8,
-    lineHeight: 20,
+    lineHeight: 18,
   },
-  formMeta: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    flexWrap: 'wrap',
-  },
-  formMetaText: {
-    fontSize: 12,
-    fontFamily: 'Poppins-Regular',
-    color: '#999999',
-    marginRight: 16,
-    marginBottom: 2,
-  },
-  formItemRight: {
+  formCardAction: {
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    backgroundColor: '#000000',
     alignItems: 'center',
     justifyContent: 'center',
-    paddingLeft: 8,
+    marginLeft: 12,
   },
-  statusBadge: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#F0F8FF',
-    paddingHorizontal: 10,
-    paddingVertical: 6,
-    borderRadius: 14,
-    marginBottom: 12,
-  },
-  statusText: {
-    fontSize: 11,
-    fontFamily: 'Poppins-Medium',
-    color: '#4CAF50',
-  },
-  chevron: {
+  formCardActionIcon: {
     fontSize: 20,
-    color: '#CCCCCC',
-    fontFamily: 'Poppins-Medium',
+    color: '#FFFFFF',
+    fontWeight: '300',
+    fontFamily: 'Poppins-Light',
   },
   // Bottom Navigation
   bottomNav: {

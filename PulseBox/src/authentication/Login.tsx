@@ -13,8 +13,8 @@ const Login: React.FC<Props> = ({ navigation }) => {
     <View style={styles.screen}>
       <View style={styles.brandRow}><Text style={styles.brand}><Text style={styles.brandPulse}>Pulse</Text><Text style={styles.brandBox}>Box</Text></Text></View>
       <View style={styles.content}>
-        <Text style={styles.sub}>Welcome Back</Text>
-        <Text style={styles.heading}>Log In</Text>
+        {/* <Text style={styles.sub}>Welcome Back</Text> */}
+        <Text style={styles.heading}>Welcome Back!</Text>
         <TextInput
           value={email}
             onChangeText={setEmail}
@@ -55,7 +55,7 @@ const styles = StyleSheet.create({
   brandBox: { color: theme.primary },
   content: { flex: 1 },
   sub: { fontSize: 18, fontFamily: 'Poppins-Regular', color: theme.text },
-  heading: { fontSize: 54, fontWeight: '800', fontFamily: 'Poppins-Bold', color: theme.text, marginVertical: 12, lineHeight: 62 },
+  heading: { fontSize: 64, fontWeight: '800', fontFamily: 'Poppins-Bold', color: theme.text, marginVertical: 12, lineHeight: 62, letterSpacing: -1 },
   input: { width: '100%', borderWidth: 1.5, borderColor: theme.primary, borderRadius: 6, paddingHorizontal: 14, paddingVertical: 14, fontSize: 14, fontFamily: 'Poppins-Regular', color: theme.text, marginTop: 14 },
   primaryBtn: { marginTop: 28, backgroundColor: theme.primary, paddingVertical: 16, borderRadius: 14, alignItems: 'center' },
   primaryLabel: { color: '#FFFFFF', fontSize: 16, fontFamily: 'Poppins-Medium', fontWeight: '600' },
