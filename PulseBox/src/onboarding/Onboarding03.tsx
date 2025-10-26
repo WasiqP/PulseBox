@@ -18,8 +18,8 @@ const Onboarding03: React.FC<Props> = ({ navigation }) => {
   return (
     <OnboardingCard
       Illustration={Onboarding3Illustration}
-      title="Ready to Begin?"
-      description="You're all set! Create your account and start discovering amazing content. Your personalized entertainment experience awaits."
+      title="Share & Collect Responses"
+      description="Generate shareable links for your forms and start collecting valuable feedback from clients. Track responses and grow your business with data-driven insights."
       step={3}
       total={3}
       onNext={() => navigation.replace('SignUp')}

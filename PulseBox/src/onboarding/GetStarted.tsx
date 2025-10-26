@@ -23,8 +23,8 @@ const GetStarted: React.FC<Props> = ({ navigation }) => {
           <Text style={styles.brandPulse}>Pulse</Text>
           <Text style={styles.brandBox}>Box</Text>
         </Text>
-        <Text style={styles.subtitle}>Stream, track & discover movies you love.</Text>
-        <Text style={styles.meta}>Binge the latest movies, explore classics and build your ultimate watchlist.</Text>
+        <Text style={styles.subtitle}>Collect feedback & grow your business.</Text>
+        <Text style={styles.meta}>Create custom forms, gather client insights, and make data-driven decisions to improve your services.</Text>
         <View style={styles.actionsRow}>
           <Pressable style={styles.primaryBtn} android_ripple={{ color: 'rgba(255,255,255,0.2)' }} onPress={() => navigation.navigate('Onboarding01')}>
             <Text style={styles.primaryLabel}>Get Started</Text>

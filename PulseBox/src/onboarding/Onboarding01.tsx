@@ -19,7 +19,7 @@ const Onboarding01: React.FC<Props> = ({ navigation }) => {
     <OnboardingCard
       Illustration={Onboarding1Illustration}
       title="Welcome to PulseBox!"
-      description="Discover an amazing world of movies and entertainment. Start your journey with us and explore endless possibilities."
+      description="Transform your business with powerful feedback collection tools. Create custom forms and gather valuable insights from your clients."
       step={1}
       total={3}
       onNext={() => navigation.navigate('Onboarding02')}

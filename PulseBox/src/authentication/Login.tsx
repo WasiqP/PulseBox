@@ -32,7 +32,7 @@ const Login: React.FC<Props> = ({ navigation }) => {
             secureTextEntry
             style={styles.input}
         />
-        <Pressable style={styles.primaryBtn} android_ripple={{ color: 'rgba(255,255,255,0.15)' }} onPress={() => navigation.replace('MainScreen')}>
+        <Pressable style={styles.primaryBtn} android_ripple={{ color: 'rgba(255,255,255,0.15)' }} onPress={() => navigation.replace('Home')}>
           <Text style={styles.primaryLabel}>Log In</Text>
         </Pressable>
         <Pressable onPress={() => {}} hitSlop={8}><Text style={styles.forgot}>Forgot Password?</Text></Pressable>

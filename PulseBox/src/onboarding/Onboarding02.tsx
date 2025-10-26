@@ -18,8 +18,8 @@ const Onboarding02: React.FC<Props> = ({ navigation }) => {
   return (
     <OnboardingCard
       Illustration={Onboarding2Illustration}
-      title="Your Entertainment Hub"
-      description="Access thousands of movies, TV shows, and exclusive content. Everything you love, all in one place, ready when you are."
+      title="Create Custom Forms"
+      description="Build beautiful feedback forms tailored to your business needs. Choose from multiple field types and customize everything to match your brand."
       step={2}
       total={3}
       onNext={() => navigation.navigate('Onboarding03')}
