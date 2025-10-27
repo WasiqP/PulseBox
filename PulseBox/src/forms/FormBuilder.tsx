@@ -1,13 +1,18 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { View, Text, StyleSheet, Pressable, ScrollView } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../../App';
 import { theme } from '../theme';
+import FormDetailsModal from '../components/FormDetailsModal';
+import { useForms, FormData } from '../context/FormsContext';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'FormBuilder'>;
 
 const questions = [
+  {
+    title: 'What are you?',
+  },
   {
     title: 'What are you trying to collect feedback about?',
   },
@@ -24,34 +29,57 @@ const questions = [
 
 const FormBuilder: React.FC<Props> = ({ navigation, route }) => {
   const { answers } = route.params || {};
+  const [showModal, setShowModal] = useState(false);
+  const { addForm } = useForms();
+
+  const handleSave = async (formName: string, iconId: string) => {
+    const formData: FormData = {
+      id: Date.now().toString(),
+      name: formName,
+      iconId: iconId,
+      answers: answers,
+      createdAt: new Date().toISOString(),
+    };
+    
+    await addForm(formData);
+    
+    // Navigate back to Home after saving
+    navigation.navigate('Home');
+  };
 
   return (
     <SafeAreaView style={styles.container} edges={['top']}>
       <ScrollView contentContainerStyle={styles.scrollContent}>
         <View style={styles.content}>
-          <Text style={styles.title}>Form Builder</Text>
+          <Text style={styles.title}>Publish Form</Text>
           <Text style={styles.subtitle}>This is where you'll build your form</Text>
           
           {answers && (
-            <View style={styles.answersContainer}>
-              <Text style={styles.answersTitle}>Your Answers</Text>
+            <View style={styles.previewContainer}>
+              <Text style={styles.previewTitle}>Form Preview</Text>
+              <Text style={styles.previewSubtitle}>Review your selections</Text>
+              
               {Object.entries(answers).map(([step, answerArray], index) => (
-                <View key={index} style={styles.answerItem}>
-                  <View style={styles.answerHeader}>
-                    <View style={styles.stepBadge}>
-                      <Text style={styles.stepBadgeText}>{parseInt(step) + 1}</Text>
-                    </View>
-                    <Text style={styles.answerLabel}>{questions[parseInt(step)].title}</Text>
+                <View key={index} style={styles.questionCard}>
+                  <View style={styles.questionHeader}>
+                    <Text style={styles.questionNumber}>Q{parseInt(step) + 1}</Text>
+                    <View style={styles.questionDivider} />
                   </View>
-                  <View style={styles.answerValueContainer}>
+                  <Text style={styles.questionTitle}>{questions[parseInt(step)].title}</Text>
+                  
+                  <View style={styles.tagsContainer}>
                     {Array.isArray(answerArray) && answerArray.length > 0 ? (
                       answerArray.map((answer: string, idx: number) => (
-                        <Text key={idx} style={styles.answerValue}>
-                          • {answer.charAt(0).toUpperCase() + answer.slice(1).replace(/_/g, ' ')}
-                        </Text>
+                        <View key={idx} style={styles.tag}>
+                          <Text style={styles.tagText}>
+                            {answer.charAt(0).toUpperCase() + answer.slice(1).replace(/_/g, ' ')}
+                          </Text>
+                        </View>
                       ))
                     ) : (
-                      <Text style={styles.answerValue}>{String(answerArray || '')}</Text>
+                      <View style={styles.tag}>
+                        <Text style={styles.tagText}>{String(answerArray || '')}</Text>
+                      </View>
                     )}
                   </View>
                 </View>
@@ -61,7 +89,7 @@ const FormBuilder: React.FC<Props> = ({ navigation, route }) => {
 
           <Pressable 
             style={styles.backButton}
-            onPress={() => navigation.navigate('Home')}
+            onPress={() => setShowModal(true)}
             android_ripple={{ color: 'rgba(160,96,255,0.2)' }}
           >
             <Text style={styles.backButtonText}>Publish Form</Text>
@@ -75,6 +103,12 @@ const FormBuilder: React.FC<Props> = ({ navigation, route }) => {
           </Pressable>
         </View>
       </ScrollView>
+
+      <FormDetailsModal
+        visible={showModal}
+        onClose={() => setShowModal(false)}
+        onSave={handleSave}
+      />
     </SafeAreaView>
   );
 };
@@ -106,65 +140,83 @@ const styles = StyleSheet.create({
     color: '#666666',
     marginBottom: 32,
   },
-  answersContainer: {
-    backgroundColor: '#F8F8F8',
-    borderRadius: 16,
-    padding: 20,
-    marginBottom: 24,
+  previewContainer: {
+    marginBottom: 32,
   },
-  answersTitle: {
-    fontSize: 20,
+  previewTitle: {
+    fontSize: 24,
     fontWeight: '700',
     fontFamily: 'Poppins-Bold',
     color: '#000000',
-    marginBottom: 16,
+    marginBottom: 6,
   },
-  answerItem: {
+  previewSubtitle: {
+    fontSize: 14,
+    fontFamily: 'Poppins-Regular',
+    color: '#999999',
+    marginBottom: 24,
+  },
+  questionCard: {
     backgroundColor: '#FFFFFF',
-    borderRadius: 12,
-    padding: 16,
-    marginBottom: 12,
-    borderWidth: 1,
-    borderColor: '#E8E8E8',
+    borderRadius: 16,
+    padding: 20,
+    marginBottom: 16,
+    borderLeftWidth: 4,
+    borderLeftColor: theme.primary,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.05,
+    shadowRadius: 8,
+    elevation: 2,
   },
-  answerHeader: {
+  questionHeader: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 8,
-    gap: 12,
+    marginBottom: 12,
   },
-  stepBadge: {
-    width: 32,
-    height: 32,
-    borderRadius: 16,
-    backgroundColor: theme.primary,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  stepBadgeText: {
-    fontSize: 14,
+  questionNumber: {
+    fontSize: 12,
     fontWeight: '700',
     fontFamily: 'Poppins-Bold',
-    color: '#FFFFFF',
+    color: theme.primary,
+    backgroundColor: '#F0F0FF',
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    borderRadius: 8,
+    overflow: 'hidden',
   },
-  answerLabel: {
+  questionDivider: {
     flex: 1,
-    fontSize: 14,
-    fontFamily: 'Poppins-Medium',
-    color: '#666666',
-    lineHeight: 20,
+    height: 1,
+    backgroundColor: '#F0F0F0',
+    marginLeft: 12,
   },
-  answerValueContainer: {
-    marginTop: 4,
-    paddingLeft: 44,
-  },
-  answerValue: {
+  questionTitle: {
     fontSize: 15,
     fontWeight: '600',
     fontFamily: 'Poppins-Medium',
-    color: '#000000',
-    marginBottom: 4,
+    color: '#333333',
     lineHeight: 22,
+    marginBottom: 12,
+  },
+  tagsContainer: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 8,
+  },
+  tag: {
+    backgroundColor: '#F5F5FF',
+    paddingHorizontal: 14,
+    paddingVertical: 8,
+    borderRadius: 20,
+    borderWidth: 1,
+    borderColor: '#E0E0FF',
+  },
+  tagText: {
+    fontSize: 13,
+    fontWeight: '500',
+    fontFamily: 'Poppins-Medium',
+    color: theme.primary,
   },
   backButton: {
     backgroundColor: theme.primary,

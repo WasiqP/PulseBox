@@ -10,6 +10,7 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { StatusBar, useColorScheme } from 'react-native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
+import { FormsProvider } from './src/context/FormsContext';
 
 // Import screens
 import GetStarted from './src/onboarding/GetStarted';
@@ -19,6 +20,9 @@ import Onboarding03 from './src/onboarding/Onboarding03';
 import Login from './src/authentication/Login';
 import SignUp from './src/authentication/SignUp';
 import Home from './src/main/Home';
+import MyForms from './src/main/MyForms';
+import Responses from './src/main/Responses';
+import Settings from './src/main/Settings';
 import CreateForm from './src/forms/CreateForm';
 import FormBuilder from './src/forms/FormBuilder';
 
@@ -31,6 +35,9 @@ export type RootStackParamList = {
   Login: undefined;
   SignUp: undefined;
   Home: undefined;
+  MyForms: undefined;
+  Responses: undefined;
+  Settings: undefined;
   MainScreen: undefined;
   CreateForm: undefined;
   FormBuilder: { answers?: any };
@@ -43,8 +50,9 @@ function App() {
 
   return (
     <SafeAreaProvider>
-      <StatusBar barStyle={isDarkMode ? 'light-content' : 'dark-content'} />
-      <NavigationContainer>
+      <FormsProvider>
+        <StatusBar barStyle={isDarkMode ? 'light-content' : 'dark-content'} />
+        <NavigationContainer>
         <Stack.Navigator 
           initialRouteName="GetStarted"
           screenOptions={{
@@ -58,10 +66,14 @@ function App() {
           <Stack.Screen name="Login" component={Login} />
           <Stack.Screen name="SignUp" component={SignUp} />
           <Stack.Screen name="Home" component={Home} />
+          <Stack.Screen name="MyForms" component={MyForms} />
+          <Stack.Screen name="Responses" component={Responses} />
+          <Stack.Screen name="Settings" component={Settings} />
           <Stack.Screen name="CreateForm" component={CreateForm} />
           <Stack.Screen name="FormBuilder" component={FormBuilder} />
         </Stack.Navigator>
       </NavigationContainer>
+      </FormsProvider>
     </SafeAreaProvider>
   );
 }

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { View, Text, StyleSheet, Pressable, ScrollView } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
@@ -10,8 +10,23 @@ type Props = NativeStackScreenProps<RootStackParamList, 'CreateForm'>;
 const CreateForm: React.FC<Props> = ({ navigation }) => {
   const [currentStep, setCurrentStep] = useState(0);
   const [answers, setAnswers] = useState<any>({});
+  const scrollViewRef = useRef<ScrollView>(null);
 
   const questions = [
+    {
+      title: 'What are you?',
+      subtitle: 'Help us get to know you better',
+      options: [
+        { id: 'business_owner', title: 'Business Owner', description: 'Running your own business' },
+        { id: 'freelancer', title: 'Freelancer', description: 'Independent professional' },
+        { id: 'designer', title: 'Designer', description: 'Creative professional' },
+        { id: 'customer_support', title: 'Customer Support', description: 'Supporting customers' },
+        { id: 'developer', title: 'Developer', description: 'Building with code' },
+        { id: 'student', title: 'Student', description: 'Learning and studying' },
+        { id: 'teacher', title: 'Teacher', description: 'Educating others' },
+        { id: 'other', title: 'Others', description: 'Something else' },
+      ],
+    },
     {
       title: 'What are you trying to collect feedback about?',
       subtitle: 'Select the type that best describes your needs',
@@ -86,6 +101,8 @@ const CreateForm: React.FC<Props> = ({ navigation }) => {
   const handleNext = () => {
     if (currentStep < questions.length - 1) {
       setCurrentStep(currentStep + 1);
+      // Scroll to top
+      scrollViewRef.current?.scrollTo({ y: 0, animated: true });
     } else {
       // All questions answered, proceed to form builder
       navigation.navigate('FormBuilder', { answers });
@@ -97,6 +114,8 @@ const CreateForm: React.FC<Props> = ({ navigation }) => {
   const handleBack = () => {
     if (currentStep > 0) {
       setCurrentStep(currentStep - 1);
+      // Scroll to top
+      scrollViewRef.current?.scrollTo({ y: 0, animated: true });
     } else {
       navigation.goBack();
     }
@@ -107,7 +126,7 @@ const CreateForm: React.FC<Props> = ({ navigation }) => {
 
   return (
     <SafeAreaView style={styles.container} edges={['top']}>
-      <ScrollView style={styles.scrollView} contentContainerStyle={styles.scrollContent}>
+      <ScrollView ref={scrollViewRef} style={styles.scrollView} contentContainerStyle={styles.scrollContent}>
         {/* Progress Bar */}
         <View style={styles.progressContainer}>
           <View style={styles.progressBar}>
