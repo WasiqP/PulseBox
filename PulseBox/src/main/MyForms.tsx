@@ -1,13 +1,15 @@
 import React, { useState, useRef } from 'react';
-import { View, Text, StyleSheet, ScrollView, Animated, Modal, TouchableWithoutFeedback, Dimensions } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, Animated, Modal, TouchableWithoutFeedback, Dimensions, Pressable } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
-import { RootStackParamList } from '../../App';
+import type { RootStackParamList } from '../types/navigation';
 import BottomTab from '../components/BottomTab';
 import Svg, { Path } from 'react-native-svg';
 import { useForms } from '../context/FormsContext';
 import FormIcon from '../components/FormIcons';
 import { PanResponder } from 'react-native';
+import ShareIcon from '../../assets/images/share.svg';
+import EditIcon from '../../assets/images/edit.svg';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'MyForms'>;
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
@@ -180,8 +182,9 @@ const FormItem = ({ form, onDelete, onDragStart, onDragEnd }: FormItemProps) => 
         <Text style={styles.placeholderLine1}>{form.name}</Text>
         <Text style={styles.placeholderLine2}>Created {new Date(form.createdAt).toLocaleDateString()}</Text>
       </View>
-      <View style={styles.plusContainer}>
-        <PlusIcon size={18} />
+      <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+        <View style={styles.plusContainer}><EditIcon width={18} height={18} stroke="#000000" /></View>
+        <View style={[styles.plusContainer, { marginLeft: 8 }]}><ShareIcon width={18} height={18} stroke="#000000" /></View>
       </View>
     </Animated.View>
     </View>
@@ -250,13 +253,15 @@ const MyForms: React.FC<Props> = ({ navigation, route }) => {
             </View>
           ) : (
             forms.map((form, index) => (
-              <FormItem
+              <Pressable key={form.id} onPress={() => navigation.navigate('EditForm', { formId: form.id })}>
+                <FormItem
                 key={form.id}
                 form={form}
                 onDelete={handleDelete}
                 onDragStart={handleDragStart}
                 onDragEnd={handleDragEnd}
               />
+              </Pressable>
             ))
           )}
         </ScrollView>
@@ -376,10 +381,6 @@ const styles = StyleSheet.create({
     color: '#666666',
   },
   plusContainer: {
-    width: 32,
-    height: 32,
-    borderRadius: 16,
-    backgroundColor: '#000000',
     alignItems: 'center',
     justifyContent: 'center',
     marginLeft: 12,

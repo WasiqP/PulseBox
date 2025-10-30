@@ -2,12 +2,14 @@ import React from 'react';
 import { View, Text, StyleSheet, ScrollView, Pressable } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
-import { RootStackParamList } from '../../App';
+import type { RootStackParamList } from '../types/navigation';
 import { theme } from '../theme';
 import Svg, { Path } from 'react-native-svg';
 import BottomTab from '../components/BottomTab';
 import { useForms } from '../context/FormsContext';
 import FormIcon from '../components/FormIcons';
+import ShareIcon from '../../assets/images/share.svg';
+import EditIcon from '../../assets/images/edit.svg';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'Home'>;
 
@@ -189,6 +191,7 @@ const Home: React.FC<Props> = ({ navigation }) => {
                     key={form.id} 
                     style={[styles.formCard, index === forms.length - 1 && styles.formCardLast]} 
                     android_ripple={{ color: 'rgba(0,0,0,0.05)' }}
+                    onPress={() => navigation.navigate('EditForm', { formId: form.id })}
                   >
                     <View style={styles.formCardIcon}>
                       <FormIcon iconId={form.iconId} size={24} color="#666" />
@@ -197,8 +200,9 @@ const Home: React.FC<Props> = ({ navigation }) => {
                       <Text style={styles.formCardTitle}>{form.name}</Text>
                       <Text style={styles.formCardSubtitle}>Created {new Date(form.createdAt).toLocaleDateString()}</Text>
                     </View>
-                    <View style={styles.formCardAction}>
-                      <Text style={styles.formCardActionIcon}>+</Text>
+                    <View style={styles.actionsRow}>
+                      <View style={styles.formCardAction}><EditIcon width={20} height={20} stroke="#000000" /></View>
+                      <View style={[styles.formCardAction, { marginLeft: 8 }]}><ShareIcon width={20} height={20} stroke="#000000" /></View>
                     </View>
                   </Pressable>
                 ))
@@ -622,13 +626,13 @@ const styles = StyleSheet.create({
     lineHeight: 18,
   },
   formCardAction: {
-    width: 32,
-    height: 32,
-    borderRadius: 16,
-    backgroundColor: '#000000',
+    marginLeft: 12,
     alignItems: 'center',
     justifyContent: 'center',
-    marginLeft: 12,
+  },
+  actionsRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
   },
   formCardActionIcon: {
     fontSize: 20,

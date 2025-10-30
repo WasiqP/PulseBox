@@ -25,23 +25,11 @@ import Responses from './src/main/Responses';
 import Settings from './src/main/Settings';
 import CreateForm from './src/forms/CreateForm';
 import FormBuilder from './src/forms/FormBuilder';
+import EditForm from './src/forms/EditForm.tsx';
+import QuestionsScreen from './src/forms/QuestionsScreen.tsx';
 
-// Define navigation types
-export type RootStackParamList = {
-  GetStarted: undefined;
-  Onboarding01: undefined;
-  Onboarding02: undefined;
-  Onboarding03: undefined;
-  Login: undefined;
-  SignUp: undefined;
-  Home: undefined;
-  MyForms: undefined;
-  Responses: undefined;
-  Settings: undefined;
-  MainScreen: undefined;
-  CreateForm: undefined;
-  FormBuilder: { answers?: any };
-};
+// Navigation types
+import type { RootStackParamList } from './src/types/navigation';
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
@@ -71,6 +59,8 @@ function App() {
           <Stack.Screen name="Settings" component={Settings} />
           <Stack.Screen name="CreateForm" component={CreateForm} />
           <Stack.Screen name="FormBuilder" component={FormBuilder} />
+          <Stack.Screen name="EditForm" component={EditForm} />
+          <Stack.Screen name="QuestionsScreen" component={QuestionsScreen} />
         </Stack.Navigator>
       </NavigationContainer>
       </FormsProvider>
