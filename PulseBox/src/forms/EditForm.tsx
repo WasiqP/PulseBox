@@ -1,15 +1,18 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
-import { View, Text, StyleSheet, Animated, TouchableWithoutFeedback, Modal, Pressable, PanResponder } from 'react-native';
+import { View, Text, StyleSheet, Animated, TouchableWithoutFeedback, Modal, Pressable, PanResponder, Vibration } from 'react-native';
+import Svg, { Defs, LinearGradient as SvgLinearGradient, Stop, Rect } from 'react-native-svg';
 import type { GestureResponderEvent, PanResponderGestureState } from 'react-native';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import type { RootStackParamList } from '../types/navigation';
+import { theme } from '../theme/Colors';
 import { useForms } from '../context/FormsContext';
 import ShareIcon from '../../assets/images/share.svg';
 import EditIcon from '../../assets/images/edit.svg';
+import EditPurpleIcon from '../../assets/images/edit-purple.svg';
 import TrashIcon from '../../assets/images/trash.svg';
 import SwapIcon from '../../assets/images/swap.svg';
-import ArrowUp from '../../assets/images/arrow-up-white.svg';
-import ArrowDown from '../../assets/images/arrow-down-white.svg';
+import ArrowUp from '../../assets/images/purple-arrow-up.svg';
+import ArrowDown from '../../assets/images/purple-arrow-down.svg';
 import BackIcon from '../../assets/images/Back.svg';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'EditForm'>;
@@ -41,7 +44,18 @@ const EditForm: React.FC<Props> = ({ route, navigation }) => {
   }, [form]);
 
   const handleDeleteByIndex = (index: number) => {
-    setQuestions(prev => prev.filter((_, i) => i !== index));
+    setQuestions(prev => {
+      const next = prev.filter((_, i) => i !== index);
+      if (form) {
+        updateForm(formId, {
+          answers: {
+            ...form.answers,
+            questions: next,
+          },
+        });
+      }
+      return next;
+    });
     setShowDeleteModal(true);
     setTimeout(() => setShowDeleteModal(false), 1600);
   };
@@ -50,8 +64,9 @@ const EditForm: React.FC<Props> = ({ route, navigation }) => {
     if (toIndex < 0 || toIndex >= questions.length || toIndex === fromIndex) return;
     setQuestions(prev => {
       const copy = prev.slice();
-      const [moved] = copy.splice(fromIndex, 1);
-      copy.splice(toIndex, 0, moved);
+      const tmp = copy[fromIndex];
+      copy[fromIndex] = copy[toIndex];
+      copy[toIndex] = tmp;
       // Save to form context
       if (form) {
         updateForm(formId, {
@@ -71,53 +86,90 @@ const EditForm: React.FC<Props> = ({ route, navigation }) => {
     const scale = useRef(new Animated.Value(1)).current;
     const opacity = useRef(new Animated.Value(1)).current;
     const [isDragging, setIsDragging] = useState(false);
+    const hasMovedRef = useRef(false);
+    const dragStartY = useRef(0);
 
     const panResponder = useRef(
       PanResponder.create({
         onStartShouldSetPanResponder: () => true,
-        onMoveShouldSetPanResponder: () => true,
+        onMoveShouldSetPanResponder: (_, gesture) => {
+          // Only start drag if movement is significant (more than 5 pixels)
+          return Math.abs(gesture.dx) > 5 || Math.abs(gesture.dy) > 5;
+        },
         onPanResponderGrant: () => {
+          hasMovedRef.current = false;
           setIsDragging(true);
-          Animated.parallel([
-            Animated.spring(scale, { toValue: 1.02, useNativeDriver: true }),
-            Animated.timing(opacity, { toValue: 0.95, duration: 120, useNativeDriver: true }),
-          ]).start();
-          Animated.spring(trashScale, { toValue: 1.2, friction: 4, useNativeDriver: true }).start();
+          dragStartY.current = 0;
         },
         onPanResponderMove: (_evt: GestureResponderEvent, gesture: PanResponderGestureState) => {
-          translateX.setValue(gesture.dx);
-          translateY.setValue(gesture.dy);
+          if (Math.abs(gesture.dx) > 5 || Math.abs(gesture.dy) > 5) {
+            hasMovedRef.current = true;
+            if (!dragStartY.current) {
+              // First significant movement - activate drag
+              dragStartY.current = gesture.moveY;
+              Vibration.vibrate(10);
+              Animated.parallel([
+                Animated.spring(scale, { toValue: 1.02, useNativeDriver: true }),
+                Animated.timing(opacity, { toValue: 0.95, duration: 120, useNativeDriver: true }),
+              ]).start();
+              Animated.spring(trashScale, { toValue: 1.2, friction: 4, useNativeDriver: true }).start();
+            }
+            translateX.setValue(gesture.dx);
+            translateY.setValue(gesture.dy);
+          }
         },
         onPanResponderRelease: (_evt: GestureResponderEvent, gesture: PanResponderGestureState) => {
-          Animated.parallel([
-            Animated.spring(scale, { toValue: 1, useNativeDriver: true }),
-            Animated.timing(opacity, { toValue: 1, duration: 120, useNativeDriver: true }),
-            Animated.spring(trashScale, { toValue: 1, useNativeDriver: true }),
-          ]).start();
+          // Only handle drag actions if there was significant movement
+          if (hasMovedRef.current) {
+            Animated.parallel([
+              Animated.spring(scale, { toValue: 1, useNativeDriver: true }),
+              Animated.timing(opacity, { toValue: 1, duration: 120, useNativeDriver: true }),
+              Animated.spring(trashScale, { toValue: 1, useNativeDriver: true }),
+            ]).start();
 
-          if (gesture.dx < -80) {
-            handleDeleteByIndex(index);
-            return;
+            if (gesture.dx < -80) {
+              handleDeleteByIndex(index);
+              hasMovedRef.current = false;
+              setIsDragging(false);
+              Animated.parallel([
+                Animated.spring(translateX, { toValue: 0, useNativeDriver: true }),
+                Animated.spring(translateY, { toValue: 0, useNativeDriver: true }),
+              ]).start();
+              return;
+            }
+
+            if (gesture.dx > 100 && gesture.dy < -60) {
+              handleDeleteByIndex(index);
+              hasMovedRef.current = false;
+              setIsDragging(false);
+              Animated.parallel([
+                Animated.spring(translateX, { toValue: 0, useNativeDriver: true }),
+                Animated.spring(translateY, { toValue: 0, useNativeDriver: true }),
+              ]).start();
+              return;
+            }
+
+            if (Math.abs(gesture.dy) > ITEM_HEIGHT / 2) {
+              const steps = Math.round(gesture.dy / ITEM_HEIGHT);
+              const targetIndex = Math.max(0, Math.min(questions.length - 1, index + steps));
+              if (targetIndex !== index) {
+                swapQuestions(index, targetIndex);
+              }
+            }
+
+            Animated.parallel([
+              Animated.spring(translateX, { toValue: 0, useNativeDriver: true }),
+              Animated.spring(translateY, { toValue: 0, useNativeDriver: true }),
+            ]).start();
           }
-
-          if (gesture.dx > 100 && gesture.dy < -60) {
-            handleDeleteByIndex(index);
-            return;
-          }
-
-          if (Math.abs(gesture.dy) > ITEM_HEIGHT / 2) {
-            const direction = gesture.dy > 0 ? 1 : -1;
-            swapQuestions(index, index + direction);
-          }
-
-          Animated.parallel([
-            Animated.spring(translateX, { toValue: 0, useNativeDriver: true }),
-            Animated.spring(translateY, { toValue: 0, useNativeDriver: true }),
-          ]).start();
+          hasMovedRef.current = false;
           setIsDragging(false);
+          dragStartY.current = 0;
         },
         onPanResponderTerminate: () => {
+          hasMovedRef.current = false;
           setIsDragging(false);
+          dragStartY.current = 0;
           Animated.parallel([
             Animated.spring(translateX, { toValue: 0, useNativeDriver: true }),
             Animated.spring(translateY, { toValue: 0, useNativeDriver: true }),
@@ -129,7 +181,15 @@ const EditForm: React.FC<Props> = ({ route, navigation }) => {
     ).current;
 
     return (
-      <Pressable onPress={() => navigation.navigate('QuestionsScreen', { formId, questionId: q.id })}>
+      <Pressable 
+        onPress={() => {
+          // Only navigate if it wasn't a drag gesture
+          if (!hasMovedRef.current && !isDragging) {
+            navigation.navigate('QuestionsScreen', { formId, questionId: q.id });
+          }
+        }}
+        delayLongPress={200}
+      >
         <Animated.View
           style={[
             styles.questionItem,
@@ -146,7 +206,16 @@ const EditForm: React.FC<Props> = ({ route, navigation }) => {
             <Text style={styles.qSub}>Tap to edit details</Text>
           </View>
           <View style={styles.qRight}>
-            <View style={styles.plusCircle}><Text style={styles.plusText}>+</Text></View>
+            <Pressable 
+              onPress={(e) => {
+                e.stopPropagation();
+                navigation.navigate('QuestionsScreen', { formId, questionId: q.id });
+              }}
+              style={styles.editIconBtn}
+              android_ripple={{ color: 'rgba(160,96,255,0.12)', borderless: true }}
+            >
+              <EditPurpleIcon width={24} height={24} />
+            </Pressable>
           </View>
         </Animated.View>
       </Pressable>
@@ -163,16 +232,28 @@ const EditForm: React.FC<Props> = ({ route, navigation }) => {
 
   return (
     <View style={styles.container}>
+      {/* Subtle purple-white gradient background */}
+      <Svg pointerEvents="none" style={StyleSheet.absoluteFillObject}>
+        <Defs>
+          <SvgLinearGradient id="bgGradEdit" x1="0%" y1="0%" x2="0%" y2="100%">
+            <Stop offset="0%" stopColor="#FFFFFF" stopOpacity="1" />
+            <Stop offset="65%" stopColor="#FFFFFF" stopOpacity="0.96" />
+            <Stop offset="85%" stopColor="#F3E9FF" stopOpacity="0.85" />
+            <Stop offset="100%" stopColor="#A060FF" stopOpacity="0.30" />
+          </SvgLinearGradient>
+        </Defs>
+        <Rect x="0" y="0" width="100%" height="100%" fill="url(#bgGradEdit)" />
+      </Svg>
       {/* Header */}
       <View style={styles.header}>
-        <Pressable onPress={() => navigation.goBack()} style={styles.backBtn} hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }} android_ripple={{ color: 'rgba(0,0,0,0.05)', borderless: true }}>
-          <BackIcon width={16} height={16} stroke="#000000" />
+        <Pressable onPress={() => navigation.goBack()} style={styles.backBtn} hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }} android_ripple={{ color: 'rgba(160,96,255,0.12)', borderless: true }}>
+          <BackIcon width={16} height={16} stroke={theme.text} />
         </Pressable>
         <View style={styles.headerCenter}>
           <Text style={styles.screenTitle}>Edit Your Forms</Text>
         </View>
         <View style={styles.headerRight}>
-          <View style={styles.headerAction}><ShareIcon width={22} height={22} stroke="#000000" /></View>
+          <View style={styles.headerAction}><ShareIcon width={22} height={22} stroke={theme.text} /></View>
         </View>
       </View>
 
@@ -187,21 +268,37 @@ const EditForm: React.FC<Props> = ({ route, navigation }) => {
         {/* Toolbar Row */}
         <View style={styles.toolsRow}>
           <Animated.View style={[styles.trashTarget, { transform: [{ scale: trashScale }] }]}> 
-            <TrashIcon width={30} height={30} stroke="#000000" />
+            <TrashIcon width={30} height={30} stroke={theme.text} />
           </Animated.View>
-          <Pressable style={styles.addBtn} onPress={() => setQuestions(prev => [...prev, { id: (prev.length + 1).toString(), title: `Question ${prev.length + 1}` }])} android_ripple={{ color: 'rgba(0,0,0,0.06)' }}>
+          <Pressable style={styles.addBtn} onPress={() => setQuestions(prev => {
+            const maxId = prev.reduce((max, q) => {
+              const n = parseInt(q.id, 10);
+              return Number.isFinite(n) ? Math.max(max, n) : max;
+            }, 0);
+            const nextId = (maxId + 1).toString();
+            const next = [...prev, { id: nextId, title: `Question ${nextId}` }];
+            if (form) {
+              updateForm(formId, {
+                answers: {
+                  ...form.answers,
+                  questions: next,
+                },
+              });
+            }
+            return next;
+          })} android_ripple={{ color: 'rgba(0,0,0,0.06)' }}>
             <Text style={styles.addBtnText}>Add a Question</Text>
           </Pressable>
           <View style={{ flex: 1 }} />
-          <Pressable style={styles.rowEndIcon} onPress={() => navigation.navigate('SwapQuestions', { formId })} android_ripple={{ color: 'rgba(0,0,0,0.06)', borderless: true }}>
-            <SwapIcon width={28} height={28} stroke="#000000" />
+          <Pressable style={styles.rowEndIcon} onPress={() => navigation.navigate('SwapQuestions', { formId })} android_ripple={{ color: 'rgba(160,96,255,0.12)', borderless: true }}>
+            <SwapIcon width={28} height={28} stroke={theme.text} />
           </Pressable>
         </View>
 
         <Animated.View style={[styles.pagedList, { opacity: listOpacity }]}>
           <Text style={styles.sectionTitle}>Questions</Text>
           {questions.slice(pageStart, pageStart + PAGE_SIZE).map((q, i) => (
-            <QuestionRow key={q.id} q={q} index={pageStart + i} />
+            <QuestionRow key={`${q.id}-${pageStart + i}`} q={q} index={pageStart + i} />
           ))}
         </Animated.View>
       </View>
@@ -217,11 +314,11 @@ const EditForm: React.FC<Props> = ({ route, navigation }) => {
               });
             }}
             style={styles.pageBtn}
-            android_ripple={pageStart === 0 ? undefined : { color: 'rgba(0,0,0,0.06)', borderless: true }}
+              android_ripple={pageStart === 0 ? undefined : { color: 'rgba(160,96,255,0.12)', borderless: true }}
             disabled={pageStart === 0}
           >
-            <View style={pageStart === 0 ? styles.iconDisabled : null}>
-              <ArrowUp width={46} height={46} stroke={pageStart === 0 ? "#CCCCCC" : "#000000"} />
+              <View style={pageStart === 0 ? styles.iconDisabled : null}>
+                <ArrowUp width={50} height={50} />
             </View>
           </Pressable>
           <Pressable 
@@ -233,11 +330,11 @@ const EditForm: React.FC<Props> = ({ route, navigation }) => {
               });
             }}
             style={styles.pageBtn}
-            android_ripple={pageStart + PAGE_SIZE >= questions.length ? undefined : { color: 'rgba(0,0,0,0.06)', borderless: true }}
+              android_ripple={pageStart + PAGE_SIZE >= questions.length ? undefined : { color: 'rgba(160,96,255,0.12)', borderless: true }}
             disabled={pageStart + PAGE_SIZE >= questions.length}
           >
-            <View style={pageStart + PAGE_SIZE >= questions.length ? styles.iconDisabled : null}>
-              <ArrowDown width={46} height={46} stroke={pageStart + PAGE_SIZE >= questions.length ? "#CCCCCC" : "#000000"} />
+              <View style={pageStart + PAGE_SIZE >= questions.length ? styles.iconDisabled : null}>
+                <ArrowDown width={50} height={50} />
             </View>
           </Pressable>
         </View>
@@ -262,14 +359,14 @@ const EditForm: React.FC<Props> = ({ route, navigation }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: theme.background,
   },
   header: {
     paddingTop: 70,
     paddingHorizontal: 24,
     paddingBottom: 8,
     borderBottomWidth: 1,
-    borderColor: '#EFEFEF',
+    borderColor: theme.border,
     flexDirection: 'row',
     justifyContent: 'space-evenly',
     alignItems: 'center',
@@ -279,7 +376,7 @@ const styles = StyleSheet.create({
     height: 32,
     borderRadius: 16,
     borderWidth: 1,
-    borderColor: '#000000',
+    borderColor: theme.primary,
     alignItems: 'center',
     justifyContent: 'center',
     marginRight: 10,
@@ -322,10 +419,10 @@ const styles = StyleSheet.create({
   },
   content: {
     flex: 1,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: theme.background,
     paddingHorizontal: 16,
     paddingTop: 10,
-    paddingBottom: 20,
+    paddingBottom: 160,
     overflow: 'visible',
   },
   toolsRow: {
@@ -347,7 +444,7 @@ const styles = StyleSheet.create({
   scrollContent: {
     padding: 20,
     paddingTop: 18,
-    paddingBottom: 24,
+    paddingBottom: 60,
   },
   scrollView: {
     overflow: 'visible',
@@ -360,11 +457,11 @@ const styles = StyleSheet.create({
   },
   pageControls: {
     position: 'absolute',
-    bottom: 50,
-    right: 30,
+    bottom: 40,
+    left: 30,
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'flex-end',
+    justifyContent: 'flex-start',
     zIndex: 30,
   },
   pageBtn: {
@@ -376,7 +473,7 @@ const styles = StyleSheet.create({
   },
   questionItem: {
     height: ITEM_HEIGHT,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: theme.card,
     borderWidth: 1,
     borderColor: '#000000',
     borderRadius: 14,
@@ -400,8 +497,8 @@ const styles = StyleSheet.create({
     textAlignVertical: 'center',
     borderRadius: 10,
     borderWidth: 1,
-    borderColor: '#000000',
-    backgroundColor: '#E6E9EF',
+    borderColor: theme.primary,
+    backgroundColor: theme.backgroundAlt,
     fontSize: 14,
     fontFamily: 'Poppins-Medium',
     color: '#000000',
@@ -424,24 +521,16 @@ const styles = StyleSheet.create({
     marginTop: 2,
   },
   qRight: {
-    width: 28,
+    width: 40,
     alignItems: 'center',
     justifyContent: 'center',
   },
-  plusCircle: {
-    width: 24,
-    height: 24,
-    borderRadius: 12,
-    borderWidth: 1,
-    borderColor: '#000000',
+  editIconBtn: {
+    width: 32,
+    height: 32,
     alignItems: 'center',
     justifyContent: 'center',
-  },
-  plusText: {
-    fontSize: 14,
-    fontFamily: 'Poppins-Medium',
-    color: '#000000',
-    lineHeight: 16,
+    borderRadius: 8,
   },
   modalOverlay: {
     flex: 1,
@@ -450,7 +539,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   modalContent: {
-    backgroundColor: '#FFFFFF',
+    backgroundColor: theme.card,
     borderRadius: 16,
     paddingVertical: 20,
     paddingHorizontal: 28,
@@ -468,9 +557,9 @@ const styles = StyleSheet.create({
   },
   addBtn: {
     alignSelf: 'flex-start',
-    backgroundColor: '#FFFFFF',
+    backgroundColor: theme.card,
     borderWidth: 2,
-    borderColor: '#000000',
+    borderColor: theme.primary,
     borderRadius: 12,
     paddingVertical: 10,
     paddingHorizontal: 14,
@@ -482,7 +571,7 @@ const styles = StyleSheet.create({
   addBtnText: {
     fontSize: 14,
     fontFamily: 'Poppins-Medium',
-    color: '#000000',
+    color: theme.primary,
   },
   sectionTitle: {
     display: 'none',

@@ -1,10 +1,13 @@
 import React, { useEffect, useState, useRef } from 'react';
-import { View, Text, StyleSheet, ScrollView, Animated, Pressable, PanResponder } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, Animated, Pressable, PanResponder, Dimensions, Vibration } from 'react-native';
+import Svg, { Defs, LinearGradient as SvgLinearGradient, Stop, Rect } from 'react-native-svg';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import type { GestureResponderEvent, PanResponderGestureState } from 'react-native';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { useFocusEffect } from '@react-navigation/native';
 import type { RootStackParamList } from '../types/navigation';
 import { useForms } from '../context/FormsContext';
+import { theme } from '../theme/Colors';
 import BackIcon from '../../assets/images/Back.svg';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'SwapQuestions'>;
@@ -21,6 +24,13 @@ const SwapQuestionsScreen: React.FC<Props> = ({ route, navigation }) => {
   
   const [questions, setQuestions] = useState<QuestionItem[]>([]);
   const fadeAnim = useRef(new Animated.Value(0)).current;
+  const scrollRef = useRef<ScrollView | null>(null);
+  const scrollYRef = useRef(0);
+  const autoScrollTimerRef = useRef<NodeJS.Timer | null>(null);
+  const scrollDeltaRef = useRef(0); // negative = up, positive = down
+  const { height: SCREEN_HEIGHT } = Dimensions.get('window');
+  const ITEM_HEIGHT = 64; // approximate row height for drag calculations
+  const insets = useSafeAreaInsets();
 
   useEffect(() => {
     // Derive questions from stored answers if present
@@ -45,48 +55,100 @@ const SwapQuestionsScreen: React.FC<Props> = ({ route, navigation }) => {
     if (toIndex < 0 || toIndex >= questions.length || toIndex === fromIndex) return;
     setQuestions(prev => {
       const copy = prev.slice();
-      const [moved] = copy.splice(fromIndex, 1);
-      copy.splice(toIndex, 0, moved);
+      const tmp = copy[fromIndex];
+      copy[fromIndex] = copy[toIndex];
+      copy[toIndex] = tmp;
+      if (form) {
+        updateForm(formId, {
+          answers: {
+            ...form.answers,
+            questions: copy,
+          },
+        });
+      }
       return copy;
     });
   };
 
-  const handleSave = async () => {
-    // Save the reordered questions back to the form
-    if (form) {
-      await updateForm(formId, {
-        answers: {
-          ...form.answers,
-          questions: questions
-        }
-      });
-      navigation.goBack();
-    }
-  };
+  // Saving occurs on each swap; no explicit save needed
 
   const SwapRow: React.FC<{ q: QuestionItem; index: number }> = ({ q, index }) => {
     const translateY = useRef(new Animated.Value(0)).current;
     const scale = useRef(new Animated.Value(1)).current;
     const opacity = useRef(new Animated.Value(1)).current;
+    const longPressTimerRef = useRef<NodeJS.Timeout | null>(null);
+    const dragActiveRef = useRef(false);
 
     const panResponder = useRef(
       PanResponder.create({
-        onStartShouldSetPanResponder: () => true,
-        onMoveShouldSetPanResponder: () => true,
+        onStartShouldSetPanResponder: () => {
+          // Arm a long-press without taking responder yet to keep scroll smooth
+          if (longPressTimerRef.current) clearTimeout(longPressTimerRef.current);
+          longPressTimerRef.current = setTimeout(() => {
+            dragActiveRef.current = true;
+            Vibration.vibrate(10);
+            Animated.parallel([
+              Animated.spring(scale, { toValue: 1.02, useNativeDriver: true }),
+              Animated.timing(opacity, { toValue: 0.96, duration: 100, useNativeDriver: true }),
+            ]).start();
+          }, 200);
+          return false; // don't capture yet; allow scroll
+        },
+        onMoveShouldSetPanResponder: () => {
+          return dragActiveRef.current; // take over only after long press armed
+        },
         onPanResponderGrant: () => {
-          Animated.parallel([
-            Animated.spring(scale, { toValue: 1.02, useNativeDriver: true }),
-            Animated.timing(opacity, { toValue: 0.96, duration: 100, useNativeDriver: true }),
-          ]).start();
+          // already armed by long-press; nothing extra needed here
         },
         onPanResponderMove: (_evt: GestureResponderEvent, gesture: PanResponderGestureState) => {
+          if (!dragActiveRef.current) return;
           translateY.setValue(gesture.dy);
+
+          // Auto-scroll when dragging near edges
+          const topEdge = 120;
+          const bottomEdge = SCREEN_HEIGHT - (insets.bottom + 40); // account for bottom inset
+          const shouldScrollUp = gesture.moveY < topEdge;
+          const shouldScrollDown = gesture.moveY > bottomEdge;
+
+          // set desired scroll direction
+          if (shouldScrollUp) {
+            scrollDeltaRef.current = -12;
+          } else if (shouldScrollDown) {
+            scrollDeltaRef.current = 12;
+          } else {
+            scrollDeltaRef.current = 0;
+          }
+
+          // start timer once; it will read latest delta from ref
+          if (!autoScrollTimerRef.current) {
+            autoScrollTimerRef.current = setInterval(() => {
+              if (!scrollRef.current) return;
+              const delta = scrollDeltaRef.current;
+              if (delta === 0) return;
+              const next = Math.max(0, scrollYRef.current + delta);
+              scrollRef.current.scrollTo({ y: next, animated: false });
+              scrollYRef.current = next;
+            }, 16);
+          }
         },
         onPanResponderRelease: (_evt: GestureResponderEvent, gesture: PanResponderGestureState) => {
-          if (Math.abs(gesture.dy) > 28) {
-            const direction = gesture.dy > 0 ? 1 : -1;
-            swapQuestions(index, index + direction);
+          if (longPressTimerRef.current) {
+            clearTimeout(longPressTimerRef.current);
+            longPressTimerRef.current = null;
           }
+          if (autoScrollTimerRef.current) {
+            clearInterval(autoScrollTimerRef.current);
+            autoScrollTimerRef.current = null;
+          }
+          scrollDeltaRef.current = 0;
+          if (dragActiveRef.current && Math.abs(gesture.dy) > ITEM_HEIGHT / 2) {
+            const steps = Math.round(gesture.dy / ITEM_HEIGHT);
+            const targetIndex = Math.max(0, Math.min(questions.length - 1, index + steps));
+            if (targetIndex !== index) {
+              swapQuestions(index, targetIndex);
+            }
+          }
+          dragActiveRef.current = false;
           Animated.parallel([
             Animated.spring(scale, { toValue: 1, useNativeDriver: true }),
             Animated.spring(opacity, { toValue: 1, useNativeDriver: true }),
@@ -94,6 +156,16 @@ const SwapQuestionsScreen: React.FC<Props> = ({ route, navigation }) => {
           ]).start();
         },
         onPanResponderTerminate: () => {
+          if (longPressTimerRef.current) {
+            clearTimeout(longPressTimerRef.current);
+            longPressTimerRef.current = null;
+          }
+          if (autoScrollTimerRef.current) {
+            clearInterval(autoScrollTimerRef.current);
+            autoScrollTimerRef.current = null;
+          }
+          scrollDeltaRef.current = 0;
+          dragActiveRef.current = false;
           Animated.parallel([
             Animated.spring(scale, { toValue: 1, useNativeDriver: true }),
             Animated.spring(opacity, { toValue: 1, useNativeDriver: true }),
@@ -116,15 +188,26 @@ const SwapQuestionsScreen: React.FC<Props> = ({ route, navigation }) => {
 
   return (
     <Animated.View style={[styles.container, { opacity: fadeAnim }]}>
+      {/* Subtle purple-white gradient background */}
+      <Svg pointerEvents="none" style={StyleSheet.absoluteFillObject}>
+        <Defs>
+          <SvgLinearGradient id="bgGradSwap" x1="0%" y1="0%" x2="0%" y2="100%">
+            <Stop offset="0%" stopColor="#FFFFFF" stopOpacity="1" />
+            <Stop offset="75%" stopColor="#FFFFFF" stopOpacity="0.96" />
+            <Stop offset="100%" stopColor="#A060FF" stopOpacity="0.12" />
+          </SvgLinearGradient>
+        </Defs>
+        <Rect x="0" y="0" width="100%" height="100%" fill="url(#bgGradSwap)" />
+      </Svg>
       {/* Header */}
       <View style={styles.header}>
         <Pressable 
           onPress={() => navigation.goBack()} 
           style={styles.backBtn} 
           hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }} 
-          android_ripple={{ color: 'rgba(0,0,0,0.05)', borderless: true }}
+          android_ripple={{ color: 'rgba(160,96,255,0.12)', borderless: true }}
         >
-          <BackIcon width={16} height={16} stroke="#000000" />
+          <BackIcon width={16} height={16} stroke={theme.text} />
         </Pressable>
         <View style={styles.headerCenter}>
           <Text style={styles.screenTitle}>Reorder Questions</Text>
@@ -140,21 +223,18 @@ const SwapQuestionsScreen: React.FC<Props> = ({ route, navigation }) => {
         </View>
 
         <ScrollView 
-          contentContainerStyle={styles.swapList} 
+          ref={ref => (scrollRef.current = ref)}
+          contentContainerStyle={[styles.swapList, { paddingBottom: insets.bottom + 24 }]}
           showsVerticalScrollIndicator={false}
+          onScroll={e => {
+            scrollYRef.current = e.nativeEvent.contentOffset.y;
+          }}
+          scrollEventThrottle={16}
         >
           {questions.map((q, i) => (
-            <SwapRow key={`swap-${q.id}`} q={q} index={i} />
+            <SwapRow key={`swap-${q.id}-${i}`} q={q} index={i} />
           ))}
         </ScrollView>
-
-        <Pressable 
-          style={styles.saveBtn} 
-          onPress={handleSave} 
-          android_ripple={{ color: 'rgba(0,0,0,0.06)' }}
-        >
-          <Text style={styles.saveBtnText}>Save Order</Text>
-        </Pressable>
       </View>
     </Animated.View>
   );
@@ -163,14 +243,14 @@ const SwapQuestionsScreen: React.FC<Props> = ({ route, navigation }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: theme.background,
   },
   header: {
     paddingTop: 70,
     paddingHorizontal: 24,
     paddingBottom: 8,
     borderBottomWidth: 1,
-    borderColor: '#EFEFEF',
+    borderColor: theme.border,
     flexDirection: 'row',
     justifyContent: 'space-evenly',
     alignItems: 'center',
@@ -180,7 +260,7 @@ const styles = StyleSheet.create({
     height: 32,
     borderRadius: 16,
     borderWidth: 1,
-    borderColor: '#000000',
+    borderColor: theme.primary,
     alignItems: 'center',
     justifyContent: 'center',
     marginRight: 10,
@@ -196,7 +276,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: '700',
     fontFamily: 'Poppins-Bold',
-    color: '#000000',
+    color: theme.text,
   },
   content: {
     flex: 1,
@@ -208,31 +288,32 @@ const styles = StyleSheet.create({
     marginBottom: 20,
     paddingBottom: 16,
     borderBottomWidth: 1,
-    borderColor: '#EFEFEF',
+    borderColor: theme.border,
   },
   infoTitle: {
     fontSize: 20,
     fontWeight: '700',
     fontFamily: 'Poppins-Bold',
-    color: '#000000',
+    color: theme.text,
     marginBottom: 8,
   },
   infoDesc: {
     fontSize: 14,
     fontFamily: 'Poppins-Regular',
-    color: '#666666',
+    color: 'rgba(0,0,0,0.6)',
     lineHeight: 20,
   },
   swapList: {
     paddingVertical: 6,
+    paddingBottom: 100, // space for floating Save button
     flexGrow: 1,
   },
   swapItem: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#FFFFFF',
+    backgroundColor: theme.card,
     borderWidth: 1,
-    borderColor: '#000000',
+    borderColor: theme.primary,
     borderRadius: 10,
     paddingVertical: 14,
     paddingHorizontal: 16,
@@ -243,36 +324,22 @@ const styles = StyleSheet.create({
     height: 32,
     borderRadius: 8,
     borderWidth: 1,
-    borderColor: '#000000',
+    borderColor: theme.primary,
     textAlign: 'center',
     textAlignVertical: 'center',
     marginRight: 14,
     fontSize: 14,
     fontFamily: 'Poppins-Medium',
-    color: '#000000',
-    backgroundColor: '#F5F5F5',
+    color: theme.text,
+    backgroundColor: theme.backgroundAlt,
   },
   swapText: {
     flex: 1,
     fontSize: 16,
     fontFamily: 'Poppins-Medium',
-    color: '#000000',
+    color: theme.text,
   },
-  saveBtn: {
-    marginTop: 20,
-    alignSelf: 'stretch',
-    backgroundColor: '#000000',
-    borderRadius: 12,
-    paddingVertical: 14,
-    paddingHorizontal: 24,
-    alignItems: 'center',
-  },
-  saveBtnText: {
-    fontSize: 16,
-    fontWeight: '600',
-    fontFamily: 'Poppins-SemiBold',
-    color: '#FFFFFF',
-  },
+  
 });
 
 export default SwapQuestionsScreen;
