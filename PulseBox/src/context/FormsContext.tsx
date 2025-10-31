@@ -12,6 +12,7 @@ export interface FormData {
 interface FormsContextType {
   forms: FormData[];
   addForm: (form: FormData) => Promise<void>;
+  updateForm: (id: string, updates: Partial<FormData>) => Promise<void>;
   deleteForm: (id: string) => Promise<void>;
   isLoading: boolean;
 }
@@ -49,6 +50,18 @@ export const FormsProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     }
   };
 
+  const updateForm = async (id: string, updates: Partial<FormData>) => {
+    try {
+      const updatedForms = forms.map(form => 
+        form.id === id ? { ...form, ...updates } : form
+      );
+      setForms(updatedForms);
+      await AsyncStorage.setItem('forms', JSON.stringify(updatedForms));
+    } catch (error) {
+      console.error('Error updating form:', error);
+    }
+  };
+
   const deleteForm = async (id: string) => {
     try {
       const updatedForms = forms.filter(form => form.id !== id);
@@ -60,7 +73,7 @@ export const FormsProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   };
 
   return (
-    <FormsContext.Provider value={{ forms, addForm, deleteForm, isLoading }}>
+    <FormsContext.Provider value={{ forms, addForm, updateForm, deleteForm, isLoading }}>
       {children}
     </FormsContext.Provider>
   );

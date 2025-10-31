@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
-import { View, Text, StyleSheet, ScrollView, Animated, TouchableWithoutFeedback, Modal, Dimensions, Pressable, PanResponder } from 'react-native';
+import { View, Text, StyleSheet, Animated, TouchableWithoutFeedback, Modal, Pressable, PanResponder } from 'react-native';
 import type { GestureResponderEvent, PanResponderGestureState } from 'react-native';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import type { RootStackParamList } from '../types/navigation';
@@ -13,7 +13,6 @@ import ArrowDown from '../../assets/images/arrow-down-white.svg';
 import BackIcon from '../../assets/images/Back.svg';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'EditForm'>;
-const { width: SCREEN_WIDTH } = Dimensions.get('window');
 
 interface QuestionItem {
   id: string;
@@ -24,12 +23,11 @@ const ITEM_HEIGHT = 96;
 
 const EditForm: React.FC<Props> = ({ route, navigation }) => {
   const { formId } = route.params;
-  const { forms, addForm } = useForms();
+  const { forms, addForm, updateForm } = useForms();
   const form = useMemo(() => forms.find(f => f.id === formId), [forms, formId]);
 
   const [questions, setQuestions] = useState<QuestionItem[]>([]);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
-  const [showSwapModal, setShowSwapModal] = useState(false);
   const trashScale = useRef(new Animated.Value(1)).current;
   const listOpacity = useRef(new Animated.Value(1)).current;
   const [pageStart, setPageStart] = useState(0);
@@ -54,6 +52,15 @@ const EditForm: React.FC<Props> = ({ route, navigation }) => {
       const copy = prev.slice();
       const [moved] = copy.splice(fromIndex, 1);
       copy.splice(toIndex, 0, moved);
+      // Save to form context
+      if (form) {
+        updateForm(formId, {
+          answers: {
+            ...form.answers,
+            questions: copy
+          }
+        });
+      }
       return copy;
     });
   };
@@ -146,56 +153,6 @@ const EditForm: React.FC<Props> = ({ route, navigation }) => {
     );
   };
 
-  const SwapRow: React.FC<{ q: QuestionItem; index: number }> = ({ q, index }) => {
-    const translateY = useRef(new Animated.Value(0)).current;
-    const scale = useRef(new Animated.Value(1)).current;
-    const opacity = useRef(new Animated.Value(1)).current;
-
-    const panResponder = useRef(
-      PanResponder.create({
-        onStartShouldSetPanResponder: () => true,
-        onMoveShouldSetPanResponder: () => true,
-        onPanResponderGrant: () => {
-          Animated.parallel([
-            Animated.spring(scale, { toValue: 1.02, useNativeDriver: true }),
-            Animated.timing(opacity, { toValue: 0.96, duration: 100, useNativeDriver: true }),
-          ]).start();
-        },
-        onPanResponderMove: (_evt: GestureResponderEvent, gesture: PanResponderGestureState) => {
-          translateY.setValue(gesture.dy);
-        },
-        onPanResponderRelease: (_evt: GestureResponderEvent, gesture: PanResponderGestureState) => {
-          if (Math.abs(gesture.dy) > 28) {
-            const direction = gesture.dy > 0 ? 1 : -1;
-            swapQuestions(index, index + direction);
-          }
-          Animated.parallel([
-            Animated.spring(scale, { toValue: 1, useNativeDriver: true }),
-            Animated.spring(opacity, { toValue: 1, useNativeDriver: true }),
-            Animated.spring(translateY, { toValue: 0, useNativeDriver: true }),
-          ]).start();
-        },
-        onPanResponderTerminate: () => {
-          Animated.parallel([
-            Animated.spring(scale, { toValue: 1, useNativeDriver: true }),
-            Animated.spring(opacity, { toValue: 1, useNativeDriver: true }),
-            Animated.spring(translateY, { toValue: 0, useNativeDriver: true }),
-          ]).start();
-        },
-      })
-    ).current;
-
-    return (
-      <Animated.View
-        style={[styles.swapItem, { transform: [{ translateY }, { scale }], opacity }]}
-        {...panResponder.panHandlers}
-      >
-        <Text style={styles.swapIndex}>{index + 1}</Text>
-        <Text style={styles.swapText}>{q.title}</Text>
-      </Animated.View>
-    );
-  };
-
   if (!form) {
     return (
       <View style={[styles.container, { alignItems: 'center', justifyContent: 'center' }]}> 
@@ -236,7 +193,7 @@ const EditForm: React.FC<Props> = ({ route, navigation }) => {
             <Text style={styles.addBtnText}>Add a Question</Text>
           </Pressable>
           <View style={{ flex: 1 }} />
-          <Pressable style={styles.rowEndIcon} onPress={() => setShowSwapModal(true)} android_ripple={{ color: 'rgba(0,0,0,0.06)', borderless: true }}>
+          <Pressable style={styles.rowEndIcon} onPress={() => navigation.navigate('SwapQuestions', { formId })} android_ripple={{ color: 'rgba(0,0,0,0.06)', borderless: true }}>
             <SwapIcon width={28} height={28} stroke="#000000" />
           </Pressable>
         </View>
@@ -247,38 +204,44 @@ const EditForm: React.FC<Props> = ({ route, navigation }) => {
             <QuestionRow key={q.id} q={q} index={pageStart + i} />
           ))}
         </Animated.View>
-
-        {questions.length > PAGE_SIZE && (
-          <View style={styles.pageControls}>
-            <Pressable 
-              onPress={() => {
-                if (pageStart === 0) return;
-                Animated.timing(listOpacity, { toValue: 0, duration: 180, useNativeDriver: true }).start(() => {
-                  setPageStart(prev => Math.max(0, prev - PAGE_SIZE));
-                  Animated.timing(listOpacity, { toValue: 1, duration: 180, useNativeDriver: true }).start();
-                });
-              }}
-              style={styles.pageBtn}
-              android_ripple={{ color: 'rgba(0,0,0,0.06)', borderless: true }}
-            >
-              <ArrowUp width={46} height={46} stroke="#000000" />
-            </Pressable>
-            <Pressable 
-              onPress={() => {
-                if (pageStart + PAGE_SIZE >= questions.length) return;
-                Animated.timing(listOpacity, { toValue: 0, duration: 180, useNativeDriver: true }).start(() => {
-                  setPageStart(prev => Math.min(questions.length - PAGE_SIZE, prev + PAGE_SIZE));
-                  Animated.timing(listOpacity, { toValue: 1, duration: 180, useNativeDriver: true }).start();
-                });
-              }}
-              style={[styles.pageBtn]}
-              android_ripple={{ color: 'rgba(0,0,0,0.06)', borderless: true }}
-            >
-              <ArrowDown width={46} height={46} stroke="#000000" />
-            </Pressable>
-          </View>
-        )}
       </View>
+
+      {questions.length > PAGE_SIZE && (
+        <View style={styles.pageControls}>
+          <Pressable 
+            onPress={() => {
+              if (pageStart === 0) return;
+              Animated.timing(listOpacity, { toValue: 0, duration: 150, useNativeDriver: true }).start(() => {
+                setPageStart(prev => Math.max(0, prev - PAGE_SIZE));
+                Animated.timing(listOpacity, { toValue: 1, duration: 300, useNativeDriver: true }).start();
+              });
+            }}
+            style={styles.pageBtn}
+            android_ripple={pageStart === 0 ? undefined : { color: 'rgba(0,0,0,0.06)', borderless: true }}
+            disabled={pageStart === 0}
+          >
+            <View style={pageStart === 0 ? styles.iconDisabled : null}>
+              <ArrowUp width={46} height={46} stroke={pageStart === 0 ? "#CCCCCC" : "#000000"} />
+            </View>
+          </Pressable>
+          <Pressable 
+            onPress={() => {
+              if (pageStart + PAGE_SIZE >= questions.length) return;
+              Animated.timing(listOpacity, { toValue: 0, duration: 150, useNativeDriver: true }).start(() => {
+                setPageStart(prev => Math.min(questions.length - PAGE_SIZE, prev + PAGE_SIZE));
+                Animated.timing(listOpacity, { toValue: 1, duration: 300, useNativeDriver: true }).start();
+              });
+            }}
+            style={styles.pageBtn}
+            android_ripple={pageStart + PAGE_SIZE >= questions.length ? undefined : { color: 'rgba(0,0,0,0.06)', borderless: true }}
+            disabled={pageStart + PAGE_SIZE >= questions.length}
+          >
+            <View style={pageStart + PAGE_SIZE >= questions.length ? styles.iconDisabled : null}>
+              <ArrowDown width={46} height={46} stroke={pageStart + PAGE_SIZE >= questions.length ? "#CCCCCC" : "#000000"} />
+            </View>
+          </Pressable>
+        </View>
+      )}
 
       {/* Delete toast */}
       <Modal visible={showDeleteModal} transparent animationType="fade">
@@ -292,31 +255,6 @@ const EditForm: React.FC<Props> = ({ route, navigation }) => {
         </TouchableWithoutFeedback>
       </Modal>
 
-      {/* Swap Modal */}
-      <Modal visible={showSwapModal} transparent animationType="fade">
-        <TouchableWithoutFeedback onPress={() => setShowSwapModal(false)}>
-          <View style={styles.modalOverlay}>
-            <TouchableWithoutFeedback>
-              <View style={styles.swapPanel}>
-                <View style={styles.swapHeaderRow}>
-                  <Text style={styles.swapTitle}>Swap the Questions</Text>
-                  <Pressable onPress={() => setShowSwapModal(false)} hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}>
-                    <Text style={styles.swapClose}>✕</Text>
-                  </Pressable>
-                </View>
-                <ScrollView contentContainerStyle={styles.swapList} showsVerticalScrollIndicator={false}>
-                  {questions.map((q, i) => (
-                    <SwapRow key={`swap-${q.id}`} q={q} index={i} />
-                  ))}
-                </ScrollView>
-                <Pressable style={styles.swapDoneBtn} onPress={() => setShowSwapModal(false)} android_ripple={{ color: 'rgba(0,0,0,0.06)' }}>
-                  <Text style={styles.swapDoneText}>Done</Text>
-                </Pressable>
-              </View>
-            </TouchableWithoutFeedback>
-          </View>
-        </TouchableWithoutFeedback>
-      </Modal>
     </View>
   );
 };
@@ -387,7 +325,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#FFFFFF',
     paddingHorizontal: 16,
     paddingTop: 10,
-    paddingBottom: 8,
+    paddingBottom: 20,
     overflow: 'visible',
   },
   toolsRow: {
@@ -418,12 +356,12 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
     paddingTop: 10,
     paddingBottom: 10,
-    marginBottom: 10,
+    marginBottom: 20,
   },
   pageControls: {
     position: 'absolute',
-    bottom: 40,
-    left: 30,
+    bottom: 50,
+    right: 30,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'flex-end',
@@ -432,6 +370,9 @@ const styles = StyleSheet.create({
   pageBtn: {
     padding: 4,
     borderRadius: 8,
+  },
+  iconDisabled: {
+    opacity: 0.3,
   },
   questionItem: {
     height: ITEM_HEIGHT,
@@ -514,78 +455,6 @@ const styles = StyleSheet.create({
     paddingVertical: 20,
     paddingHorizontal: 28,
     alignItems: 'center',
-  },
-  swapPanel: {
-    backgroundColor: '#FFFFFF',
-    borderRadius: 12,
-    paddingVertical: 14,
-    paddingHorizontal: 14,
-    width: '90%',
-    maxHeight: '75%',
-    elevation: 8,
-  },
-  swapHeaderRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    marginBottom: 10,
-  },
-  swapTitle: {
-    fontSize: 18,
-    fontWeight: '700',
-    fontFamily: 'Poppins-Bold',
-    color: '#000000',
-  },
-  swapClose: {
-    fontSize: 18,
-    color: '#000000',
-  },
-  swapList: {
-    paddingVertical: 6,
-  },
-  swapItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#FFFFFF',
-    borderWidth: 1,
-    borderColor: '#000000',
-    borderRadius: 10,
-    paddingVertical: 10,
-    paddingHorizontal: 12,
-    marginBottom: 10,
-  },
-  swapIndex: {
-    width: 24,
-    height: 24,
-    borderRadius: 8,
-    borderWidth: 1,
-    borderColor: '#000000',
-    textAlign: 'center',
-    textAlignVertical: 'center',
-    marginRight: 10,
-    fontSize: 12,
-    fontFamily: 'Poppins-Medium',
-    color: '#000000',
-  },
-  swapText: {
-    flex: 1,
-    fontSize: 14,
-    fontFamily: 'Poppins-Medium',
-    color: '#000000',
-  },
-  swapDoneBtn: {
-    marginTop: 6,
-    alignSelf: 'flex-end',
-    borderWidth: 1,
-    borderColor: '#000000',
-    borderRadius: 10,
-    paddingVertical: 8,
-    paddingHorizontal: 12,
-  },
-  swapDoneText: {
-    fontSize: 14,
-    fontFamily: 'Poppins-Medium',
-    color: '#000000',
   },
   modalIcon: {
     fontSize: 40,
