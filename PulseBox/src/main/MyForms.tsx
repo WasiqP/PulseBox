@@ -1,7 +1,7 @@
 import React, { useState, useRef } from 'react';
 import { View, Text, StyleSheet, ScrollView, Animated, Modal, TouchableWithoutFeedback, Dimensions, Pressable } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { NativeStackScreenProps } from '@react-navigation/native-stack';
+import { NativeStackScreenProps, NativeStackNavigationProp } from '@react-navigation/native-stack';
 import type { RootStackParamList } from '../types/navigation';
 import BottomTab from '../components/BottomTab';
 import Svg, { Path } from 'react-native-svg';
@@ -41,9 +41,10 @@ interface FormItemProps {
   onDelete: (id: string) => void;
   onDragStart: () => void;
   onDragEnd: () => void;
+  navigation: NativeStackNavigationProp<RootStackParamList, 'MyForms'>;
 }
 
-const FormItem = ({ form, onDelete, onDragStart, onDragEnd }: FormItemProps) => {
+const FormItem = ({ form, onDelete, onDragStart, onDragEnd, navigation }: FormItemProps) => {
   const [isDragging, setIsDragging] = useState(false);
   const translateX = useRef(new Animated.Value(0)).current;
   const translateY = useRef(new Animated.Value(0)).current;
@@ -183,8 +184,26 @@ const FormItem = ({ form, onDelete, onDragStart, onDragEnd }: FormItemProps) => 
         <Text style={styles.placeholderLine2}>Created {new Date(form.createdAt).toLocaleDateString()}</Text>
       </View>
       <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-        <View style={styles.plusContainer}><EditIcon width={18} height={18} stroke="#000000" /></View>
-        <View style={[styles.plusContainer, { marginLeft: 8 }]}><ShareIcon width={18} height={18} stroke="#000000" /></View>
+        <Pressable 
+          style={styles.plusContainer}
+          onPress={(e) => {
+            e.stopPropagation();
+            navigation.navigate('EditForm', { formId: form.id });
+          }}
+          android_ripple={{ color: 'rgba(0,0,0,0.06)', borderless: true }}
+        >
+          <EditIcon width={18} height={18} stroke="#000000" />
+        </Pressable>
+        <Pressable 
+          style={[styles.plusContainer, { marginLeft: 8 }]}
+          onPress={(e) => {
+            e.stopPropagation();
+            navigation.navigate('ShareForm', { formId: form.id });
+          }}
+          android_ripple={{ color: 'rgba(0,0,0,0.06)', borderless: true }}
+        >
+          <ShareIcon width={18} height={18} stroke="#000000" />
+        </Pressable>
       </View>
     </Animated.View>
     </View>
@@ -260,6 +279,7 @@ const MyForms: React.FC<Props> = ({ navigation, route }) => {
                 onDelete={handleDelete}
                 onDragStart={handleDragStart}
                 onDragEnd={handleDragEnd}
+                navigation={navigation}
               />
               </Pressable>
             ))

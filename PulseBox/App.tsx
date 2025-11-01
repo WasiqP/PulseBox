@@ -28,6 +28,7 @@ import FormBuilder from './src/forms/FormBuilder';
 import EditForm from './src/forms/EditForm.tsx';
 import QuestionsScreen from './src/forms/QuestionsScreen.tsx';
 import SwapQuestionsScreen from './src/forms/SwapQuestionsScreen.tsx';
+import ShareForm from './src/forms/ShareForm.tsx';
 
 // Navigation types
 import type { RootStackParamList } from './src/types/navigation';
@@ -62,6 +63,7 @@ function App() {
           <Stack.Screen name="FormBuilder" component={FormBuilder} />
           <Stack.Screen name="EditForm" component={EditForm} />
           <Stack.Screen name="QuestionsScreen" component={QuestionsScreen} />
+          <Stack.Screen name="ShareForm" component={ShareForm} />
           <Stack.Screen 
             name="SwapQuestions" 
             component={SwapQuestionsScreen}

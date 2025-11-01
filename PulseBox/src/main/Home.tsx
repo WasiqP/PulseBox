@@ -201,8 +201,26 @@ const Home: React.FC<Props> = ({ navigation }) => {
                       <Text style={styles.formCardSubtitle}>Created {new Date(form.createdAt).toLocaleDateString()}</Text>
                     </View>
                     <View style={styles.actionsRow}>
-                      <View style={styles.formCardAction}><EditIcon width={20} height={20} stroke="#000000" /></View>
-                      <View style={[styles.formCardAction, { marginLeft: 8 }]}><ShareIcon width={20} height={20} stroke="#000000" /></View>
+                      <Pressable 
+                        style={styles.formCardAction}
+                        onPress={(e) => {
+                          e.stopPropagation();
+                          navigation.navigate('EditForm', { formId: form.id });
+                        }}
+                        android_ripple={{ color: 'rgba(0,0,0,0.06)', borderless: true }}
+                      >
+                        <EditIcon width={20} height={20} stroke="#000000" />
+                      </Pressable>
+                      <Pressable 
+                        style={[styles.formCardAction, { marginLeft: 8 }]}
+                        onPress={(e) => {
+                          e.stopPropagation();
+                          navigation.navigate('ShareForm', { formId: form.id });
+                        }}
+                        android_ripple={{ color: 'rgba(0,0,0,0.06)', borderless: true }}
+                      >
+                        <ShareIcon width={20} height={20} stroke="#000000" />
+                      </Pressable>
                     </View>
                   </Pressable>
                 ))

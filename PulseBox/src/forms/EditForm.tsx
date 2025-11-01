@@ -3,6 +3,7 @@ import { View, Text, StyleSheet, Animated, TouchableWithoutFeedback, Modal, Pres
 import Svg, { Defs, LinearGradient as SvgLinearGradient, Stop, Rect } from 'react-native-svg';
 import type { GestureResponderEvent, PanResponderGestureState } from 'react-native';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
+import { useFocusEffect } from '@react-navigation/native';
 import type { RootStackParamList } from '../types/navigation';
 import { theme } from '../theme/Colors';
 import { useForms } from '../context/FormsContext';
@@ -14,13 +15,9 @@ import SwapIcon from '../../assets/images/swap.svg';
 import ArrowUp from '../../assets/images/purple-arrow-up.svg';
 import ArrowDown from '../../assets/images/purple-arrow-down.svg';
 import BackIcon from '../../assets/images/Back.svg';
+import type { QuestionData, QuestionType } from './QuestionsScreen';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'EditForm'>;
-
-interface QuestionItem {
-  id: string;
-  title: string;
-}
 
 const ITEM_HEIGHT = 96;
 
@@ -29,19 +26,35 @@ const EditForm: React.FC<Props> = ({ route, navigation }) => {
   const { forms, addForm, updateForm } = useForms();
   const form = useMemo(() => forms.find(f => f.id === formId), [forms, formId]);
 
-  const [questions, setQuestions] = useState<QuestionItem[]>([]);
+  const [questions, setQuestions] = useState<QuestionData[]>([]);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const trashScale = useRef(new Animated.Value(1)).current;
   const listOpacity = useRef(new Animated.Value(1)).current;
   const [pageStart, setPageStart] = useState(0);
   const PAGE_SIZE = 4;
 
-  useEffect(() => {
+  const loadQuestions = () => {
     // derive questions from stored answers if present
-    const derived: QuestionItem[] = (form?.answers?.questions as QuestionItem[] | undefined)
-      || Array.from({ length: 6 }).map((_, i) => ({ id: `${i + 1}`, title: `Question ${i + 1}` }));
+    const derived: QuestionData[] = (form?.answers?.questions as QuestionData[] | undefined)
+      || Array.from({ length: 6 }).map((_, i) => ({ 
+          id: `${i + 1}`, 
+          title: `Question ${i + 1}`,
+          type: 'shortText' as QuestionType,
+          required: false
+        }));
     setQuestions(derived);
+  };
+
+  useEffect(() => {
+    loadQuestions();
   }, [form]);
+
+  // Reload questions when screen comes into focus (e.g., returning from QuestionsScreen)
+  useFocusEffect(
+    React.useCallback(() => {
+      loadQuestions();
+    }, [form])
+  );
 
   const handleDeleteByIndex = (index: number) => {
     setQuestions(prev => {
@@ -80,7 +93,7 @@ const EditForm: React.FC<Props> = ({ route, navigation }) => {
     });
   };
 
-  const QuestionRow: React.FC<{ q: QuestionItem; index: number }> = ({ q, index }) => {
+  const QuestionRow: React.FC<{ q: QuestionData; index: number }> = ({ q, index }) => {
     const translateX = useRef(new Animated.Value(0)).current;
     const translateY = useRef(new Animated.Value(0)).current;
     const scale = useRef(new Animated.Value(1)).current;
@@ -202,8 +215,33 @@ const EditForm: React.FC<Props> = ({ route, navigation }) => {
             <Text style={styles.qIndex}>{index + 1}</Text>
           </View>
           <View style={styles.qContent}>
-            <Text style={styles.qTitle}>{q.title}</Text>
-            <Text style={styles.qSub}>Tap to edit details</Text>
+            <Text style={styles.qTitle}>{q.title || 'Untitled Question'}</Text>
+            <View style={styles.qSubRow}>
+              <Text style={styles.qSub}>
+                {q.type === 'multipleChoice' && q.options && q.options.length > 0 
+                  ? `${q.options.length} options`
+                  : q.type === 'checkbox' && q.options && q.options.length > 0
+                  ? `${q.options.length} options`
+                  : q.type === 'dropdown' && q.options && q.options.length > 0
+                  ? `${q.options.length} options`
+                  : q.type === 'rating'
+                  ? `Rating (${q.maxRating || 5} max)`
+                  : q.type === 'number'
+                  ? `Number${q.min !== undefined || q.max !== undefined ? ' (constrained)' : ''}`
+                  : q.type === 'date'
+                  ? `Date (${q.dateFormat || 'MM/DD/YYYY'})`
+                  : q.type === 'shortText' || q.type === 'longText'
+                  ? `${q.type === 'shortText' ? 'Short' : 'Long'} Answer${q.maxLength ? ` (${q.maxLength} chars)` : ''}`
+                  : q.type === 'email'
+                  ? 'Email'
+                  : q.type ? q.type.charAt(0).toUpperCase() + q.type.slice(1) : 'Question'}
+              </Text>
+              {q.required && (
+                <View style={styles.requiredBadge}>
+                  <Text style={styles.requiredText}>Required</Text>
+                </View>
+              )}
+            </View>
           </View>
           <View style={styles.qRight}>
             <Pressable 
@@ -253,7 +291,13 @@ const EditForm: React.FC<Props> = ({ route, navigation }) => {
           <Text style={styles.screenTitle}>Edit Your Forms</Text>
         </View>
         <View style={styles.headerRight}>
-          <View style={styles.headerAction}><ShareIcon width={22} height={22} stroke={theme.text} /></View>
+          <Pressable 
+            style={styles.headerAction}
+            onPress={() => navigation.navigate('ShareForm', { formId })}
+            android_ripple={{ color: 'rgba(160,96,255,0.12)', borderless: true }}
+          >
+            <ShareIcon width={22} height={22} stroke={theme.text} />
+          </Pressable>
         </View>
       </View>
 
@@ -276,7 +320,12 @@ const EditForm: React.FC<Props> = ({ route, navigation }) => {
               return Number.isFinite(n) ? Math.max(max, n) : max;
             }, 0);
             const nextId = (maxId + 1).toString();
-            const next = [...prev, { id: nextId, title: `Question ${nextId}` }];
+            const next = [...prev, { 
+              id: nextId, 
+              title: `Question ${nextId}`,
+              type: 'shortText' as QuestionType,
+              required: false
+            }];
             if (form) {
               updateForm(formId, {
                 answers: {
@@ -514,11 +563,30 @@ const styles = StyleSheet.create({
     fontFamily: 'Poppins-Medium',
     color: '#000000',
   },
+  qSubRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginTop: 4,
+    gap: 8,
+    flexWrap: 'wrap',
+  },
   qSub: {
     fontSize: 12,
     fontFamily: 'Poppins-Regular',
     color: '#888888',
-    marginTop: 2,
+  },
+  requiredBadge: {
+    backgroundColor: '#FFE5E5',
+    borderWidth: 1,
+    borderColor: '#FF6B6B',
+    borderRadius: 8,
+    paddingHorizontal: 8,
+    paddingVertical: 2,
+  },
+  requiredText: {
+    fontSize: 10,
+    fontFamily: 'Poppins-SemiBold',
+    color: '#D32F2F',
   },
   qRight: {
     width: 40,

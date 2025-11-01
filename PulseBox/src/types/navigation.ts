@@ -15,6 +15,7 @@ export type RootStackParamList = {
   EditForm: { formId: string };
   QuestionsScreen: { formId: string; questionId: string };
   SwapQuestions: { formId: string };
+  ShareForm: { formId: string };
 };
 
 
