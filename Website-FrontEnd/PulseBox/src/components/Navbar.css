@@ -1,0 +1,223 @@
+.navbar {
+  position: fixed;
+  top: 3rem;
+  left: 0;
+  right: 0;
+  width: 60%;
+  max-width: 800px;
+  margin: 0 auto;
+  z-index: 1000;
+  background: #A060FF;
+  transition: all 0.3s ease;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 32px;
+  box-shadow: 0 4px 20px rgba(160, 96, 255, 0.3);
+}
+
+.navbar.scrolled {
+  background: #A060FF;
+  box-shadow: 0 4px 20px rgba(160, 96, 255, 0.4);
+  border-bottom-color: rgba(255, 255, 255, 0.2);
+}
+
+.navbar-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 1.25rem 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 2rem;
+}
+
+.navbar-logo {
+  font-size: 1.5rem;
+  font-weight: 800;
+  font-family: 'Poppins', sans-serif;
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+  gap: 0;
+}
+
+.navbar-logo-image {
+  height: 40px;
+  width: auto;
+  object-fit: contain;
+  transition: transform 0.3s ease;
+}
+
+.navbar-logo-image:hover {
+  transform: scale(1.05);
+}
+
+.navbar-menu {
+  display: flex;
+  gap: 2rem;
+  align-items: center;
+}
+
+.navbar-link {
+  color: #FFFFFF;
+  text-decoration: none;
+  font-weight: 500;
+  font-size: 0.95rem;
+  transition: all 0.3s ease;
+  position: relative;
+  opacity: 0.9;
+}
+
+.navbar-link:hover {
+  color: #FFFFFF;
+  opacity: 1;
+}
+
+.navbar-link.active {
+  color: #FFFFFF;
+  font-weight: 600;
+  opacity: 1;
+}
+
+.navbar-link.active::after {
+  content: '';
+  position: absolute;
+  bottom: -4px;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: #FFFFFF;
+  border-radius: 2px;
+}
+
+.navbar-actions {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.navbar-button-primary {
+  background: #FFFFFF;
+  color: #A060FF;
+  padding: 0.75rem 1.5rem;
+  border-radius: 12px;
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 0.95rem;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.navbar-button-primary:hover {
+  background: #F8F5FF;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
+}
+
+/* Mobile Menu */
+.mobile-menu-button {
+  display: none;
+  flex-direction: column;
+  gap: 4px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0.5rem;
+}
+
+.mobile-menu-button span {
+  width: 24px;
+  height: 2px;
+  background: #FFFFFF;
+  border-radius: 2px;
+  transition: all 0.3s ease;
+}
+
+.mobile-menu-button span:nth-child(1).open {
+  transform: rotate(45deg) translate(6px, 6px);
+}
+
+.mobile-menu-button span:nth-child(2).open {
+  opacity: 0;
+}
+
+.mobile-menu-button span:nth-child(3).open {
+  transform: rotate(-45deg) translate(6px, -6px);
+}
+
+.mobile-menu {
+  display: none;
+  flex-direction: column;
+  padding: 1rem 2rem;
+  background: #A060FF;
+  border-top: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 0 0 32px 32px;
+}
+
+.mobile-menu-link {
+  color: #FFFFFF;
+  text-decoration: none;
+  padding: 1rem 0;
+  font-weight: 500;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  transition: all 0.3s ease;
+  opacity: 0.9;
+}
+
+.mobile-menu-link:hover,
+.mobile-menu-link.active {
+  color: #FFFFFF;
+  opacity: 1;
+}
+
+.mobile-menu-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.mobile-menu-button {
+  display: block;
+  padding: 0.75rem 1.5rem;
+  border-radius: 12px;
+  text-decoration: none;
+  text-align: center;
+  font-weight: 600;
+  border: 2px solid #FFFFFF;
+  color: #FFFFFF;
+  background: transparent;
+  transition: all 0.3s ease;
+}
+
+.mobile-menu-button.primary {
+  background: #FFFFFF;
+  color: #A060FF;
+  border-color: #FFFFFF;
+}
+
+.mobile-menu-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(160, 96, 255, 0.3);
+}
+
+@media (max-width: 768px) {
+  .navbar-menu,
+  .navbar-actions {
+    display: none;
+  }
+
+  .mobile-menu-button {
+    display: flex;
+  }
+
+  .mobile-menu {
+    display: flex;
+  }
+
+  .navbar-container {
+    padding: 1rem 1.5rem;
+  }
+}
+
