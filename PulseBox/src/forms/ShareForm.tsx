@@ -1,47 +1,18 @@
 import React, { useState, useRef } from 'react';
-import { View, Text, StyleSheet, ScrollView, Pressable, TextInput, Alert, Dimensions, Share as RNShare } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, Pressable, TextInput, Alert, Dimensions, Share as RNShare, Linking } from 'react-native';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import type { RootStackParamList } from '../types/navigation';
 import { useForms } from '../context/FormsContext';
 import { theme } from '../theme/Colors';
 import BackIcon from '../../assets/images/Back.svg';
 import ShareIcon from '../../assets/images/share.svg';
-import Svg, { Rect, Path } from 'react-native-svg';
-// import { ViewShot } from 'react-native-view-shot'; // Install react-native-view-shot if needed
+import Clipboard from '@react-native-clipboard/clipboard';
+import QRCode from 'react-native-qrcode-svg';
+import { captureRef } from 'react-native-view-shot';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'ShareForm'>;
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
-
-// Simple QR Code Component (Basic representation)
-const QRCodePlaceholder: React.FC<{ size: number }> = ({ size }) => {
-  // This is a placeholder QR pattern - in production, use react-native-qrcode-svg or similar
-  const gridSize = 25;
-  const cellSize = size / gridSize;
-  
-  return (
-    <View style={[styles.qrContainer, { width: size, height: size }]}>
-      <Svg width={size} height={size} viewBox={`0 0 ${size} ${size}`}>
-        {/* QR pattern placeholder - alternating pattern */}
-        {Array.from({ length: gridSize }).map((_, i) =>
-          Array.from({ length: gridSize }).map((_, j) => {
-            const shouldFill = (i + j) % 3 === 0 || (i === 0 || i === gridSize - 1 || j === 0 || j === gridSize - 1);
-            return (
-              <Rect
-                key={`${i}-${j}`}
-                x={j * cellSize}
-                y={i * cellSize}
-                width={cellSize}
-                height={cellSize}
-                fill={shouldFill ? '#000000' : '#FFFFFF'}
-              />
-            );
-          })
-        )}
-      </Svg>
-    </View>
-  );
-};
 
 const ShareForm: React.FC<Props> = ({ route, navigation }) => {
   const { formId } = route.params;
@@ -57,9 +28,27 @@ const ShareForm: React.FC<Props> = ({ route, navigation }) => {
     : '';
 
   const copyToClipboard = async () => {
-    // In React Native, use Clipboard API
-    Alert.alert('Link Copied', 'Form link has been copied to clipboard');
-    // Clipboard.setString(formLink);
+    try {
+      await Clipboard.setString(formLink);
+      Alert.alert('Link Copied', 'Form link has been copied to clipboard');
+    } catch (error) {
+      console.error('Error copying to clipboard:', error);
+      Alert.alert('Error', 'Failed to copy link to clipboard');
+    }
+  };
+
+  const openInBrowser = async () => {
+    try {
+      const supported = await Linking.canOpenURL(formLink);
+      if (supported) {
+        await Linking.openURL(formLink);
+      } else {
+        Alert.alert('Error', `Cannot open URL: ${formLink}`);
+      }
+    } catch (error) {
+      console.error('Error opening URL:', error);
+      Alert.alert('Error', 'Failed to open link in browser');
+    }
   };
 
   const shareLink = async () => {
@@ -104,12 +93,16 @@ const ShareForm: React.FC<Props> = ({ route, navigation }) => {
   const saveQRCode = async () => {
     try {
       if (viewShotRef.current) {
-        const uri = await viewShotRef.current.capture();
-        Alert.alert('QR Code Saved', 'QR code has been saved to your gallery');
-        // You can use CameraRoll.save(uri) to save to gallery
+        const uri = await captureRef(viewShotRef, {
+          format: 'png',
+          quality: 1.0,
+        });
+        Alert.alert('QR Code Saved', `QR code has been saved to: ${uri}`);
+        // Note: To save to gallery, you may need to use a library like react-native-fs or expo-media-library
       }
     } catch (error) {
       console.error('Error saving QR code:', error);
+      Alert.alert('Error', 'Failed to save QR code');
     }
   };
 
@@ -165,8 +158,21 @@ const ShareForm: React.FC<Props> = ({ route, navigation }) => {
               <Text style={styles.previewFormName}>{form.name}</Text>
             </View>
             <Text style={styles.previewDescription}>
-              Share this form with others to collect responses
+              Share this form with others to collect responses. This form will be accessible on the web.
             </Text>
+            {/* Web Sharing Indicator */}
+            <View style={styles.webIndicator}>
+              <Text style={styles.webIndicatorText}>🌐 Web Form</Text>
+              <Text style={styles.webIndicatorSubtext}>This form will be published on the web</Text>
+            </View>
+            {/* Preview Button */}
+            <Pressable
+              style={styles.previewBtn}
+              onPress={openInBrowser}
+              android_ripple={{ color: 'rgba(160,96,255,0.12)' }}
+            >
+              <Text style={styles.previewBtnText}>Preview in Browser</Text>
+            </Pressable>
           </View>
         </View>
 
@@ -214,8 +220,16 @@ const ShareForm: React.FC<Props> = ({ route, navigation }) => {
                 </Pressable>
               </View>
               <Text style={styles.helperText}>
-                Share this link with anyone to allow them to fill out your form
+                Share this link with anyone to allow them to fill out your form on the web
               </Text>
+              {/* Open in Browser Button */}
+              <Pressable
+                style={styles.openBrowserBtn}
+                onPress={openInBrowser}
+                android_ripple={{ color: 'rgba(0,0,0,0.06)' }}
+              >
+                <Text style={styles.openBrowserBtnText}>Open in Browser</Text>
+              </Pressable>
             </View>
 
             {/* Quick Share Actions */}
@@ -283,9 +297,14 @@ const ShareForm: React.FC<Props> = ({ route, navigation }) => {
               
               <View style={styles.qrWrapper}>
                 <View ref={viewShotRef} style={styles.qrCard}>
-                  <QRCodePlaceholder size={250} />
+                  <QRCode
+                    value={formLink}
+                    size={250}
+                    color="#000000"
+                    backgroundColor="#FFFFFF"
+                  />
                   <Text style={styles.qrFormName}>{form.name}</Text>
-                  <Text style={styles.qrHelperText}>Scan to access form</Text>
+                  <Text style={styles.qrHelperText}>Scan to access form on web</Text>
                 </View>
               </View>
 
@@ -613,6 +632,52 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontFamily: 'Poppins-Regular',
     color: '#666666',
+  },
+  webIndicator: {
+    marginTop: 12,
+    padding: 12,
+    backgroundColor: '#E8F5E9',
+    borderWidth: 1,
+    borderColor: '#4CAF50',
+    borderRadius: 8,
+    alignItems: 'center',
+  },
+  webIndicatorText: {
+    fontSize: 14,
+    fontFamily: 'Poppins-SemiBold',
+    color: '#2E7D32',
+    marginBottom: 4,
+  },
+  webIndicatorSubtext: {
+    fontSize: 12,
+    fontFamily: 'Poppins-Regular',
+    color: '#4CAF50',
+  },
+  previewBtn: {
+    marginTop: 12,
+    backgroundColor: '#000000',
+    borderRadius: 12,
+    paddingVertical: 12,
+    alignItems: 'center',
+  },
+  previewBtnText: {
+    fontSize: 14,
+    fontFamily: 'Poppins-SemiBold',
+    color: '#FFFFFF',
+  },
+  openBrowserBtn: {
+    marginTop: 12,
+    backgroundColor: '#F5F5F5',
+    borderWidth: 1,
+    borderColor: '#000000',
+    borderRadius: 12,
+    paddingVertical: 14,
+    alignItems: 'center',
+  },
+  openBrowserBtnText: {
+    fontSize: 14,
+    fontFamily: 'Poppins-SemiBold',
+    color: '#000000',
   },
 });
 
