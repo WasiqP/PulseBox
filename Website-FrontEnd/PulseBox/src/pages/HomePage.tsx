@@ -1,4 +1,4 @@
-import { useRef } from 'react';
+import { useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import type { Variants } from 'framer-motion';
@@ -14,11 +14,12 @@ import {
   FiUpload,
   FiTrendingUp
 } from 'react-icons/fi';
-import { FaStar } from 'react-icons/fa';
+import TestimonialsBento from '../components/TestimonialsBento';
 import './HomePage.css';
 
 const HomePage = () => {
   const heroRef = useRef<HTMLDivElement>(null);
+  const [openFaq, setOpenFaq] = useState<number | null>(null);
 
   // Animation variants
   const fadeInUp: Variants = {
@@ -40,6 +41,73 @@ const HomePage = () => {
       transition: {
         staggerChildren: 0.2,
         delayChildren: 0.3
+      }
+    }
+  };
+
+  // Timeline-specific animation variants
+  const timelineItemVariants: Variants = {
+    hidden: { 
+      opacity: 0, 
+      x: -100,
+      scale: 0.8
+    },
+    visible: { 
+      opacity: 1, 
+      x: 0,
+      scale: 1,
+      transition: { 
+        duration: 0.8,
+        ease: [0.6, -0.05, 0.01, 0.99] as [number, number, number, number],
+        staggerChildren: 0.2
+      }
+    }
+  };
+
+  const timelineDotVariants: Variants = {
+    hidden: { 
+      scale: 0,
+      rotate: -180,
+      opacity: 0
+    },
+    visible: { 
+      scale: 1,
+      rotate: 0,
+      opacity: 1,
+      transition: { 
+        duration: 0.6,
+        ease: [0.34, 1.56, 0.64, 1] as [number, number, number, number]
+      }
+    }
+  };
+
+  const timelineContentVariants: Variants = {
+    hidden: { 
+      opacity: 0,
+      y: 30
+    },
+    visible: { 
+      opacity: 1,
+      y: 0,
+      transition: { 
+        duration: 0.6,
+        delay: 0.3,
+        ease: "easeOut"
+      }
+    }
+  };
+
+  const timelineLineVariants: Variants = {
+    hidden: { 
+      scaleY: 0,
+      opacity: 0
+    },
+    visible: { 
+      scaleY: 1,
+      opacity: 1,
+      transition: { 
+        duration: 0.8,
+        ease: "easeInOut"
       }
     }
   };
@@ -156,53 +224,76 @@ const HomePage = () => {
             Everything you need to collect, analyze, and act on feedback
           </motion.p>
 
-          <div className="features-grid">
+          <div className="features-showcase">
             {[
               {
                 icon: FiFileText,
                 title: 'Custom Forms',
-                description: 'Create beautiful forms with multiple question types tailored to your needs.'
+                description: 'Create beautiful forms with multiple question types tailored to your needs.',
+                style: 'gradient',
+                gradient: 'linear-gradient(135deg, rgba(160, 96, 255, 0.15) 0%, rgba(138, 77, 230, 0.1) 100%)'
               },
               {
                 icon: FiBarChart2,
                 title: 'Analytics Dashboard',
-                description: 'View responses and insights in real-time with our intuitive dashboard.'
+                description: 'View responses and insights in real-time with our intuitive dashboard.',
+                style: 'outlined',
+                accent: '#A060FF'
               },
               {
                 icon: FiLink,
                 title: 'Easy Sharing',
-                description: 'Share forms via links or QR codes with just one click.'
+                description: 'Share forms via links or QR codes with just one click.',
+                style: 'solid',
+                bgColor: '#A060FF'
               },
               {
                 icon: FiSmartphone,
                 title: 'Mobile & Web',
-                description: 'Access your forms and responses from any device, anywhere.'
+                description: 'Access your forms and responses from any device, anywhere.',
+                style: 'minimal',
+                borderStyle: 'dashed'
               },
               {
                 icon: FiLock,
                 title: 'Secure & Private',
-                description: 'Your data is protected with enterprise-grade security.'
+                description: 'Your data is protected with enterprise-grade security.',
+                style: 'gradient',
+                gradient: 'linear-gradient(135deg, rgba(160, 96, 255, 0.1) 0%, rgba(138, 77, 230, 0.15) 100%)'
               },
               {
                 icon: FiZap,
                 title: 'Real-time Updates',
-                description: 'Get instant notifications when responses are submitted.'
+                description: 'Get instant notifications when responses are submitted.',
+                style: 'highlighted',
+                highlight: '#8A4DE6'
               }
             ].map((feature, index) => {
               const IconComponent = feature.icon;
               return (
                 <motion.div
                   key={index}
-                  className="feature-card"
+                  className={`feature-showcase-card feature-${feature.style}`}
                   variants={fadeInUp}
-                  whileHover={{ y: -10, scale: 1.02 }}
+                  whileHover={{ y: -8, scale: 1.02 }}
                   transition={{ duration: 0.3 }}
+                  style={{
+                    background: feature.gradient || feature.bgColor || 'transparent',
+                    borderColor: feature.accent,
+                    borderStyle: feature.borderStyle || 'solid',
+                    '--highlight-color': feature.highlight
+                  } as React.CSSProperties}
                 >
-                  <div className="feature-icon">
-                    <IconComponent />
+                  <div className="feature-showcase-icon">
+                    <div className="feature-icon-bg">
+                      <IconComponent />
+                    </div>
                   </div>
-                  <h3 className="feature-title">{feature.title}</h3>
-                  <p className="feature-description">{feature.description}</p>
+                  <div className="feature-showcase-content">
+                    <h3 className="feature-showcase-title">{feature.title}</h3>
+                    <p className="feature-showcase-description">{feature.description}</p>
+                  </div>
+                  <div className="feature-showcase-accent"></div>
                 </motion.div>
               );
             })}
@@ -225,7 +316,7 @@ const HomePage = () => {
           >
             Trusted by Businesses Worldwide
           </motion.h2>
-          <div className="stats-grid">
+          <div className="stats-bar">
             {[
               { number: '10K+', label: 'Active Users' },
               { number: '500K+', label: 'Forms Created' },
@@ -234,13 +325,18 @@ const HomePage = () => {
             ].map((stat, index) => (
               <motion.div
                 key={index}
-                className="stat-card"
+                className="stat-item"
                 variants={fadeInUp}
-                whileHover={{ scale: 1.05 }}
-                transition={{ duration: 0.3 }}
+                initial="hidden"
+                whileInView="visible"
+                viewport={{ once: true }}
+                transition={{ duration: 0.5, delay: index * 0.1 }}
               >
-                <div className="stat-number">{stat.number}</div>
-                <div className="stat-label">{stat.label}</div>
+                <div className="stat-content">
+                  <div className="stat-number">{stat.number}</div>
+                  <div className="stat-label">{stat.label}</div>
+                </div>
+                <div className="stat-divider"></div>
               </motion.div>
             ))}
           </div>
@@ -268,7 +364,7 @@ const HomePage = () => {
           >
             Get started in minutes with our simple 3-step process
           </motion.p>
-          <div className="steps-container">
+          <div className="timeline-container">
             {[
               {
                 step: '01',
@@ -293,17 +389,80 @@ const HomePage = () => {
               return (
                 <motion.div
                   key={index}
-                  className="step-card"
-                  variants={fadeInUp}
-                  whileHover={{ y: -10 }}
-                  transition={{ duration: 0.3 }}
+                  className="timeline-item"
+                  variants={timelineItemVariants}
+                  initial="hidden"
+                  whileInView="visible"
+                  viewport={{ once: true, amount: 0.3 }}
+                  transition={{ duration: 0.8, delay: index * 0.3 }}
                 >
-                  <div className="step-number">{step.step}</div>
-                  <div className="step-icon">
-                    <IconComponent />
-                  </div>
-                  <h3 className="step-title">{step.title}</h3>
-                  <p className="step-description">{step.description}</p>
+                  <motion.div 
+                    className="timeline-line"
+                    variants={timelineLineVariants}
+                    style={{ transformOrigin: 'top' }}
+                  ></motion.div>
+                  <motion.div 
+                    className="timeline-dot"
+                    variants={timelineDotVariants}
+                  >
+                    <motion.div 
+                      className="timeline-number"
+                      initial={{ scale: 0, rotate: -180 }}
+                      whileInView={{ scale: 1, rotate: 0 }}
+                      viewport={{ once: true }}
+                      transition={{ 
+                        duration: 0.5, 
+                        delay: index * 0.3 + 0.4,
+                        ease: [0.34, 1.56, 0.64, 1] as [number, number, number, number]
+                      }}
+                    >
+                      {step.step}
+                    </motion.div>
+                    <motion.div 
+                      className="timeline-icon"
+                      initial={{ scale: 0, rotate: 180 }}
+                      whileInView={{ scale: 1, rotate: 0 }}
+                      viewport={{ once: true }}
+                      transition={{ 
+                        duration: 0.5, 
+                        delay: index * 0.3 + 0.5,
+                        ease: [0.34, 1.56, 0.64, 1] as [number, number, number, number]
+                      }}
+                    >
+                      <IconComponent />
+                    </motion.div>
+                  </motion.div>
+                  <motion.div 
+                    className="timeline-content"
+                    variants={timelineContentVariants}
+                  >
+                    <motion.h3 
+                      className="timeline-title"
+                      initial={{ opacity: 0, x: -20 }}
+                      whileInView={{ opacity: 1, x: 0 }}
+                      viewport={{ once: true }}
+                      transition={{ 
+                        duration: 0.6, 
+                        delay: index * 0.3 + 0.6,
+                        ease: "easeOut"
+                      }}
+                    >
+                      {step.title}
+                    </motion.h3>
+                    <motion.p 
+                      className="timeline-description"
+                      initial={{ opacity: 0, x: -20 }}
+                      whileInView={{ opacity: 1, x: 0 }}
+                      viewport={{ once: true }}
+                      transition={{ 
+                        duration: 0.6, 
+                        delay: index * 0.3 + 0.8,
+                        ease: "easeOut"
+                      }}
+                    >
+                      {step.description}
+                    </motion.p>
+                  </motion.div>
                 </motion.div>
               );
             })}
@@ -332,55 +491,61 @@ const HomePage = () => {
           >
             See how businesses across industries use PulseBox to grow
           </motion.p>
-          <div className="use-cases-grid">
+          <div className="use-cases-masonry">
             {[
               {
                 industry: 'E-commerce',
                 useCase: 'Product Feedback & Reviews',
                 description: 'Collect customer reviews and product feedback to improve your offerings.',
-                color: '#A060FF'
+                color: '#A060FF',
+                size: 'large'
               },
               {
                 industry: 'Healthcare',
                 useCase: 'Patient Satisfaction Surveys',
                 description: 'Gather patient feedback to enhance care quality and service delivery.',
-                color: '#8A4DE6'
+                color: '#8A4DE6',
+                size: 'medium'
               },
               {
                 industry: 'Education',
                 useCase: 'Course Evaluations',
                 description: 'Get student feedback on courses and teaching methods for continuous improvement.',
-                color: '#A060FF'
+                color: '#A060FF',
+                size: 'medium'
               },
               {
                 industry: 'Restaurants',
                 useCase: 'Dining Experience Feedback',
                 description: 'Understand customer satisfaction and improve your restaurant experience.',
-                color: '#8A4DE6'
+                color: '#8A4DE6',
+                size: 'large'
               },
               {
                 industry: 'SaaS',
                 useCase: 'Feature Requests & NPS',
                 description: 'Collect user feedback and measure Net Promoter Score to guide product development.',
-                color: '#A060FF'
+                color: '#A060FF',
+                size: 'small'
               },
               {
                 industry: 'Events',
                 useCase: 'Event Feedback Forms',
                 description: 'Gather attendee feedback to make your next event even better.',
-                color: '#8A4DE6'
+                color: '#8A4DE6',
+                size: 'small'
               }
             ].map((useCase, index) => (
               <motion.div
                 key={index}
-                className="use-case-card"
+                className={`use-case-brick use-case-${useCase.size}`}
                 variants={fadeInUp}
-                whileHover={{ y: -10, scale: 1.02 }}
+                whileHover={{ scale: 1.03 }}
                 transition={{ duration: 0.3 }}
+                style={{ '--accent-color': useCase.color } as React.CSSProperties}
               >
-                <div className="use-case-header">
-                  <h3 className="use-case-industry">{useCase.industry}</h3>
-                  <div className="use-case-color" style={{ backgroundColor: useCase.color }}></div>
+                <div className="use-case-badge" style={{ backgroundColor: useCase.color }}>
+                  {useCase.industry}
                 </div>
                 <h4 className="use-case-title">{useCase.useCase}</h4>
                 <p className="use-case-description">{useCase.description}</p>
@@ -411,47 +576,90 @@ const HomePage = () => {
           >
             Join thousands of satisfied businesses using PulseBox
           </motion.p>
-          <div className="testimonials-grid">
-            {[
-              {
-                name: 'Sarah Johnson',
-                role: 'CEO, TechStart Inc.',
-                content: 'PulseBox has transformed how we collect customer feedback. The analytics are incredible and the forms are so easy to create.',
-                rating: 5
-              },
-              {
-                name: 'Michael Chen',
-                role: 'Marketing Director, RetailPlus',
-                content: 'The best feedback collection tool we\'ve used. Our response rates increased by 40% since switching to PulseBox.',
-                rating: 5
-              },
-              {
-                name: 'Emily Rodriguez',
-                role: 'Operations Manager, HealthCare Pro',
-                content: 'Simple, powerful, and secure. Exactly what we needed for patient feedback. Highly recommend!',
-                rating: 5
-              }
-            ].map((testimonial, index) => (
-              <motion.div
-                key={index}
-                className="testimonial-card"
-                variants={fadeInUp}
-                whileHover={{ y: -10 }}
-                transition={{ duration: 0.3 }}
-              >
-                <div className="testimonial-rating">
-                  {Array.from({ length: testimonial.rating }).map((_, i) => (
-                    <FaStar key={i} />
-                  ))}
-                </div>
-                <p className="testimonial-content">"{testimonial.content}"</p>
-                <div className="testimonial-author">
-                  <div className="testimonial-name">{testimonial.name}</div>
-                  <div className="testimonial-role">{testimonial.role}</div>
-                </div>
-              </motion.div>
-            ))}
-          </div>
+          
+          <motion.div
+            variants={fadeInUp}
+            style={{ marginTop: '4rem' }}
+          >
+            <TestimonialsBento
+              textAutoHide={false}
+              enableStars={true}
+              enableSpotlight={true}
+              enableBorderGlow={true}
+              enableTilt={false}
+              enableMagnetism={false}
+              clickEffect={true}
+              spotlightRadius={300}
+              particleCount={12}
+              glowColor="160, 96, 255"
+              testimonials={[
+                {
+                  name: 'Sarah Johnson',
+                  role: 'CEO',
+                  company: 'TechStart Inc.',
+                  content: 'PulseBox has transformed how we collect customer feedback. The analytics are incredible and the forms are so easy to create. Our team productivity increased significantly!',
+                  rating: 5,
+                  color: '#FFFFFF'
+                },
+                {
+                  name: 'Michael Chen',
+                  role: 'Marketing Director',
+                  company: 'RetailPlus',
+                  content: 'The best feedback collection tool we\'ve used. Our response rates increased by 40% since switching to PulseBox. Highly recommend!',
+                  rating: 5,
+                  color: '#FFFFFF'
+                },
+                {
+                  name: 'Emily Rodriguez',
+                  role: 'Operations Manager',
+                  company: 'HealthCare Pro',
+                  content: 'Simple, powerful, and secure. Exactly what we needed for patient feedback. The real-time analytics help us make data-driven decisions.',
+                  rating: 5,
+                  color: '#FFFFFF'
+                },
+                {
+                  name: 'David Thompson',
+                  role: 'Product Manager',
+                  company: 'SaaS Innovations',
+                  content: 'PulseBox\'s form builder is incredibly intuitive. We can create complex surveys in minutes. The integration capabilities are outstanding.',
+                  rating: 5,
+                  color: '#FFFFFF'
+                },
+                {
+                  name: 'Lisa Wang',
+                  role: 'Customer Success Lead',
+                  company: 'E-commerce Solutions',
+                  content: 'Our customer satisfaction scores improved dramatically after implementing PulseBox. The visual analytics make it easy to spot trends and act quickly.',
+                  rating: 5,
+                  color: '#FFFFFF'
+                },
+                {
+                  name: 'James Martinez',
+                  role: 'Founder',
+                  company: 'EventPro',
+                  content: 'We use PulseBox for all our event feedback. The QR code sharing feature is a game-changer. Setup takes minutes, not hours.',
+                  rating: 5,
+                  color: '#FFFFFF'
+                },
+                {
+                  name: 'Rachel Green',
+                  role: 'HR Director',
+                  company: 'Global Tech Corp',
+                  content: 'PulseBox streamlined our employee feedback process. The secure data handling gives us peace of mind, and the export features are perfect for reporting.',
+                  rating: 5,
+                  color: '#FFFFFF'
+                },
+                {
+                  name: 'Alex Kumar',
+                  role: 'Head of Product',
+                  company: 'StartupHub',
+                  content: 'As a startup, we needed something affordable yet powerful. PulseBox exceeded our expectations. The free tier is generous, and the paid features are worth every penny.',
+                  rating: 5,
+                  color: '#FFFFFF'
+                }
+              ]}
+            />
+          </motion.div>
         </motion.div>
       </section>
 
@@ -476,20 +684,22 @@ const HomePage = () => {
           >
             Connect PulseBox with your favorite tools and workflows
           </motion.p>
-          <div className="integrations-grid">
-            {[
-              'Slack', 'Google Sheets', 'Zapier', 'Webhook', 'API', 'Email'
-            ].map((integration, index) => (
-              <motion.div
-                key={index}
-                className="integration-card"
-                variants={fadeInUp}
-                whileHover={{ scale: 1.1, rotate: 5 }}
-                transition={{ duration: 0.3 }}
-              >
-                <div className="integration-name">{integration}</div>
-              </motion.div>
-            ))}
+          <div className="integrations-wall">
+            <div className="integrations-scroll">
+              {[
+                'Slack', 'Google Sheets', 'Zapier', 'Webhook', 'API', 'Email',
+                'Slack', 'Google Sheets', 'Zapier', 'Webhook', 'API', 'Email'
+              ].map((integration, index) => (
+                <motion.div
+                  key={index}
+                  className="integration-badge"
+                  whileHover={{ scale: 1.15, y: -5 }}
+                  transition={{ duration: 0.3 }}
+                >
+                  <div className="integration-name">{integration}</div>
+                </motion.div>
+              ))}
+            </div>
           </div>
         </motion.div>
       </section>
@@ -509,7 +719,7 @@ const HomePage = () => {
           >
             Frequently Asked Questions
           </motion.h2>
-          <div className="faq-list">
+          <div className="faq-accordion">
             {[
               {
                 question: 'How secure is my data?',
@@ -531,18 +741,38 @@ const HomePage = () => {
                 question: 'Can I embed forms on my website?',
                 answer: 'Absolutely! You can embed forms using our embed code, share via link, or generate QR codes. Forms are mobile-responsive and work on all devices.'
               }
-            ].map((faq, index) => (
-              <motion.div
-                key={index}
-                className="faq-item"
-                variants={fadeInUp}
-                whileHover={{ x: 10 }}
-                transition={{ duration: 0.3 }}
-              >
-                <h3 className="faq-question">{faq.question}</h3>
-                <p className="faq-answer">{faq.answer}</p>
-              </motion.div>
-            ))}
+            ].map((faq, index) => {
+              const isOpen = openFaq === index;
+              return (
+                <motion.div
+                  key={index}
+                  className={`faq-accordion-item ${isOpen ? 'open' : ''}`}
+                  variants={fadeInUp}
+                  initial="hidden"
+                  whileInView="visible"
+                  viewport={{ once: true }}
+                >
+                  <button
+                    className="faq-accordion-header"
+                    onClick={() => setOpenFaq(isOpen ? null : index)}
+                  >
+                    <h3 className="faq-question">{faq.question}</h3>
+                    <span className="faq-toggle">{isOpen ? '−' : '+'}</span>
+                  </button>
+                  <motion.div
+                    className="faq-accordion-content"
+                    initial={false}
+                    animate={{
+                      height: isOpen ? 'auto' : 0,
+                      opacity: isOpen ? 1 : 0
+                    }}
+                    transition={{ duration: 0.3 }}
+                  >
+                    <p className="faq-answer">{faq.answer}</p>
+                  </motion.div>
+                </motion.div>
+              );
+            })}
           </div>
         </motion.div>
       </section>
@@ -561,7 +791,7 @@ const HomePage = () => {
             Join thousands of businesses collecting valuable feedback with PulseBox
           </p>
           <Link to="/signup" className="btn-primary large">
-            Start Free Trial
+           Get Started
           </Link>
         </div>
       </motion.section>
