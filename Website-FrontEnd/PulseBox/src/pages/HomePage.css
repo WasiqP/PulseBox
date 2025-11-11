@@ -26,7 +26,7 @@
   z-index: 0;
   overflow: hidden;
   background: #000000;
-  cursor: pointer;
+  pointer-events: none;
 }
 
 .particles-background .particles-container {
@@ -46,8 +46,7 @@
   position: absolute !important;
   top: 0 !important;
   left: 0 !important;
-  pointer-events: auto !important;
-  cursor: pointer !important;
+  pointer-events: none !important;
 }
 
 .hero-background {
@@ -446,6 +445,26 @@
 .stats-section {
   padding: 100px 2rem;
   background: #000000;
+  position: relative;
+  overflow: hidden;
+}
+
+.stats-galaxy-background {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 0;
+  opacity: 0.8;
+  pointer-events: none;
+}
+
+.stats-galaxy-background .galaxy-container {
+  width: 100%;
+  height: 100%;
 }
 
 .stats-section .section-title {
@@ -459,6 +478,8 @@
 .stats-container {
   max-width: 1200px;
   margin: 0 auto;
+  position: relative;
+  z-index: 1;
 }
 
 /* Stats - Horizontal Bar Layout */

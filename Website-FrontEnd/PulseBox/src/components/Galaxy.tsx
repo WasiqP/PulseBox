@@ -223,6 +223,19 @@ export default function Galaxy({
     });
     const gl = renderer.gl;
 
+    const isMobileLike =
+      (typeof window !== 'undefined' && window.innerWidth <= 900) ||
+      /Mobi|Android/i.test(navigator.userAgent);
+
+    const prefersReducedMotion =
+      typeof window !== 'undefined' &&
+      typeof window.matchMedia === 'function' &&
+      window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    // Lower device pixel ratio to reduce GPU load, especially on mobile
+    // @ts-expect-error ogl allows dpr override at runtime
+    renderer.dpr = Math.min(window.devicePixelRatio || 1, isMobileLike ? 1 : 1.25);
+
     if (transparent) {
       gl.enable(gl.BLEND);
       gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
@@ -234,8 +247,8 @@ export default function Galaxy({
     let program: Program;
 
     function resize() {
-      const scale = 1;
-      renderer.setSize(ctn.offsetWidth * scale, ctn.offsetHeight * scale);
+      // Keep canvas visually full-size; internal resolution is controlled by renderer.dpr
+      renderer.setSize(ctn.offsetWidth, ctn.offsetHeight);
       if (program) {
         program.uniforms.uResolution.value = new Color(
           gl.canvas.width,
@@ -248,6 +261,12 @@ export default function Galaxy({
     resize();
 
     const geometry = new Triangle(gl);
+    const effectiveDensity =
+      (density ?? 1) *
+      (prefersReducedMotion ? 0.5 : isMobileLike ? 0.6 : 0.85);
+    const effectiveSpeed = prefersReducedMotion ? Math.min(0.4, speed * 0.6) : speed;
+    const effectiveTwinkle = prefersReducedMotion ? Math.min(0.15, (twinkleIntensity ?? 0) * 0.5) : twinkleIntensity;
+
     program = new Program(gl, {
       vertex: vertexShader,
       fragment: fragmentShader,
@@ -259,16 +278,16 @@ export default function Galaxy({
         uFocal: { value: new Float32Array(focal) },
         uRotation: { value: new Float32Array(rotation) },
         uStarSpeed: { value: starSpeed },
-        uDensity: { value: density },
+        uDensity: { value: effectiveDensity },
         uHueShift: { value: hueShift },
-        uSpeed: { value: speed },
+        uSpeed: { value: effectiveSpeed },
         uMouse: {
           value: new Float32Array([smoothMousePos.current.x, smoothMousePos.current.y])
         },
         uGlowIntensity: { value: glowIntensity },
         uSaturation: { value: saturation },
         uMouseRepulsion: { value: mouseRepulsion },
-        uTwinkleIntensity: { value: twinkleIntensity },
+        uTwinkleIntensity: { value: effectiveTwinkle },
         uRotationSpeed: { value: rotationSpeed },
         uRepulsionStrength: { value: repulsionStrength },
         uMouseActiveFactor: { value: 0.0 },
@@ -279,10 +298,24 @@ export default function Galaxy({
 
     const mesh = new Mesh(gl, { geometry, program });
     let animateId: number;
+    let lastFrameTime = 0;
+    // Cap FPS to ease CPU/GPU load
+    const fpsCap = prefersReducedMotion ? 24 : isMobileLike ? 30 : 45;
+    const frameInterval = 1000 / fpsCap;
+    let isOffscreen = false;
 
     function update(t: number) {
       animateId = requestAnimationFrame(update);
-      if (!disableAnimation) {
+
+      // Skip rendering when tab is hidden or when section is offscreen
+      if (document.hidden || isOffscreen) return;
+
+      // Frame skipping based on FPS cap
+      if (lastFrameTime && t - lastFrameTime < frameInterval) return;
+      lastFrameTime = t;
+
+      const animationDisabled = disableAnimation || prefersReducedMotion;
+      if (!animationDisabled) {
         program.uniforms.uTime.value = t * 0.001;
         program.uniforms.uStarSpeed.value = (t * 0.001 * starSpeed) / 10.0;
       }
@@ -314,6 +347,21 @@ export default function Galaxy({
       targetMouseActive.current = 0.0;
     }
 
+    // Pause rendering when container is not visible in viewport
+    const observer = new IntersectionObserver(
+      (entries) => {
+        isOffscreen = !entries[0].isIntersecting;
+      },
+      { threshold: 0.05 }
+    );
+    observer.observe(ctn);
+
+    function onVisibilityChange() {
+      // Reset frame timer so we don't burst frames on visibility return
+      lastFrameTime = 0;
+    }
+    document.addEventListener('visibilitychange', onVisibilityChange);
+
     if (mouseInteraction) {
       ctn.addEventListener('mousemove', handleMouseMove);
       ctn.addEventListener('mouseleave', handleMouseLeave);
@@ -322,6 +370,8 @@ export default function Galaxy({
     return () => {
       cancelAnimationFrame(animateId);
       window.removeEventListener('resize', resize);
+      observer.disconnect();
+      document.removeEventListener('visibilitychange', onVisibilityChange);
       if (mouseInteraction) {
         ctn.removeEventListener('mousemove', handleMouseMove);
         ctn.removeEventListener('mouseleave', handleMouseLeave);

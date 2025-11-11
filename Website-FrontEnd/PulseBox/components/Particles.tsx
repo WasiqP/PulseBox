@@ -153,11 +153,14 @@ const Particles: React.FC<ParticlesProps> = ({
     container.appendChild(canvas);
     gl.clearColor(0, 0, 0, 0);
     
-    // Enable pointer events on canvas
-    canvas.style.pointerEvents = 'auto';
-    canvas.style.cursor = 'pointer';
+    // Performance: cap DPR to reduce GPU load
+    // @ts-expect-error allow runtime override
+    renderer.dpr = Math.min(window.devicePixelRatio || 1, window.innerWidth <= 900 ? 1 : 1.25);
+
+    // Do not capture pointer events by default; this is a decorative background
+    canvas.style.pointerEvents = 'none';
+    canvas.style.cursor = 'default';
     
-    // Enable smooth particle rendering with proper blending
     gl.enable(gl.BLEND);
     gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
 
@@ -176,7 +179,6 @@ const Particles: React.FC<ParticlesProps> = ({
     const handleMouseMove = (e: MouseEvent) => {
       if (!canvas) return;
       const rect = canvas.getBoundingClientRect();
-      // Check if mouse is within canvas bounds
       if (
         e.clientX >= rect.left &&
         e.clientX <= rect.right &&
@@ -194,14 +196,14 @@ const Particles: React.FC<ParticlesProps> = ({
     };
 
     if (moveParticlesOnHover) {
-      // Attach to window to capture events even when content is on top
-      // This ensures particles react even when hovering over text/buttons
       window.addEventListener('mousemove', handleMouseMove, { passive: true });
-      // Also attach to container and canvas as fallback
       container.addEventListener('mousemove', handleMouseMove, { passive: true });
       canvas.addEventListener('mousemove', handleMouseMove, { passive: true });
       container.addEventListener('mouseleave', handleMouseLeave);
       canvas.addEventListener('mouseleave', handleMouseLeave);
+      // If interactivity is enabled, allow pointer events on canvas
+      canvas.style.pointerEvents = 'auto';
+      canvas.style.cursor = 'pointer';
     }
 
     const count = particleCount;
@@ -250,14 +252,31 @@ const Particles: React.FC<ParticlesProps> = ({
     const particles = new Mesh(gl, { mode: gl.POINTS, geometry, program });
 
     let animationFrameId: number;
+    let lastRAF = 0;
     let lastTime = performance.now();
     let elapsed = 0;
 
+    const prefersReducedMotion =
+      typeof window !== 'undefined' &&
+      typeof window.matchMedia === 'function' &&
+      window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    const isMobileLike = (typeof window !== 'undefined' && window.innerWidth <= 900) || /Mobi|Android/i.test(navigator.userAgent);
+    const fpsCap = prefersReducedMotion ? 24 : isMobileLike ? 30 : 45;
+    const minFrameDelta = 1000 / fpsCap;
+    let isOffscreen = false;
+
     const update = (t: number) => {
       animationFrameId = requestAnimationFrame(update);
+
+      if (document.hidden || isOffscreen) return;
+      if (lastRAF && t - lastRAF < minFrameDelta) return;
+      lastRAF = t;
+
       const delta = t - lastTime;
       lastTime = t;
-      elapsed += delta * speed;
+      const effectiveSpeed = prefersReducedMotion ? Math.min(0.05, speed * 0.5) : speed;
+      elapsed += delta * effectiveSpeed;
 
       program.uniforms.uTime.value = elapsed * 0.001;
 
@@ -269,18 +288,33 @@ const Particles: React.FC<ParticlesProps> = ({
         program.uniforms.uHoverFactor.value = 0;
       }
 
-      if (!disableRotation) {
+      if (!disableRotation && !prefersReducedMotion) {
         particles.rotation.x = Math.sin(elapsed * 0.0002) * 0.1;
         particles.rotation.y = Math.cos(elapsed * 0.0005) * 0.15;
-        particles.rotation.z += 0.01 * speed;
+        particles.rotation.z += 0.01 * effectiveSpeed;
       }
 
       renderer.render({ scene: particles, camera });
     };
 
+    const observer = new IntersectionObserver(
+      (entries) => {
+        isOffscreen = !entries[0].isIntersecting;
+      },
+      { threshold: 0.05 }
+    );
+    observer.observe(container);
+
+    const onVisibility = () => {
+      lastRAF = 0;
+    };
+    document.addEventListener('visibilitychange', onVisibility);
+
     animationFrameId = requestAnimationFrame(update);
 
     return () => {
+      observer.disconnect();
+      document.removeEventListener('visibilitychange', onVisibility);
       window.removeEventListener('resize', resize);
       if (moveParticlesOnHover) {
         window.removeEventListener('mousemove', handleMouseMove);

@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import type { Variants } from 'framer-motion';
@@ -15,10 +15,28 @@ import {
   FiTrendingUp
 } from 'react-icons/fi';
 import TestimonialsBento from '../components/TestimonialsBento';
+import Galaxy from '../components/Galaxy';
 import './HomePage.css';
 
 const HomePage = () => {
   const heroRef = useRef<HTMLDivElement>(null);
+  const statsSectionRef = useRef<HTMLElement | null>(null);
+  const [showStatsGalaxy, setShowStatsGalaxy] = useState(false);
+  useEffect(() => {
+    if (!statsSectionRef.current) return;
+    const el = statsSectionRef.current;
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting) {
+          setShowStatsGalaxy(true);
+          observer.disconnect();
+        }
+      },
+      { threshold: 0.1 }
+    );
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, []);
   const [openFaq, setOpenFaq] = useState<number | null>(null);
 
   // Animation variants
@@ -122,10 +140,14 @@ const HomePage = () => {
         {/* Particles Background - Full Coverage */}
         <div className="particles-background" style={{ width: '100%', height: '100%', position: 'absolute', top: 0, left: 0 }}>
           <Particles
-            particleColors={['#FFFFFF', '#A060FF', '#FFFFFF', '#8A4DE6']}
-            particleBaseSize={200}
-            moveParticlesOnHover={true}
-            particleHoverFactor={0.5}
+            particleColors={[ '#FFFFFF', '#A060FF', '#FFFFFF', '#8A4DE6' ]}
+            particleCount={180}
+            particleSpread={8}
+            particleBaseSize={140}
+            sizeRandomness={0.8}
+            speed={0.08}
+            moveParticlesOnHover={false}
+            alphaParticles={false}
           />
         </div>
         
@@ -302,7 +324,24 @@ const HomePage = () => {
       </section>
 
       {/* Stats Section */}
-      <section className="stats-section">
+      <section className="stats-section" ref={(el) => { statsSectionRef.current = el; }}>
+        <div className="stats-galaxy-background">
+          {showStatsGalaxy && (
+            <Galaxy
+              transparent={false}
+              density={1.0}
+              starSpeed={0.25}
+              speed={0.6}
+              glowIntensity={0.3}
+              twinkleIntensity={0.25}
+              rotationSpeed={0.03}
+              mouseInteraction={false}
+              mouseRepulsion={false}
+              hueShift={270}
+              saturation={0.6}
+            />
+          )}
+        </div>
         <motion.div
           className="stats-container"
           initial="hidden"
