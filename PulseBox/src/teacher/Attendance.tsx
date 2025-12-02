@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, ScrollView, Pressable, TextInput, Alert } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { View, Text, StyleSheet, ScrollView, Pressable, TextInput, Alert, Platform } from 'react-native';
+import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import type { RootStackParamList } from '../types/navigation';
 import BackIcon from '../../assets/images/Back.svg';
@@ -36,6 +36,7 @@ const ClockIcon = ({ size = 20, color = '#FF9800' }) => (
 
 const Attendance: React.FC<Props> = ({ route, navigation }) => {
   const { classId } = route.params;
+  const insets = useSafeAreaInsets();
   const [date, setDate] = useState(new Date().toISOString().split('T')[0]);
   const [searchQuery, setSearchQuery] = useState('');
   
@@ -107,7 +108,7 @@ const Attendance: React.FC<Props> = ({ route, navigation }) => {
   const lateCount = students.filter(s => s.status === 'late').length;
 
   return (
-    <SafeAreaView style={styles.container} edges={['top']}>
+    <SafeAreaView style={styles.container} edges={['top', 'bottom']}>
       {/* Header */}
       <View style={styles.header}>
         <Pressable
@@ -129,19 +130,31 @@ const Attendance: React.FC<Props> = ({ route, navigation }) => {
         <View style={styles.placeholder} />
       </View>
 
-      {/* Stats */}
-      <View style={styles.statsContainer}>
-        <View style={styles.statCard}>
-          <Text style={styles.statNumber}>{presentCount}</Text>
-          <Text style={styles.statLabel}>Present</Text>
-        </View>
-        <View style={[styles.statCard, styles.statCardAbsent]}>
-          <Text style={[styles.statNumber, styles.statNumberAbsent]}>{absentCount}</Text>
-          <Text style={styles.statLabel}>Absent</Text>
-        </View>
-        <View style={[styles.statCard, styles.statCardLate]}>
-          <Text style={[styles.statNumber, styles.statNumberLate]}>{lateCount}</Text>
-          <Text style={styles.statLabel}>Late</Text>
+      {/* Stats - Reorganized */}
+      <View style={styles.statsSection}>
+        <Text style={styles.statsTitle}>Today's Summary</Text>
+        <View style={styles.statsContainer}>
+          <View style={styles.statCard}>
+            <View style={styles.statIconContainer}>
+              <CheckIcon size={24} color="#4CAF50" />
+            </View>
+            <Text style={styles.statNumber}>{presentCount}</Text>
+            <Text style={styles.statLabel}>Present</Text>
+          </View>
+          <View style={[styles.statCard, styles.statCardAbsent]}>
+            <View style={styles.statIconContainer}>
+              <XIcon size={24} color="#F44336" />
+            </View>
+            <Text style={[styles.statNumber, styles.statNumberAbsent]}>{absentCount}</Text>
+            <Text style={styles.statLabel}>Absent</Text>
+          </View>
+          <View style={[styles.statCard, styles.statCardLate]}>
+            <View style={styles.statIconContainer}>
+              <ClockIcon size={24} color="#FF9800" />
+            </View>
+            <Text style={[styles.statNumber, styles.statNumberLate]}>{lateCount}</Text>
+            <Text style={styles.statLabel}>Late</Text>
+          </View>
         </View>
       </View>
 
@@ -161,6 +174,7 @@ const Attendance: React.FC<Props> = ({ route, navigation }) => {
         style={styles.scrollView}
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
+        nestedScrollEnabled={true}
       >
         {filteredStudents.map((student) => (
           <View key={student.id} style={styles.studentCard}>
@@ -220,8 +234,8 @@ const Attendance: React.FC<Props> = ({ route, navigation }) => {
         ))}
       </ScrollView>
 
-      {/* Save Button */}
-      <View style={styles.footer}>
+      {/* Save Button - Fixed Footer */}
+      <View style={[styles.footer, { paddingBottom: Math.max(insets.bottom, 20) }]}>
         <Pressable
           style={styles.saveBtn}
           onPress={handleSave}
@@ -247,6 +261,7 @@ const styles = StyleSheet.create({
     paddingBottom: 16,
     borderBottomWidth: 1,
     borderBottomColor: '#E0E0E0',
+    backgroundColor: '#FFFFFF',
   },
   backBtn: {
     width: 40,
@@ -273,25 +288,49 @@ const styles = StyleSheet.create({
   placeholder: {
     width: 40,
   },
+  statsSection: {
+    paddingHorizontal: 24,
+    paddingTop: 20,
+    paddingBottom: 20,
+    backgroundColor: '#FFFFFF',
+    borderBottomWidth: 1,
+    borderBottomColor: '#F0F0F0',
+  },
+  statsTitle: {
+    fontSize: 14,
+    fontFamily: 'Poppins-SemiBold',
+    color: '#666666',
+    marginBottom: 12,
+    textTransform: 'uppercase',
+    letterSpacing: 0.5,
+  },
   statsContainer: {
     flexDirection: 'row',
-    paddingHorizontal: 24,
-    paddingTop: 16,
-    paddingBottom: 8,
     gap: 12,
   },
   statCard: {
     flex: 1,
     backgroundColor: '#E8F5E9',
-    borderRadius: 12,
-    padding: 16,
+    borderRadius: 16,
+    padding: 14,
     alignItems: 'center',
+    borderWidth: 1,
+    borderColor: '#E0E0E0',
   },
   statCardAbsent: {
     backgroundColor: '#FFEBEE',
   },
   statCardLate: {
     backgroundColor: '#FFF3E0',
+  },
+  statIconContainer: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    backgroundColor: 'rgba(255,255,255,0.8)',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 6,
   },
   statNumber: {
     fontSize: 24,
@@ -313,8 +352,9 @@ const styles = StyleSheet.create({
   },
   searchContainer: {
     paddingHorizontal: 24,
-    paddingTop: 16,
-    paddingBottom: 8,
+    paddingTop: 20,
+    paddingBottom: 16,
+    backgroundColor: '#FFFFFF',
   },
   searchInput: {
     backgroundColor: '#F5F5F5',
@@ -332,8 +372,8 @@ const styles = StyleSheet.create({
   },
   scrollContent: {
     paddingHorizontal: 24,
-    paddingTop: 16,
-    paddingBottom: 100,
+    paddingTop: 8,
+    paddingBottom: 120,
   },
   studentCard: {
     flexDirection: 'row',
@@ -341,10 +381,15 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     backgroundColor: '#FFFFFF',
     borderWidth: 1,
-    borderColor: '#000000',
-    borderRadius: 12,
-    padding: 16,
-    marginBottom: 12,
+    borderColor: '#E0E0E0',
+    borderRadius: 16,
+    padding: 14,
+    marginBottom: 10,
+    shadowColor: '#000000',
+    shadowOpacity: 0.05,
+    shadowOffset: { width: 0, height: 2 },
+    shadowRadius: 4,
+    elevation: 2,
   },
   studentInfo: {
     flexDirection: 'row',
@@ -352,9 +397,9 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   studentAvatar: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
+    width: 44,
+    height: 44,
+    borderRadius: 22,
     backgroundColor: '#A060FF',
     alignItems: 'center',
     justifyContent: 'center',
@@ -370,15 +415,17 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontFamily: 'Poppins-Medium',
     color: '#000000',
+    flex: 1,
   },
   statusButtons: {
     flexDirection: 'row',
     gap: 8,
+    alignItems: 'center',
   },
   statusBtn: {
-    width: 44,
-    height: 44,
-    borderRadius: 22,
+    width: 42,
+    height: 42,
+    borderRadius: 21,
     alignItems: 'center',
     justifyContent: 'center',
     borderWidth: 2,
@@ -409,16 +456,25 @@ const styles = StyleSheet.create({
   },
   footer: {
     paddingHorizontal: 24,
-    paddingTop: 16,
-    paddingBottom: 24,
+    paddingTop: 14,
+    paddingBottom: 20,
     borderTopWidth: 1,
     borderTopColor: '#E0E0E0',
     backgroundColor: '#FFFFFF',
+    shadowColor: '#000000',
+    shadowOpacity: 0.1,
+    shadowOffset: { width: 0, height: -2 },
+    shadowRadius: 8,
+    elevation: 8,
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    right: 0,
   },
   saveBtn: {
     backgroundColor: '#A060FF',
-    borderRadius: 16,
-    paddingVertical: 18,
+    borderRadius: 14,
+    paddingVertical: 14,
     alignItems: 'center',
     justifyContent: 'center',
     shadowColor: '#A060FF',
@@ -428,7 +484,7 @@ const styles = StyleSheet.create({
     elevation: 4,
   },
   saveBtnText: {
-    fontSize: 18,
+    fontSize: 16,
     fontWeight: '600',
     fontFamily: 'Poppins-SemiBold',
     color: '#FFFFFF',

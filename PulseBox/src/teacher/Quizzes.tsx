@@ -301,6 +301,7 @@ const styles = StyleSheet.create({
     paddingBottom: 16,
     borderBottomWidth: 1,
     borderBottomColor: '#E0E0E0',
+    backgroundColor: '#FFFFFF',
   },
   headerTop: {
     flexDirection: 'row',
@@ -322,7 +323,8 @@ const styles = StyleSheet.create({
   searchContainer: {
     paddingHorizontal: 24,
     paddingTop: 16,
-    paddingBottom: 8,
+    paddingBottom: 12,
+    backgroundColor: '#FFFFFF',
   },
   searchInput: {
     backgroundColor: '#F5F5F5',
@@ -338,8 +340,10 @@ const styles = StyleSheet.create({
   filterTabs: {
     flexDirection: 'row',
     paddingHorizontal: 24,
-    paddingVertical: 12,
+    paddingTop: 8,
+    paddingBottom: 16,
     gap: 8,
+    backgroundColor: '#FFFFFF',
   },
   filterTab: {
     paddingHorizontal: 16,
@@ -368,7 +372,7 @@ const styles = StyleSheet.create({
     borderRadius: 16,
     marginHorizontal: 24,
     marginTop: 8,
-    marginBottom: 20,
+    marginBottom: 24,
     shadowColor: '#A060FF',
     shadowOpacity: 0.1,
     shadowOffset: { width: 0, height: 4 },
@@ -416,6 +420,7 @@ const styles = StyleSheet.create({
   },
   scrollContent: {
     paddingHorizontal: 24,
+    paddingTop: 8,
     paddingBottom: 100,
   },
   quizCard: {
@@ -426,6 +431,7 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     padding: 16,
     marginBottom: 12,
+    alignItems: 'center',
   },
   quizIcon: {
     width: 48,
@@ -491,6 +497,7 @@ const styles = StyleSheet.create({
   quizActions: {
     flexDirection: 'row',
     alignItems: 'center',
+    marginLeft: 8,
   },
   actionBtn: {
     width: 36,

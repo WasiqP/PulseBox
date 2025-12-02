@@ -509,17 +509,17 @@ const styles = StyleSheet.create({
     borderTopLeftRadius: 30,
     borderTopRightRadius: 30,
     marginTop: -110, // Overlap more with header
-    paddingTop: 20,
+    paddingTop: 30,
   },
   scrollContent: {
     flexGrow: 1,
-    paddingHorizontal: 20,
+    paddingHorizontal: 24,
     paddingTop: 10,
-    paddingBottom: 20,
+    paddingBottom: 100,
   },
   // Content Header
   contentHeader: {
-    marginBottom: 20,
+    marginBottom: 24,
   },
   contentTitle: {
     fontSize: 24,
@@ -630,7 +630,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#FFFFFF',
     borderRadius: 12,
     paddingHorizontal: 16,
-    paddingVertical: 16,
+    paddingVertical: 14,
     marginBottom: 12,
   },
   formCardLast: {

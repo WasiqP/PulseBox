@@ -234,7 +234,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   scrollContent: {
-    paddingBottom: 40,
+    paddingBottom: 60,
   },
   aiHeader: {
     alignItems: 'center',
@@ -267,9 +267,10 @@ const styles = StyleSheet.create({
   },
   form: {
     paddingHorizontal: 24,
+    paddingTop: 8,
   },
   inputGroup: {
-    marginBottom: 24,
+    marginBottom: 20,
   },
   label: {
     fontSize: 16,

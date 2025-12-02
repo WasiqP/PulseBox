@@ -379,8 +379,10 @@ const styles = StyleSheet.create({
   filterTabs: {
     flexDirection: 'row',
     paddingHorizontal: 24,
-    paddingVertical: 12,
+    paddingTop: 8,
+    paddingBottom: 16,
     gap: 8,
+    backgroundColor: '#FFFFFF',
   },
   filterTab: {
     paddingHorizontal: 16,
@@ -423,7 +425,8 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   scrollContent: {
-    padding: 24,
+    paddingHorizontal: 24,
+    paddingTop: 16,
     paddingBottom: 100,
   },
   responseCard: {

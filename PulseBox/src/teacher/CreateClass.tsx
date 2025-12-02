@@ -5,8 +5,35 @@ import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import type { RootStackParamList } from '../types/navigation';
 import BackIcon from '../../assets/images/Back.svg';
 import { useClasses, ClassData } from '../context/ClassesContext';
+import Svg, { Path } from 'react-native-svg';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'CreateClass'>;
+
+interface Student {
+  id: string;
+  name: string;
+  email?: string;
+}
+
+// Icons
+const PlusIcon = ({ size = 20, color = '#A060FF' }) => (
+  <Svg width={size} height={size} viewBox="0 0 24 24" fill="none">
+    <Path d="M12 5V19M5 12H19" stroke={color} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
+  </Svg>
+);
+
+const XIcon = ({ size = 18, color = '#F44336' }) => (
+  <Svg width={size} height={size} viewBox="0 0 24 24" fill="none">
+    <Path d="M18 6L6 18M6 6L18 18" stroke={color} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
+  </Svg>
+);
+
+const UserIcon = ({ size = 20, color = '#666' }) => (
+  <Svg width={size} height={size} viewBox="0 0 24 24" fill="none">
+    <Path d="M20 21V19C20 17.9391 19.5786 16.9217 18.8284 16.1716C18.0783 15.4214 17.0609 15 16 15H8C6.93913 15 5.92172 15.4214 5.17157 16.1716C4.42143 16.9217 4 17.9391 4 19V21" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+    <Path d="M12 11C14.2091 11 16 9.20914 16 7C16 4.79086 14.2091 3 12 3C9.79086 3 8 4.79086 8 7C8 9.20914 9.79086 11 12 11Z" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+  </Svg>
+);
 
 const CreateClass: React.FC<Props> = ({ navigation }) => {
   const { addClass } = useClasses();
@@ -15,9 +42,33 @@ const CreateClass: React.FC<Props> = ({ navigation }) => {
   const [gradeLevel, setGradeLevel] = useState('');
   const [schedule, setSchedule] = useState('');
   const [roomNumber, setRoomNumber] = useState('');
+  const [students, setStudents] = useState<Student[]>([]);
+  const [studentName, setStudentName] = useState('');
+  const [studentEmail, setStudentEmail] = useState('');
 
   const gradeLevels = ['Kindergarten', 'Grade 1', 'Grade 2', 'Grade 3', 'Grade 4', 'Grade 5', 
                        'Grade 6', 'Grade 7', 'Grade 8', 'Grade 9', 'Grade 10', 'Grade 11', 'Grade 12'];
+
+  const handleAddStudent = () => {
+    if (!studentName.trim()) {
+      Alert.alert('Missing Information', 'Please enter a student name');
+      return;
+    }
+
+    const newStudent: Student = {
+      id: Date.now().toString(),
+      name: studentName.trim(),
+      email: studentEmail.trim() || undefined,
+    };
+
+    setStudents([...students, newStudent]);
+    setStudentName('');
+    setStudentEmail('');
+  };
+
+  const handleRemoveStudent = (studentId: string) => {
+    setStudents(students.filter(s => s.id !== studentId));
+  };
 
   const handleCreate = async () => {
     if (!className || !subject || !gradeLevel) {
@@ -31,7 +82,7 @@ const CreateClass: React.FC<Props> = ({ navigation }) => {
       name: className,
       subject: subject,
       gradeLevel: gradeLevel,
-      studentCount: 0, // Will be updated when students are added
+      studentCount: students.length, // Set to number of added students
       schedule: schedule || 'Not set',
       roomNumber: roomNumber || undefined,
       createdAt: new Date().toISOString(),
@@ -40,7 +91,7 @@ const CreateClass: React.FC<Props> = ({ navigation }) => {
     // Save to context (which saves to AsyncStorage)
     await addClass(newClass);
 
-    Alert.alert('Success', 'Class created successfully!', [
+    Alert.alert('Success', `Class created successfully with ${students.length} student${students.length !== 1 ? 's' : ''}!`, [
       { text: 'OK', onPress: () => navigation.goBack() },
     ]);
   };
@@ -137,6 +188,75 @@ const CreateClass: React.FC<Props> = ({ navigation }) => {
             />
           </View>
 
+          {/* Add Students Section */}
+          <View style={styles.inputGroup}>
+            <Text style={styles.label}>Add Students (Optional)</Text>
+            <Text style={styles.subLabel}>You can add students now or later</Text>
+            
+            <View style={styles.addStudentContainer}>
+              <View style={styles.studentInputRow}>
+                <View style={styles.studentInputGroup}>
+                  <TextInput
+                    style={[styles.input, styles.studentNameInput]}
+                    placeholder="Student Name"
+                    placeholderTextColor="#999"
+                    value={studentName}
+                    onChangeText={setStudentName}
+                  />
+                </View>
+                <View style={styles.studentInputGroup}>
+                  <TextInput
+                    style={[styles.input, styles.studentEmailInput]}
+                    placeholder="Email (Optional)"
+                    placeholderTextColor="#999"
+                    value={studentEmail}
+                    onChangeText={setStudentEmail}
+                    keyboardType="email-address"
+                    autoCapitalize="none"
+                  />
+                </View>
+                <Pressable
+                  style={styles.addStudentBtn}
+                  onPress={handleAddStudent}
+                  android_ripple={{ color: 'rgba(160,96,255,0.2)' }}
+                >
+                  <PlusIcon size={20} color="#FFFFFF" />
+                </Pressable>
+              </View>
+            </View>
+
+            {/* Students List */}
+            {students.length > 0 && (
+              <View style={styles.studentsList}>
+                <Text style={styles.studentsListTitle}>
+                  Added Students ({students.length})
+                </Text>
+                {students.map((student) => (
+                  <View key={student.id} style={styles.studentItem}>
+                    <View style={styles.studentItemInfo}>
+                      <View style={styles.studentAvatar}>
+                        <UserIcon size={16} color="#FFFFFF" />
+                      </View>
+                      <View style={styles.studentItemText}>
+                        <Text style={styles.studentItemName}>{student.name}</Text>
+                        {student.email && (
+                          <Text style={styles.studentItemEmail}>{student.email}</Text>
+                        )}
+                      </View>
+                    </View>
+                    <Pressable
+                      style={styles.removeStudentBtn}
+                      onPress={() => handleRemoveStudent(student.id)}
+                      android_ripple={{ color: 'rgba(244,67,54,0.1)', borderless: true }}
+                    >
+                      <XIcon size={18} color="#F44336" />
+                    </Pressable>
+                  </View>
+                ))}
+              </View>
+            )}
+          </View>
+
           <Pressable
             style={styles.createBtn}
             onPress={handleCreate}
@@ -184,14 +304,14 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   scrollContent: {
-    paddingBottom: 40,
+    paddingBottom: 60,
   },
   form: {
     paddingHorizontal: 24,
-    paddingTop: 32,
+    paddingTop: 24,
   },
   inputGroup: {
-    marginBottom: 24,
+    marginBottom: 20,
   },
   label: {
     fontSize: 16,
@@ -253,6 +373,99 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     fontFamily: 'Poppins-SemiBold',
     color: '#FFFFFF',
+  },
+  subLabel: {
+    fontSize: 14,
+    fontFamily: 'Poppins-Regular',
+    color: '#999999',
+    marginTop: 4,
+    marginBottom: 12,
+  },
+  addStudentContainer: {
+    marginTop: 8,
+  },
+  studentInputRow: {
+    flexDirection: 'row',
+    gap: 8,
+    alignItems: 'flex-start',
+  },
+  studentInputGroup: {
+    flex: 1,
+  },
+  studentNameInput: {
+    flex: 1,
+  },
+  studentEmailInput: {
+    flex: 1,
+  },
+  addStudentBtn: {
+    width: 48,
+    height: 48,
+    borderRadius: 12,
+    backgroundColor: '#A060FF',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginTop: 0,
+  },
+  studentsList: {
+    marginTop: 16,
+    paddingTop: 16,
+    borderTopWidth: 1,
+    borderTopColor: '#E0E0E0',
+  },
+  studentsListTitle: {
+    fontSize: 16,
+    fontWeight: '600',
+    fontFamily: 'Poppins-SemiBold',
+    color: '#000000',
+    marginBottom: 12,
+  },
+  studentItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    backgroundColor: '#F5F5F5',
+    borderWidth: 1,
+    borderColor: '#E0E0E0',
+    borderRadius: 12,
+    padding: 12,
+    marginBottom: 8,
+  },
+  studentItemInfo: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    flex: 1,
+  },
+  studentAvatar: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    backgroundColor: '#A060FF',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginRight: 12,
+  },
+  studentItemText: {
+    flex: 1,
+  },
+  studentItemName: {
+    fontSize: 15,
+    fontWeight: '600',
+    fontFamily: 'Poppins-SemiBold',
+    color: '#000000',
+    marginBottom: 2,
+  },
+  studentItemEmail: {
+    fontSize: 13,
+    fontFamily: 'Poppins-Regular',
+    color: '#666666',
+  },
+  removeStudentBtn: {
+    width: 32,
+    height: 32,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginLeft: 8,
   },
 });
 

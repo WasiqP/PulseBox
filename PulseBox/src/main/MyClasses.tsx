@@ -200,8 +200,8 @@ const styles = StyleSheet.create({
     borderColor: '#A060FF',
     borderRadius: 16,
     marginHorizontal: 24,
-    marginTop: 16,
-    marginBottom: 20,
+    marginTop: 12,
+    marginBottom: 24,
     shadowColor: '#A060FF',
     shadowOpacity: 0.1,
     shadowOffset: { width: 0, height: 4 },
@@ -249,6 +249,7 @@ const styles = StyleSheet.create({
   },
   scrollContent: {
     paddingHorizontal: 24,
+    paddingTop: 8,
     paddingBottom: 100,
   },
   classCard: {
@@ -259,6 +260,7 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     padding: 16,
     marginBottom: 12,
+    alignItems: 'center',
   },
   classIcon: {
     width: 48,

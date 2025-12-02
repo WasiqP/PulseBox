@@ -111,7 +111,7 @@ const styles = StyleSheet.create({
     marginBottom: 32,
   },
   scrollContent: {
-    paddingBottom: 20,
+    paddingBottom: 100,
   },
   settingsSection: {
     marginBottom: 32,
