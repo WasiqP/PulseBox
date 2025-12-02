@@ -28,44 +28,44 @@ const UseCasesSection = () => {
 
     const useCases = [
         {
-            industry: 'E-commerce',
-            useCase: 'Product Feedback & Reviews',
-            description: 'Collect customer reviews and product feedback to improve your offerings.',
+            industry: 'Elementary',
+            useCase: 'Primary School Teachers',
+            description: 'Manage multiple classes, track attendance, create age-appropriate quizzes, and generate engaging lesson plans.',
             color: '#A060FF',
             size: 'large'
         },
         {
-            industry: 'Healthcare',
-            useCase: 'Patient Satisfaction Surveys',
-            description: 'Gather patient feedback to enhance care quality and service delivery.',
+            industry: 'Secondary',
+            useCase: 'High School Teachers',
+            description: 'Handle complex schedules, manage assignments across subjects, track student progress, and automate grading workflows.',
             color: '#8A4DE6',
             size: 'medium'
         },
         {
-            industry: 'Education',
-            useCase: 'Course Evaluations',
-            description: 'Get student feedback on courses and teaching methods for continuous improvement.',
+            industry: 'Subject-Specific',
+            useCase: 'Specialized Teachers',
+            description: 'Create subject-specific lesson plans, design custom quizzes for math, science, languages, and more.',
             color: '#A060FF',
             size: 'medium'
         },
         {
-            industry: 'Restaurants',
-            useCase: 'Dining Experience Feedback',
-            description: 'Understand customer satisfaction and improve your restaurant experience.',
+            industry: 'Substitute',
+            useCase: 'Substitute Teachers',
+            description: 'Quickly access class information, mark attendance, and continue lesson plans seamlessly.',
             color: '#8A4DE6',
             size: 'large'
         },
         {
-            industry: 'SaaS',
-            useCase: 'Feature Requests & NPS',
-            description: 'Collect user feedback and measure Net Promoter Score to guide product development.',
+            industry: 'Administration',
+            useCase: 'School Administrators',
+            description: 'Monitor teacher productivity, track class statistics, and manage school-wide resources efficiently.',
             color: '#A060FF',
             size: 'small'
         },
         {
-            industry: 'Events',
-            useCase: 'Event Feedback Forms',
-            description: 'Gather attendee feedback to make your next event even better.',
+            industry: 'Tutoring',
+            useCase: 'Private Tutors',
+            description: 'Organize student sessions, create personalized lesson plans, and track individual student progress.',
             color: '#8A4DE6',
             size: 'small'
         }
@@ -84,13 +84,13 @@ const UseCasesSection = () => {
                     className="section-title"
                     variants={fadeInUp}
                 >
-                    Perfect for Every Industry
+                    Perfect for Every Teacher
                 </motion.h2>
                 <motion.p
                     className="section-subtitle"
                     variants={fadeInUp}
                 >
-                    See how businesses across industries use PulseBox to grow
+                    Whether you teach elementary, high school, or specialize in a subject, PulseBox adapts to your needs
                 </motion.p>
                 <div className="use-cases-masonry">
                     {useCases.map((useCase, index) => (

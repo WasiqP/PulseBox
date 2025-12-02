@@ -26,10 +26,10 @@ const StatsSection = () => {
     };
 
     const stats = [
-        { number: '10K+', label: 'Active Users' },
-        { number: '500K+', label: 'Forms Created' },
-        { number: '2M+', label: 'Responses Collected' },
-        { number: '98%', label: 'Customer Satisfaction' }
+        { number: '5K+', label: 'Teachers Using PulseBox' },
+        { number: '50K+', label: 'Classes Managed' },
+        { number: '1M+', label: 'Lesson Plans Generated' },
+        { number: '10+', label: 'Hours Saved Per Week' }
     ];
 
     return (
@@ -46,7 +46,7 @@ const StatsSection = () => {
                     className="section-title"
                     variants={fadeInUp}
                 >
-                    Trusted by Businesses Worldwide
+                    Trusted by Teachers Everywhere
                 </motion.h2>
                 <div className="stats-bar">
                     {stats.map((stat, index) => (

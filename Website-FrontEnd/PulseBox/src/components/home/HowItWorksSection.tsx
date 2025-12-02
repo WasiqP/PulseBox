@@ -30,20 +30,20 @@ const HowItWorksSection = () => {
     const steps = [
         {
             step: '01',
-            title: 'Create Your Form',
-            description: 'Use our intuitive form builder to create custom forms with drag-and-drop ease. Choose from multiple question types and customize to match your brand.',
+            title: 'Set Up Your Classes',
+            description: 'Create and organize your classes in minutes. Add students, set schedules, and manage all your teaching responsibilities in one place.',
             icon: FiStar
         },
         {
             step: '02',
-            title: 'Share & Collect',
-            description: 'Share your form via link, QR code, or embed it on your website. Responses are collected automatically and securely stored.',
+            title: 'Let AI Assist You',
+            description: 'Generate lesson plans with AI, mark attendance quickly, create quizzes, and automate repetitive admin tasks. Save hours every week.',
             icon: FiUpload
         },
         {
             step: '03',
-            title: 'Analyze & Act',
-            description: 'View real-time analytics, export data, and gain insights to make data-driven decisions that improve your business.',
+            title: 'Focus on Teaching',
+            description: 'With administrative tasks automated, you can dedicate more time to what you love—teaching and inspiring your students.',
             icon: FiTrendingUp
         }
     ];
@@ -67,7 +67,7 @@ const HowItWorksSection = () => {
                     className="section-subtitle"
                     variants={fadeInUp}
                 >
-                    Get started in minutes with our simple 3-step process
+                    Start saving time and reducing stress in just three simple steps
                 </motion.p>
 
                 <div className="timeline-container">

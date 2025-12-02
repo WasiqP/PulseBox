@@ -38,43 +38,43 @@ const FeaturesSection = () => {
     const features = [
         {
             icon: FiFileText,
-            title: 'Custom Forms',
-            description: 'Create beautiful forms with multiple question types tailored to your needs.',
+            title: 'AI Lesson Planner',
+            description: 'Generate comprehensive lesson plans in seconds with AI assistance. Customize for any subject, grade level, and duration.',
             style: 'gradient',
             gradient: 'linear-gradient(135deg, rgba(160, 96, 255, 0.15) 0%, rgba(138, 77, 230, 0.1) 100%)'
         },
         {
             icon: FiBarChart2,
-            title: 'Analytics Dashboard',
-            description: 'View responses and insights in real-time with our intuitive dashboard.',
+            title: 'Class Management',
+            description: 'Organize all your classes in one place. Track students, manage schedules, and access class details instantly.',
             style: 'outlined',
             accent: '#A060FF'
         },
         {
             icon: FiLink,
-            title: 'Easy Sharing',
-            description: 'Share forms via links or QR codes with just one click.',
+            title: 'Quick Attendance',
+            description: 'Mark attendance with a simple tap. Track present, absent, and late students with real-time statistics.',
             style: 'solid',
             bgColor: '#A060FF'
         },
         {
             icon: FiSmartphone,
-            title: 'Mobile & Web',
-            description: 'Access your forms and responses from any device, anywhere.',
+            title: 'Quizzes & Assignments',
+            description: 'Create quizzes, assignments, and tests with our intuitive form builder. Share with students instantly.',
             style: 'minimal',
             borderStyle: 'dashed'
         },
         {
             icon: FiLock,
-            title: 'Secure & Private',
-            description: 'Your data is protected with enterprise-grade security.',
+            title: 'Student Management',
+            description: 'View student profiles, track progress, and manage all your students across multiple classes.',
             style: 'gradient',
             gradient: 'linear-gradient(135deg, rgba(160, 96, 255, 0.1) 0%, rgba(138, 77, 230, 0.15) 100%)'
         },
         {
             icon: FiZap,
-            title: 'Real-time Updates',
-            description: 'Get instant notifications when responses are submitted.',
+            title: 'Time-Saving Automation',
+            description: 'Save 10+ hours per week by automating admin tasks. Focus on what matters most—teaching.',
             style: 'highlighted',
             highlight: '#8A4DE6'
         }
@@ -93,14 +93,14 @@ const FeaturesSection = () => {
                     className="section-title"
                     variants={fadeInUp}
                 >
-                    Powerful Features for Your Business
+                    Everything You Need to Teach Efficiently
                 </motion.h2>
 
                 <motion.p
                     className="section-subtitle"
                     variants={fadeInUp}
                 >
-                    Everything you need to collect, analyze, and act on feedback
+                    Powerful tools designed specifically for teachers to reduce admin burden and maximize teaching time
                 </motion.p>
 
                 <div className="features-showcase">

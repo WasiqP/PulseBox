@@ -38,7 +38,7 @@ const AboutPage = () => {
           About <span className="highlight">PulseBox</span>
         </motion.h1>
         <motion.p className="about-subtitle" variants={fadeInUp}>
-          Empowering businesses to collect valuable feedback and make data-driven decisions
+          Empowering teachers to save time, reduce stress, and focus on what matters most—teaching
         </motion.p>
       </motion.section>
 
@@ -55,9 +55,10 @@ const AboutPage = () => {
               Our Mission
             </motion.h2>
             <motion.p className="section-text" variants={fadeInUp}>
-              At PulseBox, we believe that feedback is the foundation of growth. Our mission is to 
-              provide businesses with powerful, easy-to-use tools that help them understand their 
-              customers better and make informed decisions that drive success.
+              At PulseBox, we understand that teachers are the 2nd most stressed professionals in the world, 
+              largely due to overwhelming administrative tasks. Our mission is to provide teachers with an 
+              AI-powered personal assistant that automates these tasks, saves 10+ hours per week, and allows 
+              educators to focus on what they do best—inspiring and teaching students.
             </motion.p>
           </motion.div>
 
@@ -73,24 +74,45 @@ const AboutPage = () => {
             </motion.h2>
             <motion.div className="features-list" variants={fadeInUp}>
               <div className="feature-item">
-                <div className="feature-icon">🎯</div>
+                <div className="feature-icon">✨</div>
                 <div>
-                  <h3>Easy Form Creation</h3>
-                  <p>Create custom forms with drag-and-drop simplicity</p>
+                  <h3>AI Lesson Planner</h3>
+                  <p>Generate comprehensive lesson plans in seconds with AI assistance</p>
                 </div>
               </div>
               <div className="feature-item">
-                <div className="feature-icon">📊</div>
+                <div className="feature-icon">📚</div>
                 <div>
-                  <h3>Real-time Analytics</h3>
-                  <p>Track responses and insights as they come in</p>
+                  <h3>Class Management</h3>
+                  <p>Organize all your classes, students, and schedules in one place</p>
+                </div>
+              </div>
+              <div className="feature-item">
+                <div className="feature-icon">✅</div>
+                <div>
+                  <h3>Quick Attendance</h3>
+                  <p>Mark attendance in seconds with our intuitive tap-to-mark system</p>
+                </div>
+              </div>
+              <div className="feature-item">
+                <div className="feature-icon">📝</div>
+                <div>
+                  <h3>Quizzes & Assignments</h3>
+                  <p>Create and share quizzes, assignments, and tests effortlessly</p>
+                </div>
+              </div>
+              <div className="feature-item">
+                <div className="feature-icon">👥</div>
+                <div>
+                  <h3>Student Management</h3>
+                  <p>Track student progress and manage all your students efficiently</p>
                 </div>
               </div>
               <div className="feature-item">
                 <div className="feature-icon">🔒</div>
                 <div>
                   <h3>Secure & Private</h3>
-                  <p>Your data is protected with enterprise-grade security</p>
+                  <p>Student data is protected with enterprise-grade security</p>
                 </div>
               </div>
             </motion.div>
@@ -107,9 +129,11 @@ const AboutPage = () => {
               Why Choose PulseBox?
             </motion.h2>
             <motion.p className="section-text" variants={fadeInUp}>
-              We've built PulseBox with one goal in mind: to make feedback collection simple, 
-              beautiful, and effective. Whether you're a small business or a large enterprise, 
-              our platform scales with you.
+              We've built PulseBox specifically for teachers, with one goal in mind: to reduce 
+              administrative burden and maximize teaching time. Whether you teach elementary, 
+              middle, or high school, whether you have one class or ten, PulseBox adapts to your 
+              needs. Our AI-powered features automate 70% of admin tasks, saving you 10+ hours 
+              per week and allowing you to focus on what truly matters—your students.
             </motion.p>
           </motion.div>
         </div>

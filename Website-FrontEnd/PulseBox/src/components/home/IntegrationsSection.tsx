@@ -27,8 +27,8 @@ const IntegrationsSection = () => {
     };
 
     const integrations = [
-        'Slack', 'Google Sheets', 'Zapier', 'Webhook', 'API', 'Email',
-        'Slack', 'Google Sheets', 'Zapier', 'Webhook', 'API', 'Email'
+        'iOS', 'Android', 'Web', 'Google Classroom', 'Microsoft Teams', 'Canvas',
+        'iOS', 'Android', 'Web', 'Google Classroom', 'Microsoft Teams', 'Canvas'
     ];
 
     return (
@@ -44,13 +44,13 @@ const IntegrationsSection = () => {
                     className="section-title"
                     variants={fadeInUp}
                 >
-                    Seamless Integrations
+                    Works Everywhere You Teach
                 </motion.h2>
                 <motion.p
                     className="section-subtitle"
                     variants={fadeInUp}
                 >
-                    Connect PulseBox with your favorite tools and workflows
+                    Access PulseBox on any device—mobile app, web browser, or integrate with your existing teaching platforms
                 </motion.p>
                 <div className="integrations-wall">
                     <div className="integrations-scroll">

@@ -40,13 +40,13 @@ const TestimonialsSection = () => {
                     className="section-title"
                     variants={fadeInUp}
                 >
-                    What Our Customers Say
+                    What Teachers Are Saying
                 </motion.h2>
                 <motion.p
                     className="section-subtitle"
                     variants={fadeInUp}
                 >
-                    Join thousands of satisfied businesses using PulseBox
+                    Join thousands of teachers who have transformed their workflow with PulseBox
                 </motion.p>
 
                 <motion.div
@@ -66,66 +66,66 @@ const TestimonialsSection = () => {
                         glowColor="160, 96, 255"
                         testimonials={[
                             {
-                                name: 'Sarah Johnson',
-                                role: 'CEO',
-                                company: 'TechStart Inc.',
-                                content: 'PulseBox has transformed how we collect customer feedback. The analytics are incredible and the forms are so easy to create. Our team productivity increased significantly!',
+                                name: 'Sarah Mitchell',
+                                role: 'Mathematics Teacher',
+                                company: 'Springfield High School',
+                                content: 'PulseBox has completely transformed my workflow. The AI lesson planner saves me 3 hours every week, and I can mark attendance in seconds. I finally have time to focus on teaching!',
                                 rating: 5,
                                 color: '#FFFFFF'
                             },
                             {
                                 name: 'Michael Chen',
-                                role: 'Marketing Director',
-                                company: 'RetailPlus',
-                                content: 'The best feedback collection tool we\'ve used. Our response rates increased by 40% since switching to PulseBox. Highly recommend!',
+                                role: 'Science Teacher',
+                                company: 'Riverside Elementary',
+                                content: 'Managing 5 different classes used to be overwhelming. With PulseBox, everything is organized and accessible. The class management features are a lifesaver!',
                                 rating: 5,
                                 color: '#FFFFFF'
                             },
                             {
                                 name: 'Emily Rodriguez',
-                                role: 'Operations Manager',
-                                company: 'HealthCare Pro',
-                                content: 'Simple, powerful, and secure. Exactly what we needed for patient feedback. The real-time analytics help us make data-driven decisions.',
+                                role: 'English Teacher',
+                                company: 'Lincoln Middle School',
+                                content: 'Creating quizzes and assignments is now so quick and easy. The form builder is intuitive, and my students love the interactive quizzes. Game changer!',
                                 rating: 5,
                                 color: '#FFFFFF'
                             },
                             {
                                 name: 'David Thompson',
-                                role: 'Product Manager',
-                                company: 'SaaS Innovations',
-                                content: 'PulseBox\'s form builder is incredibly intuitive. We can create complex surveys in minutes. The integration capabilities are outstanding.',
+                                role: 'History Teacher',
+                                company: 'Westfield Academy',
+                                content: 'The AI lesson planner generates comprehensive plans that I can customize. It understands different grade levels and learning objectives perfectly. Highly recommend!',
                                 rating: 5,
                                 color: '#FFFFFF'
                             },
                             {
                                 name: 'Lisa Wang',
-                                role: 'Customer Success Lead',
-                                company: 'E-commerce Solutions',
-                                content: 'Our customer satisfaction scores improved dramatically after implementing PulseBox. The visual analytics make it easy to spot trends and act quickly.',
+                                role: 'Elementary Teacher',
+                                company: 'Oakwood Primary',
+                                content: 'As a teacher with 30 students, attendance used to take forever. Now I can mark it in under a minute. PulseBox has given me back so much time!',
                                 rating: 5,
                                 color: '#FFFFFF'
                             },
                             {
                                 name: 'James Martinez',
-                                role: 'Founder',
-                                company: 'EventPro',
-                                content: 'We use PulseBox for all our event feedback. The QR code sharing feature is a game-changer. Setup takes minutes, not hours.',
+                                role: 'Substitute Teacher',
+                                company: 'Various Schools',
+                                content: 'PulseBox makes substitute teaching so much easier. I can quickly access class information, continue lesson plans, and mark attendance seamlessly. Essential tool!',
                                 rating: 5,
                                 color: '#FFFFFF'
                             },
                             {
                                 name: 'Rachel Green',
-                                role: 'HR Director',
-                                company: 'Global Tech Corp',
-                                content: 'PulseBox streamlined our employee feedback process. The secure data handling gives us peace of mind, and the export features are perfect for reporting.',
+                                role: 'Language Arts Teacher',
+                                company: 'Central High School',
+                                content: 'The student management features help me track progress across all my classes. I can see who needs extra help and who\'s excelling. Data-driven teaching made easy!',
                                 rating: 5,
                                 color: '#FFFFFF'
                             },
                             {
                                 name: 'Alex Kumar',
-                                role: 'Head of Product',
-                                company: 'StartupHub',
-                                content: 'As a startup, we needed something affordable yet powerful. PulseBox exceeded our expectations. The free tier is generous, and the paid features are worth every penny.',
+                                role: 'Physics Teacher',
+                                company: 'Tech Prep High',
+                                content: 'I\'ve tried many teacher apps, but PulseBox is the only one that truly understands what teachers need. The combination of AI assistance and practical tools is perfect.',
                                 rating: 5,
                                 color: '#FFFFFF'
                             }

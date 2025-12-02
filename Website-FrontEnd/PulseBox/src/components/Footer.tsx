@@ -12,7 +12,7 @@ const Footer = () => {
               <span className="logo-box">Box</span>
             </Link>
             <p className="footer-tagline">
-              Collect feedback & grow your business.
+              Your AI Teaching Assistant. Save time, focus on teaching.
             </p>
           </div>
 

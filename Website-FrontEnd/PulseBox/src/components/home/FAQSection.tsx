@@ -30,24 +30,24 @@ const FAQSection = () => {
 
     const faqs = [
         {
-            question: 'How secure is my data?',
-            answer: 'We use enterprise-grade encryption and security measures to protect your data. All information is stored securely and we comply with GDPR and other data protection regulations.'
+            question: 'How does the AI Lesson Planner work?',
+            answer: 'Simply input your subject, topic, grade level, and duration. Our AI generates comprehensive lesson plans with learning objectives, activities, materials, and assessment suggestions. You can customize and refine the generated plans to match your teaching style.'
         },
         {
-            question: 'Can I customize the forms?',
-            answer: 'Yes! PulseBox offers extensive customization options including branding, colors, fonts, and layout. You can create forms that perfectly match your brand identity.'
+            question: 'Can I use PulseBox for multiple classes?',
+            answer: 'Yes! PulseBox is designed to handle multiple classes simultaneously. You can organize classes by subject, grade level, or schedule. Each class has its own attendance tracking, student list, and assignment management.'
         },
         {
-            question: 'What happens to the responses?',
-            answer: 'All responses are stored securely in your dashboard. You can view them in real-time, export to CSV or Excel, and set up automated notifications for new submissions.'
+            question: 'How secure is student data?',
+            answer: 'We take data security seriously. All student information is encrypted and stored securely. We comply with educational data protection regulations and ensure your students\' privacy is protected at all times.'
         },
         {
-            question: 'Is there a free plan?',
-            answer: 'Yes! We offer a free plan with basic features. You can upgrade anytime to unlock advanced features like analytics, custom branding, and priority support.'
+            question: 'Can I use PulseBox on my phone?',
+            answer: 'Absolutely! PulseBox is available as a mobile app for iOS and Android, as well as a web application. You can mark attendance, create quizzes, and access your classes from anywhere, anytime.'
         },
         {
-            question: 'Can I embed forms on my website?',
-            answer: 'Absolutely! You can embed forms using our embed code, share via link, or generate QR codes. Forms are mobile-responsive and work on all devices.'
+            question: 'How much time will PulseBox save me?',
+            answer: 'Teachers using PulseBox report saving 10+ hours per week on administrative tasks. The AI lesson planner alone can save 2-3 hours per week, and automated attendance tracking saves additional time every day.'
         }
     ];
 
