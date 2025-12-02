@@ -11,6 +11,7 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { StatusBar, useColorScheme } from 'react-native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { FormsProvider } from './src/context/FormsContext';
+import { ClassesProvider } from './src/context/ClassesContext';
 
 // Import screens
 import GetStarted from './src/onboarding/GetStarted';
@@ -29,6 +30,13 @@ import EditForm from './src/forms/EditForm.tsx';
 import QuestionsScreen from './src/forms/QuestionsScreen.tsx';
 import SwapQuestionsScreen from './src/forms/SwapQuestionsScreen.tsx';
 import ShareForm from './src/forms/ShareForm.tsx';
+// Teacher-specific screens
+import MyClasses from './src/main/MyClasses';
+import LessonPlanner from './src/teacher/LessonPlanner';
+import Attendance from './src/teacher/Attendance';
+import Quizzes from './src/teacher/Quizzes';
+import CreateClass from './src/teacher/CreateClass';
+import ClassDetails from './src/teacher/ClassDetails';
 
 // Navigation types
 import type { RootStackParamList } from './src/types/navigation';
@@ -41,8 +49,9 @@ function App() {
   return (
     <SafeAreaProvider>
       <FormsProvider>
-        <StatusBar barStyle={isDarkMode ? 'light-content' : 'dark-content'} />
-        <NavigationContainer>
+        <ClassesProvider>
+          <StatusBar barStyle={isDarkMode ? 'light-content' : 'dark-content'} />
+          <NavigationContainer>
         <Stack.Navigator 
           initialRouteName="GetStarted"
           screenOptions={{
@@ -56,9 +65,17 @@ function App() {
           <Stack.Screen name="Login" component={Login} />
           <Stack.Screen name="SignUp" component={SignUp} />
           <Stack.Screen name="Home" component={Home} />
-          <Stack.Screen name="MyForms" component={MyForms} />
+          <Stack.Screen name="MyForms" component={Quizzes} />
+          <Stack.Screen name="MyClasses" component={MyClasses} />
+          <Stack.Screen name="Quizzes" component={Quizzes} />
           <Stack.Screen name="Responses" component={Responses} />
           <Stack.Screen name="Settings" component={Settings} />
+          {/* Teacher-specific screens */}
+          <Stack.Screen name="LessonPlanner" component={LessonPlanner} />
+          <Stack.Screen name="Attendance" component={Attendance} />
+          <Stack.Screen name="CreateClass" component={CreateClass} />
+          <Stack.Screen name="ClassDetails" component={ClassDetails} />
+          {/* Legacy form screens (for quizzes/assignments) */}
           <Stack.Screen name="CreateForm" component={CreateForm} />
           <Stack.Screen name="FormBuilder" component={FormBuilder} />
           <Stack.Screen name="EditForm" component={EditForm} />
@@ -75,6 +92,7 @@ function App() {
           />
         </Stack.Navigator>
       </NavigationContainer>
+        </ClassesProvider>
       </FormsProvider>
     </SafeAreaProvider>
   );

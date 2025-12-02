@@ -1,6 +1,8 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
+import Button from '../components/ui/Button';
+import Galaxy from '../components/Galaxy';
 import './AuthPage.css';
 
 const SignUpPage = () => {
@@ -10,17 +12,20 @@ const SignUpPage = () => {
     password: '',
     confirmPassword: ''
   });
+  const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (formData.password !== formData.confirmPassword) {
       alert('Passwords do not match');
       return;
     }
-    // Handle signup logic here
+    setIsLoading(true);
+    // Simulate API call
+    await new Promise(resolve => setTimeout(resolve, 1500));
     console.log('Signup:', formData);
-    // Navigate to dashboard after successful signup
+    setIsLoading(false);
     navigate('/app');
   };
 
@@ -33,93 +38,133 @@ const SignUpPage = () => {
 
   return (
     <div className="auth-page">
-      <motion.div 
-        className="auth-container"
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5 }}
-      >
-        <div className="auth-header">
-          <Link to="/" className="auth-logo">
-            <span className="logo-pulse">Pulse</span>
-            <span className="logo-box">Box</span>
-          </Link>
-          <h1 className="auth-title">Create Account</h1>
-          <p className="auth-subtitle">Start collecting feedback today</p>
+      <div className="auth-container">
+        {/* Left Side - Visual */}
+        <div className="auth-visual">
+          <div style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', zIndex: 0 }}>
+            <Galaxy
+              transparent={true}
+              density={0.5}
+              starSpeed={0.1}
+              speed={0.2}
+              glowIntensity={0.2}
+              twinkleIntensity={0.1}
+              rotationSpeed={0.01}
+              mouseInteraction={true}
+              mouseRepulsion={false}
+              hueShift={270}
+              saturation={0.6}
+            />
+          </div>
+          <motion.div
+            className="auth-visual-content"
+            initial={{ opacity: 0, x: -30 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.8, delay: 0.2 }}
+          >
+            <h2 className="auth-visual-title">Join <span style={{ color: '#A060FF' }}>PulseBox</span> Today</h2>
+            <p className="auth-visual-text">
+              Start collecting valuable feedback, improve customer satisfaction, and grow your business.
+            </p>
+          </motion.div>
         </div>
 
-        <form className="auth-form" onSubmit={handleSubmit}>
-          <div className="form-group">
-            <label htmlFor="name">Full Name</label>
-            <input
-              type="text"
-              id="name"
-              name="name"
-              value={formData.name}
-              onChange={handleChange}
-              required
-              placeholder="John Doe"
-            />
-          </div>
+        {/* Right Side - Form */}
+        <div className="auth-form-container">
+          <motion.div
+            className="auth-form-wrapper"
+            initial={{ opacity: 0, x: 30 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.8 }}
+          >
+            <div className="auth-header">
+              <Link to="/" className="auth-logo">
+                <span className="logo-pulse">Pulse</span>
+                <span className="logo-box">Box</span>
+              </Link>
+              <h1 className="auth-title">Create Account</h1>
+              <p className="auth-subtitle">Get started with your free account</p>
+            </div>
 
-          <div className="form-group">
-            <label htmlFor="email">Email</label>
-            <input
-              type="email"
-              id="email"
-              name="email"
-              value={formData.email}
-              onChange={handleChange}
-              required
-              placeholder="your.email@example.com"
-            />
-          </div>
+            <form className="auth-form" onSubmit={handleSubmit}>
+              <div className="form-group">
+                <label htmlFor="name">Full Name</label>
+                <input
+                  type="text"
+                  id="name"
+                  name="name"
+                  value={formData.name}
+                  onChange={handleChange}
+                  required
+                  placeholder="John Doe"
+                />
+              </div>
 
-          <div className="form-group">
-            <label htmlFor="password">Password</label>
-            <input
-              type="password"
-              id="password"
-              name="password"
-              value={formData.password}
-              onChange={handleChange}
-              required
-              placeholder="Create a password"
-            />
-          </div>
+              <div className="form-group">
+                <label htmlFor="email">Email</label>
+                <input
+                  type="email"
+                  id="email"
+                  name="email"
+                  value={formData.email}
+                  onChange={handleChange}
+                  required
+                  placeholder="your.email@example.com"
+                />
+              </div>
 
-          <div className="form-group">
-            <label htmlFor="confirmPassword">Confirm Password</label>
-            <input
-              type="password"
-              id="confirmPassword"
-              name="confirmPassword"
-              value={formData.confirmPassword}
-              onChange={handleChange}
-              required
-              placeholder="Confirm your password"
-            />
-          </div>
+              <div className="form-group">
+                <label htmlFor="password">Password</label>
+                <input
+                  type="password"
+                  id="password"
+                  name="password"
+                  value={formData.password}
+                  onChange={handleChange}
+                  required
+                  placeholder="Create a password"
+                />
+              </div>
 
-          <div className="form-options">
-            <label className="checkbox-label">
-              <input type="checkbox" required />
-              <span>I agree to the <Link to="/terms">Terms of Service</Link> and <Link to="/privacy">Privacy Policy</Link></span>
-            </label>
-          </div>
+              <div className="form-group">
+                <label htmlFor="confirmPassword">Confirm Password</label>
+                <input
+                  type="password"
+                  id="confirmPassword"
+                  name="confirmPassword"
+                  value={formData.confirmPassword}
+                  onChange={handleChange}
+                  required
+                  placeholder="Confirm your password"
+                />
+              </div>
 
-          <button type="submit" className="auth-button">
-            Create Account
-          </button>
-        </form>
+              <div className="form-options">
+                <label className="checkbox-label">
+                  <input type="checkbox" required />
+                  <span>I agree to the <Link to="/terms" style={{ color: '#A060FF' }}>Terms</Link> and <Link to="/privacy" style={{ color: '#A060FF' }}>Privacy Policy</Link></span>
+                </label>
+              </div>
 
-        <p className="auth-footer">
-          Already have an account? <Link to="/login">Sign in</Link>
-        </p>
-      </motion.div>
+              <Button
+                type="submit"
+                variant="primary"
+                fullWidth
+                size="lg"
+                isLoading={isLoading}
+              >
+                Create Account
+              </Button>
+            </form>
+
+            <p className="auth-footer">
+              Already have an account? <Link to="/login">Sign in</Link>
+            </p>
+          </motion.div>
+        </div>
+      </div>
     </div>
   );
 };
 
 export default SignUpPage;
-

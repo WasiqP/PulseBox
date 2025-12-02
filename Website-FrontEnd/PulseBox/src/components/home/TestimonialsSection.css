@@ -1,0 +1,9 @@
+.testimonials-section {
+    padding: 100px 2rem;
+    background: #FEFDFF;
+}
+
+.testimonials-container {
+    max-width: 1400px;
+    margin: 0 auto;
+}

@@ -1,7 +1,8 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { theme } from '../theme';
+import Button from '../components/ui/Button';
+import Galaxy from '../components/Galaxy';
 import './AuthPage.css';
 
 const LoginPage = () => {
@@ -9,13 +10,16 @@ const LoginPage = () => {
     email: '',
     password: ''
   });
+  const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Handle login logic here
+    setIsLoading(true);
+    // Simulate API call
+    await new Promise(resolve => setTimeout(resolve, 1500));
     console.log('Login:', formData);
-    // Navigate to dashboard after successful login
+    setIsLoading(false);
     navigate('/app');
   };
 
@@ -28,68 +32,108 @@ const LoginPage = () => {
 
   return (
     <div className="auth-page">
-      <motion.div 
-        className="auth-container"
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5 }}
-      >
-        <div className="auth-header">
-          <Link to="/" className="auth-logo">
-            <span className="logo-pulse">Pulse</span>
-            <span className="logo-box">Box</span>
-          </Link>
-          <h1 className="auth-title">Welcome Back</h1>
-          <p className="auth-subtitle">Sign in to your account to continue</p>
+      <div className="auth-container">
+        {/* Left Side - Visual */}
+        <div className="auth-visual">
+          <div style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', zIndex: 0 }}>
+            <Galaxy
+              transparent={true}
+              density={0.5}
+              starSpeed={0.1}
+              speed={0.2}
+              glowIntensity={0.2}
+              twinkleIntensity={0.1}
+              rotationSpeed={0.01}
+              mouseInteraction={true}
+              mouseRepulsion={false}
+              hueShift={270}
+              saturation={0.6}
+            />
+          </div>
+          <motion.div
+            className="auth-visual-content"
+            initial={{ opacity: 0, x: -30 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.8, delay: 0.2 }}
+          >
+            <h2 className="auth-visual-title">Welcome back to <span style={{ color: '#A060FF' }}>PulseBox</span></h2>
+            <p className="auth-visual-text">
+              Sign in to access your dashboard, manage forms, and view real-time analytics.
+            </p>
+          </motion.div>
         </div>
 
-        <form className="auth-form" onSubmit={handleSubmit}>
-          <div className="form-group">
-            <label htmlFor="email">Email</label>
-            <input
-              type="email"
-              id="email"
-              name="email"
-              value={formData.email}
-              onChange={handleChange}
-              required
-              placeholder="your.email@example.com"
-            />
-          </div>
+        {/* Right Side - Form */}
+        <div className="auth-form-container">
+          <motion.div
+            className="auth-form-wrapper"
+            initial={{ opacity: 0, x: 30 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.8 }}
+          >
+            <div className="auth-header">
+              <Link to="/" className="auth-logo">
+                <span className="logo-pulse">Pulse</span>
+                <span className="logo-box">Box</span>
+              </Link>
+              <h1 className="auth-title">Sign In</h1>
+              <p className="auth-subtitle">Enter your details to continue</p>
+            </div>
 
-          <div className="form-group">
-            <label htmlFor="password">Password</label>
-            <input
-              type="password"
-              id="password"
-              name="password"
-              value={formData.password}
-              onChange={handleChange}
-              required
-              placeholder="Enter your password"
-            />
-          </div>
+            <form className="auth-form" onSubmit={handleSubmit}>
+              <div className="form-group">
+                <label htmlFor="email">Email</label>
+                <input
+                  type="email"
+                  id="email"
+                  name="email"
+                  value={formData.email}
+                  onChange={handleChange}
+                  required
+                  placeholder="your.email@example.com"
+                />
+              </div>
 
-          <div className="form-options">
-            <label className="checkbox-label">
-              <input type="checkbox" />
-              <span>Remember me</span>
-            </label>
-            <Link to="/forgot-password" className="forgot-link">Forgot password?</Link>
-          </div>
+              <div className="form-group">
+                <label htmlFor="password">Password</label>
+                <input
+                  type="password"
+                  id="password"
+                  name="password"
+                  value={formData.password}
+                  onChange={handleChange}
+                  required
+                  placeholder="Enter your password"
+                />
+              </div>
 
-          <button type="submit" className="auth-button">
-            Sign In
-          </button>
-        </form>
+              <div className="form-options">
+                <label className="checkbox-label">
+                  <input type="checkbox" />
+                  <span>Remember me</span>
+                </label>
+                <Link to="/forgot-password" className="forgot-link">Forgot password?</Link>
+              </div>
 
-        <p className="auth-footer">
-          Don't have an account? <Link to="/signup">Sign up</Link>
-        </p>
-      </motion.div>
+              <Button
+                type="submit"
+                variant="primary"
+                fullWidth
+                size="lg"
+                isLoading={isLoading}
+              >
+                Sign In
+              </Button>
+            </form>
+
+            <p className="auth-footer">
+              Don't have an account? <Link to="/signup">Sign up</Link>
+            </p>
+          </motion.div>
+        </div>
+      </div>
     </div>
   );
 };
 
 export default LoginPage;
-

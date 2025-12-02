@@ -6,12 +6,20 @@ import type { RootStackParamList } from '../types/navigation';
 import { theme } from '../theme';
 import Svg, { Path } from 'react-native-svg';
 import BottomTab from '../components/BottomTab';
-import { useForms } from '../context/FormsContext';
-import FormIcon from '../components/FormIcons';
 import ShareIcon from '../../assets/images/share.svg';
-import EditIcon from '../../assets/images/edit.svg';
+import { useClasses } from '../context/ClassesContext';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'Home'>;
+
+// Book Icon for Classes
+const BookIcon = ({ size = 24, color = '#666' }) => (
+  <Svg width={size} height={size} viewBox="0 0 24 24" fill="none">
+    <Path d="M4 19.5C4 18.837 4.26339 18.2011 4.73223 17.7322C5.20107 17.2634 5.83696 17 6.5 17H20" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+    <Path d="M6.5 2H20V22H6.5C5.83696 22 5.20107 21.7366 4.73223 21.2678C4.26339 20.7989 4 20.163 4 19.5V4.5C4 3.83696 4.26339 3.20107 4.73223 2.73223C5.20107 2.26339 5.83696 2 6.5 2Z" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+    <Path d="M8 7H16" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+    <Path d="M8 11H16" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+  </Svg>
+);
 
 // Form Type Icons
 const ClipboardIcon = ({ size = 24, color = '#666' }) => (
@@ -59,7 +67,7 @@ const TrophyIcon = ({ size = 24, color = '#666' }) => (
 );
 
 const Home: React.FC<Props> = ({ navigation }) => {
-  const { forms } = useForms();
+  const { classes } = useClasses();
 
   return (
     <SafeAreaView style={styles.container}>
@@ -77,13 +85,13 @@ const Home: React.FC<Props> = ({ navigation }) => {
         <View style={styles.headerContent}>
           <View style={styles.welcomeSection}>
             <View style={styles.greetingContainer}>
-              <Text style={styles.greetingText}>Good morning!</Text>
-              <View style={styles.waveAnimation}>
-                <Text style={styles.waveEmoji}>👋</Text>
-              </View>
+            <Text style={styles.greetingText}>Good morning!</Text>
+            <View style={styles.waveAnimation}>
+              <Text style={styles.waveEmoji}>👋</Text>
             </View>
-            <Text style={styles.welcomeText}>Ready to collect feedback?</Text>
-            <Text style={styles.descriptionText}>Create forms that your customers will love</Text>
+          </View>
+          <Text style={styles.welcomeText}>Your Teaching Assistant</Text>
+          <Text style={styles.descriptionText}>Let AI handle the admin, so you can focus on teaching</Text>
             
             {/* Animated Stats */}
             {/* <View style={styles.animatedStats}>
@@ -152,70 +160,94 @@ const Home: React.FC<Props> = ({ navigation }) => {
         <ScrollView contentContainerStyle={styles.scrollContent}>
           {/* Header Section */}
           <View style={styles.contentHeader}>
-            <Text style={styles.contentTitle}>My Forms</Text>
-            <Text style={styles.contentSubtitle}>Manage your feedback forms</Text>
+            <Text style={styles.contentTitle}>My Classes</Text>
+            <Text style={styles.contentSubtitle}>Manage your classes and students</Text>
           </View>
 
-          {/* Create New Form Button */}
-          <Pressable 
-            style={styles.createFormBtn} 
-            android_ripple={{ color: 'rgba(160,96,255,0.1)' }}
-            onPress={() => navigation.navigate('CreateForm')}
-          >
-            <View style={styles.createFormContent}>
-              <View style={styles.plusIcon}>
-                <Text style={styles.plusText}>+</Text>
+          {/* Quick Actions */}
+          <View style={styles.quickActionsContainer}>
+            <Pressable 
+              style={styles.quickActionBtn} 
+              android_ripple={{ color: 'rgba(160,96,255,0.1)' }}
+              onPress={() => {
+              // @ts-ignore - Navigation type will be updated
+              navigation.navigate('CreateClass');
+            }}
+            >
+              <View style={styles.quickActionIcon}>
+                <Text style={styles.quickActionIconText}>📚</Text>
               </View>
-              <View style={styles.createFormText}>
-                <Text style={styles.createFormTitle}>Create New Form</Text>
-                <Text style={styles.createFormDesc}>Start collecting feedback</Text>
+              <View style={styles.quickActionText}>
+                <Text style={styles.quickActionTitle}>New Class</Text>
+                <Text style={styles.quickActionDesc}>Add a class</Text>
               </View>
-            </View>
-          </Pressable>
-
-          {/* Forms List */}
-          <View style={styles.formsSection}>
-            <Text style={styles.sectionTitle}>Recent Forms</Text>
-            <Text style={styles.createNewFormDesc}>Your Newly Published Forms will be shown Here. You can click on it to Review and Edit them</Text>
+            </Pressable>
             
-            {/* Forms Container */}
+            <Pressable 
+              style={styles.quickActionBtn} 
+              android_ripple={{ color: 'rgba(160,96,255,0.1)' }}
+              onPress={() => navigation.navigate('LessonPlanner')}
+            >
+              <View style={styles.quickActionIcon}>
+                <Text style={styles.quickActionIconText}>✨</Text>
+              </View>
+              <View style={styles.quickActionText}>
+                <Text style={styles.quickActionTitle}>AI Lesson Plan</Text>
+                <Text style={styles.quickActionDesc}>Generate lesson plan</Text>
+              </View>
+            </Pressable>
+          </View>
+
+          {/* Classes List */}
+          <View style={styles.formsSection}>
+            <Text style={styles.sectionTitle}>My Classes</Text>
+            <Text style={styles.createNewFormDesc}>Your classes will appear here. Tap to view students, attendance, and grades</Text>
+            
+            {/* Classes Container */}
             <View style={styles.formsContainer}>
-              {forms.length === 0 ? (
+              {classes.length === 0 ? (
                 <View style={styles.emptyFormsContainer}>
-                  <Text style={styles.emptyFormsText}>No forms yet</Text>
-                  <Text style={styles.emptyFormsSubtext}>Create your first form to get started</Text>
+                  <Text style={styles.emptyFormsText}>No classes yet</Text>
+                  <Text style={styles.emptyFormsSubtext}>Create your first class to get started</Text>
                 </View>
               ) : (
-                forms.map((form, index) => (
+                classes.map((classItem, index) => (
                   <Pressable 
-                    key={form.id} 
-                    style={[styles.formCard, index === forms.length - 1 && styles.formCardLast]} 
+                    key={classItem.id} 
+                    style={[styles.formCard, index === classes.length - 1 && styles.formCardLast]} 
                     android_ripple={{ color: 'rgba(0,0,0,0.05)' }}
-                    onPress={() => navigation.navigate('EditForm', { formId: form.id })}
+                    onPress={() => {
+                      // @ts-ignore - Navigation type will be updated
+                      navigation.navigate('ClassDetails', { classId: classItem.id });
+                    }}
                   >
                     <View style={styles.formCardIcon}>
-                      <FormIcon iconId={form.iconId} size={24} color="#666" />
+                      <BookIcon size={24} color="#666" />
                     </View>
                     <View style={styles.formCardContent}>
-                      <Text style={styles.formCardTitle}>{form.name}</Text>
-                      <Text style={styles.formCardSubtitle}>Created {new Date(form.createdAt).toLocaleDateString()}</Text>
+                      <Text style={styles.formCardTitle}>{classItem.name}</Text>
+                      <Text style={styles.formCardSubtitle}>
+                        {classItem.subject} • {classItem.gradeLevel} • {classItem.studentCount} students
+                      </Text>
                     </View>
                     <View style={styles.actionsRow}>
                       <Pressable 
                         style={styles.formCardAction}
                         onPress={(e) => {
                           e.stopPropagation();
-                          navigation.navigate('EditForm', { formId: form.id });
+                          // @ts-ignore - Navigation type will be updated
+                          navigation.navigate('Attendance', { classId: classItem.id });
                         }}
                         android_ripple={{ color: 'rgba(0,0,0,0.06)', borderless: true }}
                       >
-                        <EditIcon width={20} height={20} stroke="#000000" />
+                        <Text style={styles.actionEmoji}>✓</Text>
                       </Pressable>
                       <Pressable 
                         style={[styles.formCardAction, { marginLeft: 8 }]}
                         onPress={(e) => {
                           e.stopPropagation();
-                          navigation.navigate('ShareForm', { formId: form.id });
+                          // @ts-ignore - Navigation type will be updated
+                          navigation.navigate('ClassDetails', { classId: classItem.id });
                         }}
                         android_ripple={{ color: 'rgba(0,0,0,0.06)', borderless: true }}
                       >
@@ -429,21 +461,10 @@ const styles = StyleSheet.create({
     borderRadius: 3,
     backgroundColor: '#FFFFFF',
   },
-  // Quick Action Button
+  // Quick Action Button (old - not used)
   quickActionContainer: {
     marginTop: 20,
     paddingHorizontal: 8,
-  },
-  quickActionBtn: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: 'rgba(160,96,255,0.15)',
-    borderRadius: 16,
-    paddingVertical: 14,
-    paddingHorizontal: 20,
-    borderWidth: 1,
-    borderColor: 'rgba(160,96,255,0.3)',
-    justifyContent: 'space-between',
   },
   actionIcon: {
     width: 36,
@@ -657,6 +678,58 @@ const styles = StyleSheet.create({
     color: '#FFFFFF',
     fontWeight: '300',
     fontFamily: 'Poppins-Light',
+  },
+  // Quick Actions
+  quickActionsContainer: {
+    flexDirection: 'row',
+    gap: 12,
+    marginBottom: 30,
+  },
+  quickActionBtn: {
+    flex: 1,
+    backgroundColor: '#FFFFFF',
+    borderWidth: 2,
+    borderColor: '#A060FF',
+    borderRadius: 16,
+    shadowColor: '#A060FF',
+    shadowOpacity: 0.1,
+    shadowOffset: { width: 0, height: 4 },
+    shadowRadius: 8,
+    elevation: 4,
+    paddingVertical: 16,
+    paddingHorizontal: 16,
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  quickActionIcon: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: '#A060FF',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginRight: 12,
+  },
+  quickActionIconText: {
+    fontSize: 20,
+  },
+  quickActionText: {
+    flex: 1,
+  },
+  quickActionTitle: {
+    fontSize: 14,
+    fontWeight: '600',
+    fontFamily: 'Poppins-Medium',
+    color: '#A060FF',
+    marginBottom: 2,
+  },
+  quickActionDesc: {
+    fontSize: 12,
+    fontFamily: 'Poppins-Regular',
+    color: '#666666',
+  },
+  actionEmoji: {
+    fontSize: 18,
   },
 });
 

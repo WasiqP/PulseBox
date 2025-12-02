@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { theme } from '../theme';
 import logoImage from '../assets/back-remove.png';
+import Button from './ui/Button';
 import './Navbar.css';
 
 const Navbar = () => {
@@ -12,7 +12,7 @@ const Navbar = () => {
 
   useEffect(() => {
     const handleScroll = () => {
-      setIsScrolled(window.scrollY > 50);
+      setIsScrolled(window.scrollY > 20);
     };
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
@@ -34,6 +34,7 @@ const Navbar = () => {
       <div className="navbar-container">
         <Link to="/" className="navbar-logo">
           <img src={logoImage} alt="PulseBox Logo" className="navbar-logo-image" />
+          <span className="navbar-brand-text">PulseBox</span>
         </Link>
 
         {/* Desktop Menu */}
@@ -45,28 +46,33 @@ const Navbar = () => {
               className={`navbar-link ${location.pathname === link.path ? 'active' : ''}`}
             >
               {link.label}
+              {location.pathname === link.path && (
+                <motion.div className="navbar-active-indicator" layoutId="navbar-active" />
+              )}
             </Link>
           ))}
         </div>
 
         {/* Auth Buttons */}
         <div className="navbar-actions">
-          <Link to="/login" className="navbar-link">Log In</Link>
-          <Link to="/signup" className="navbar-button-primary">
-            Get Started
+          <Link to="/login">
+            <Button variant="ghost" size="sm">Log In</Button>
+          </Link>
+          <Link to="/signup">
+            <Button variant="primary" size="sm">Get Started</Button>
           </Link>
         </div>
 
         {/* Mobile Menu Button */}
-        {/* <button
-          className="mobile-menu-button"
+        <button
+          className={`mobile-menu-button ${isMobileMenuOpen ? 'open' : ''}`}
           onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
           aria-label="Toggle menu"
         >
-          <span className={isMobileMenuOpen ? 'open' : ''}></span>
-          <span className={isMobileMenuOpen ? 'open' : ''}></span>
-          <span className={isMobileMenuOpen ? 'open' : ''}></span>
-        </button> */}
+          <span></span>
+          <span></span>
+          <span></span>
+        </button>
       </div>
 
       {/* Mobile Menu */}
@@ -90,11 +96,11 @@ const Navbar = () => {
               </Link>
             ))}
             <div className="mobile-menu-actions">
-              <Link to="/login" className="mobile-menu-button" onClick={() => setIsMobileMenuOpen(false)}>
-                Log In
+              <Link to="/login" onClick={() => setIsMobileMenuOpen(false)}>
+                <Button variant="ghost" fullWidth>Log In</Button>
               </Link>
-              <Link to="/signup" className="mobile-menu-button primary" onClick={() => setIsMobileMenuOpen(false)}>
-                Get Started
+              <Link to="/signup" onClick={() => setIsMobileMenuOpen(false)}>
+                <Button variant="primary" fullWidth>Get Started</Button>
               </Link>
             </div>
           </motion.div>
@@ -105,4 +111,3 @@ const Navbar = () => {
 };
 
 export default Navbar;
-
