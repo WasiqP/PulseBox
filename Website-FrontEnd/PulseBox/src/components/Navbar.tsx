@@ -3,6 +3,7 @@ import { Link, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import logoImage from '../assets/back-remove.png';
 import Button from './ui/Button';
+import ThemeToggle from './ThemeToggle';
 import './Navbar.css';
 
 const Navbar = () => {
@@ -55,6 +56,7 @@ const Navbar = () => {
 
         {/* Auth Buttons */}
         <div className="navbar-actions">
+          <ThemeToggle />
           <Link to="/login">
             <Button variant="ghost" size="sm">Log In</Button>
           </Link>

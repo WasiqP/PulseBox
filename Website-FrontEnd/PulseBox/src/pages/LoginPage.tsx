@@ -1,8 +1,9 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
+import { FiArrowLeft } from 'react-icons/fi';
 import Button from '../components/ui/Button';
-import Galaxy from '../components/Galaxy';
+import Ribbons from '../components/Ribbons';
 import './AuthPage.css';
 
 const LoginPage = () => {
@@ -32,34 +33,57 @@ const LoginPage = () => {
 
   return (
     <div className="auth-page">
+      {/* Full Screen Ribbons */}
+      <div className="auth-ribbons-fullscreen">
+        <Ribbons
+          baseThickness={30}
+          colors={['#A060FF']}
+          speedMultiplier={0.5}
+          maxAge={500}
+          enableFade={false}
+          enableShaderEffect={false}
+        />
+        <Ribbons
+          baseThickness={30}
+          colors={['#ffffff']}
+          speedMultiplier={0.5}
+          maxAge={500}
+          enableFade={false}
+          enableShaderEffect={false}
+        />
+      </div>
       <div className="auth-container">
         {/* Left Side - Visual */}
         <div className="auth-visual">
-          <div style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', zIndex: 0 }}>
-            <Galaxy
-              transparent={true}
-              density={0.5}
-              starSpeed={0.1}
-              speed={0.2}
-              glowIntensity={0.2}
-              twinkleIntensity={0.1}
-              rotationSpeed={0.01}
-              mouseInteraction={true}
-              mouseRepulsion={false}
-              hueShift={270}
-              saturation={0.6}
-            />
-          </div>
+          <div className="auth-background-pattern"></div>
+          <Link to="/" className="auth-back-button">
+            <FiArrowLeft />
+            <span>Back to Home</span>
+          </Link>
           <motion.div
             className="auth-visual-content"
             initial={{ opacity: 0, x: -30 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.8, delay: 0.2 }}
           >
-            <h2 className="auth-visual-title">Welcome back to <span style={{ color: '#A060FF' }}>PulseBox</span></h2>
+            <h2 className="auth-visual-title">Welcome back to <span className="auth-brand-highlight">PulseBox</span></h2>
             <p className="auth-visual-text">
-              Sign in to access your dashboard, manage forms, and view real-time analytics.
+              Sign in to access your dashboard, manage classes, and track student progress.
             </p>
+            <div className="auth-features-list">
+              <div className="auth-feature-item">
+                <div className="auth-feature-icon">✓</div>
+                <span>AI-Powered Lesson Planning</span>
+              </div>
+              <div className="auth-feature-item">
+                <div className="auth-feature-icon">✓</div>
+                <span>Quick Attendance Tracking</span>
+              </div>
+              <div className="auth-feature-item">
+                <div className="auth-feature-icon">✓</div>
+                <span>Class & Student Management</span>
+              </div>
+            </div>
           </motion.div>
         </div>
 
