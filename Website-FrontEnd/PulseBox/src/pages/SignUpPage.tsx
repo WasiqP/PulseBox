@@ -1,7 +1,7 @@
-import { useState } from 'react';
+import { useState, useCallback, useRef, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { FiArrowLeft } from 'react-icons/fi';
+import { FiArrowLeft, FiEye, FiEyeOff } from 'react-icons/fi';
 import Button from '../components/ui/Button';
 import Ribbons from '../components/Ribbons';
 import './AuthPage.css';
@@ -14,7 +14,37 @@ const SignUpPage = () => {
     confirmPassword: ''
   });
   const [isLoading, setIsLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const navigate = useNavigate();
+  const formRef = useRef<HTMLFormElement>(null);
+
+  // Pause ribbons when inputs are focused
+  useEffect(() => {
+    const form = formRef.current;
+    if (!form) return;
+
+    const handleFocus = () => {
+      document.body.setAttribute('data-input-focused', 'true');
+    };
+
+    const handleBlur = () => {
+      document.body.removeAttribute('data-input-focused');
+    };
+
+    const inputs = form.querySelectorAll('input');
+    inputs.forEach(input => {
+      input.addEventListener('focus', handleFocus);
+      input.addEventListener('blur', handleBlur);
+    });
+
+    return () => {
+      inputs.forEach(input => {
+        input.removeEventListener('focus', handleFocus);
+        input.removeEventListener('blur', handleBlur);
+      });
+    };
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -30,12 +60,13 @@ const SignUpPage = () => {
     navigate('/app');
   };
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value
-    });
-  };
+  const handleChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({
+      ...prev,
+      [name]: value
+    }));
+  }, []);
 
   return (
     <div className="auth-page">
@@ -110,7 +141,7 @@ const SignUpPage = () => {
               <p className="auth-subtitle">Get started with your free account</p>
             </div>
 
-            <form className="auth-form" onSubmit={handleSubmit}>
+            <form ref={formRef} className="auth-form" onSubmit={handleSubmit}>
               <div className="form-group">
                 <label htmlFor="name">Full Name</label>
                 <input
@@ -139,28 +170,48 @@ const SignUpPage = () => {
 
               <div className="form-group">
                 <label htmlFor="password">Password</label>
-                <input
-                  type="password"
-                  id="password"
-                  name="password"
-                  value={formData.password}
-                  onChange={handleChange}
-                  required
-                  placeholder="Create a password"
-                />
+                <div className="password-input-wrapper">
+                  <input
+                    type={showPassword ? "text" : "password"}
+                    id="password"
+                    name="password"
+                    value={formData.password}
+                    onChange={handleChange}
+                    required
+                    placeholder="Create a password"
+                  />
+                  <button
+                    type="button"
+                    className="password-toggle-btn"
+                    onClick={() => setShowPassword(!showPassword)}
+                    aria-label={showPassword ? "Hide password" : "Show password"}
+                  >
+                    {showPassword ? <FiEyeOff /> : <FiEye />}
+                  </button>
+                </div>
               </div>
 
               <div className="form-group">
                 <label htmlFor="confirmPassword">Confirm Password</label>
-                <input
-                  type="password"
-                  id="confirmPassword"
-                  name="confirmPassword"
-                  value={formData.confirmPassword}
-                  onChange={handleChange}
-                  required
-                  placeholder="Confirm your password"
-                />
+                <div className="password-input-wrapper">
+                  <input
+                    type={showConfirmPassword ? "text" : "password"}
+                    id="confirmPassword"
+                    name="confirmPassword"
+                    value={formData.confirmPassword}
+                    onChange={handleChange}
+                    required
+                    placeholder="Confirm your password"
+                  />
+                  <button
+                    type="button"
+                    className="password-toggle-btn"
+                    onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                    aria-label={showConfirmPassword ? "Hide password" : "Show password"}
+                  >
+                    {showConfirmPassword ? <FiEyeOff /> : <FiEye />}
+                  </button>
+                </div>
               </div>
 
               <div className="form-options">

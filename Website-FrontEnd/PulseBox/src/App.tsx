@@ -3,6 +3,9 @@ import { ThemeProvider } from './context/ThemeContext';
 import { ClassesProvider } from './context/ClassesContext';
 import { AttendanceProvider } from './context/AttendanceContext';
 import { HomeworkProvider } from './context/HomeworkContext';
+import { TasksProvider } from './context/TasksContext';
+import { ConfirmModalProvider } from './context/ConfirmModalContext';
+import { AlertModalProvider } from './context/AlertModalContext';
 import ScrollToTop from './components/ScrollToTop';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
@@ -17,12 +20,16 @@ import CreateClassPage from './pages/CreateClassPage';
 import ClassDetailsPage from './pages/ClassDetailsPage';
 import MarkAttendancePage from './pages/MarkAttendancePage';
 import ProfilePage from './pages/ProfilePage';
-import QuizzesPage from './pages/QuizzesPage';
+import MyTasksPage from './pages/MyTasksPage';
 import LessonPlansPage from './pages/LessonPlansPage';
 import AttendancePage from './pages/AttendancePage';
 import AnalyticsPage from './pages/AnalyticsPage';
 import SettingsPage from './pages/SettingsPage';
 import AssignHomeworkPage from './pages/AssignHomeworkPage';
+import CreateTaskPage from './pages/CreateTaskPage';
+import QuestionsScreen from './pages/QuestionsScreen';
+import PublishingScreen from './pages/PublishingScreen';
+import TaskDetailsPage from './pages/TaskDetailsPage';
 import './App.css';
 
 function AppContent() {
@@ -45,8 +52,12 @@ function AppContent() {
         <Route path="/app/classes/edit/:id" element={<CreateClassPage />} />
         <Route path="/app/classes/:id" element={<ClassDetailsPage />} />
         <Route path="/app/mark-attendance" element={<MarkAttendancePage />} />
-        <Route path="/app/quizzes" element={<QuizzesPage />} />
-        <Route path="/app/quizzes/create" element={<QuizzesPage />} />
+        <Route path="/app/tasks" element={<MyTasksPage />} />
+        <Route path="/app/tasks/create" element={<CreateTaskPage />} />
+        <Route path="/app/tasks/:taskId" element={<TaskDetailsPage />} />
+        <Route path="/app/tasks/:taskId/questions" element={<QuestionsScreen />} />
+        <Route path="/app/tasks/:taskId/publish" element={<PublishingScreen />} />
+        <Route path="/app/quizzes/create" element={<CreateTaskPage />} />
         <Route path="/app/lesson-plans" element={<LessonPlansPage />} />
         <Route path="/app/attendance" element={<AttendancePage />} />
         <Route path="/app/homework" element={<AssignHomeworkPage />} />
@@ -65,10 +76,16 @@ function App() {
       <ClassesProvider>
         <AttendanceProvider>
           <HomeworkProvider>
-            <Router>
-              <ScrollToTop />
-              <AppContent />
-            </Router>
+            <TasksProvider>
+              <ConfirmModalProvider>
+                <AlertModalProvider>
+                  <Router>
+                    <ScrollToTop />
+                    <AppContent />
+                  </Router>
+                </AlertModalProvider>
+              </ConfirmModalProvider>
+            </TasksProvider>
           </HomeworkProvider>
         </AttendanceProvider>
       </ClassesProvider>

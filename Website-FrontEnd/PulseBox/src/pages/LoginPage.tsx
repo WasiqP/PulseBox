@@ -1,7 +1,7 @@
-import { useState } from 'react';
+import { useState, useCallback, useRef, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { FiArrowLeft } from 'react-icons/fi';
+import { FiArrowLeft, FiEye, FiEyeOff } from 'react-icons/fi';
 import Button from '../components/ui/Button';
 import Ribbons from '../components/Ribbons';
 import './AuthPage.css';
@@ -12,7 +12,36 @@ const LoginPage = () => {
     password: ''
   });
   const [isLoading, setIsLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
   const navigate = useNavigate();
+  const formRef = useRef<HTMLFormElement>(null);
+
+  // Pause ribbons when inputs are focused
+  useEffect(() => {
+    const form = formRef.current;
+    if (!form) return;
+
+    const handleFocus = () => {
+      document.body.setAttribute('data-input-focused', 'true');
+    };
+
+    const handleBlur = () => {
+      document.body.removeAttribute('data-input-focused');
+    };
+
+    const inputs = form.querySelectorAll('input');
+    inputs.forEach(input => {
+      input.addEventListener('focus', handleFocus);
+      input.addEventListener('blur', handleBlur);
+    });
+
+    return () => {
+      inputs.forEach(input => {
+        input.removeEventListener('focus', handleFocus);
+        input.removeEventListener('blur', handleBlur);
+      });
+    };
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -24,12 +53,13 @@ const LoginPage = () => {
     navigate('/app');
   };
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value
-    });
-  };
+  const handleChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({
+      ...prev,
+      [name]: value
+    }));
+  }, []);
 
   return (
     <div className="auth-page">
@@ -104,7 +134,7 @@ const LoginPage = () => {
               <p className="auth-subtitle">Enter your details to continue</p>
             </div>
 
-            <form className="auth-form" onSubmit={handleSubmit}>
+            <form ref={formRef} className="auth-form" onSubmit={handleSubmit}>
               <div className="form-group">
                 <label htmlFor="email">Email</label>
                 <input
@@ -120,15 +150,25 @@ const LoginPage = () => {
 
               <div className="form-group">
                 <label htmlFor="password">Password</label>
-                <input
-                  type="password"
-                  id="password"
-                  name="password"
-                  value={formData.password}
-                  onChange={handleChange}
-                  required
-                  placeholder="Enter your password"
-                />
+                <div className="password-input-wrapper">
+                  <input
+                    type={showPassword ? "text" : "password"}
+                    id="password"
+                    name="password"
+                    value={formData.password}
+                    onChange={handleChange}
+                    required
+                    placeholder="Enter your password"
+                  />
+                  <button
+                    type="button"
+                    className="password-toggle-btn"
+                    onClick={() => setShowPassword(!showPassword)}
+                    aria-label={showPassword ? "Hide password" : "Show password"}
+                  >
+                    {showPassword ? <FiEyeOff /> : <FiEye />}
+                  </button>
+                </div>
               </div>
 
               <div className="form-options">

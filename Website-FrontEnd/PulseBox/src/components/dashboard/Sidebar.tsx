@@ -26,7 +26,7 @@ const Sidebar = () => {
     const menuItems = [
         { path: '/app', icon: FiHome, label: 'Overview' },
         { path: '/app/classes', icon: FiBook, label: 'My Classes' },
-        { path: '/app/quizzes', icon: FiFileText, label: 'Quizzes & Tests' },
+        { path: '/app/tasks', icon: FiFileText, label: 'My Tasks' },
         { path: '/app/lesson-plans', icon: FiCalendar, label: 'Lesson Plans' },
         { path: '/app/attendance', icon: FiUsers, label: 'Attendance' },
         { path: '/app/analytics', icon: FiBarChart2, label: 'Analytics' },
@@ -103,7 +103,7 @@ const Sidebar = () => {
                                         <span>Mark Attendance</span>
                                     </Link>
                                     <Link 
-                                        to="/app/homework" 
+                                        to="/app/tasks/create" 
                                         className="quick-action-item"
                                         onClick={() => setIsQuickActionsOpen(false)}
                                     >

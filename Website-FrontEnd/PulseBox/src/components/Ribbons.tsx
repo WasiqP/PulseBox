@@ -238,26 +238,70 @@ const Ribbons: React.FC<RibbonsProps> = ({
       isPausedRef.current = isInteractive;
     }
     
-    document.addEventListener('mouseover', checkInteractiveElements);
-    document.addEventListener('mouseout', (e) => {
+    // Check if input is focused (for when typing without mouse movement)
+    function checkInputFocus() {
+      const hasFocusedInput = document.body.hasAttribute('data-input-focused') ||
+                              document.activeElement?.matches('input, textarea, select');
+      if (hasFocusedInput) {
+        isPausedRef.current = true;
+      }
+    }
+    
+    const handleMouseOut = (e: MouseEvent) => {
       const target = e.target as HTMLElement;
       if (target && !target.matches('input, button, a, label, textarea, select') && 
           !target.closest('input, button, a, label, textarea, select')) {
-        isPausedRef.current = false;
+        // Only unpause if no input is focused
+        checkInputFocus();
+        if (!isPausedRef.current) {
+          isPausedRef.current = false;
+        }
       }
-    });
+    };
+    
+    const handleFocusIn = (e: FocusEvent) => {
+      if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement || e.target instanceof HTMLSelectElement) {
+        isPausedRef.current = true;
+      }
+    };
+    
+    const handleFocusOut = () => {
+      // Small delay to check if focus moved to another input
+      setTimeout(() => {
+        checkInputFocus();
+        if (!document.body.hasAttribute('data-input-focused') && 
+            !document.activeElement?.matches('input, textarea, select')) {
+          isPausedRef.current = false;
+        }
+      }, 10);
+    };
+    
+    document.addEventListener('mouseover', checkInteractiveElements);
+    document.addEventListener('mouseout', handleMouseOut);
+    document.addEventListener('focusin', handleFocusIn);
+    document.addEventListener('focusout', handleFocusOut);
 
     const tmp = new Vec3();
     let frameId: number;
     let lastTime = performance.now();
     function update() {
       frameId = requestAnimationFrame(update);
+      
+      // Check input focus state on each frame
+      checkInputFocus();
+      
       const currentTime = performance.now();
       const dt = currentTime - lastTime;
       lastTime = currentTime;
 
-      // If paused, reduce movement significantly
-      const pauseFactor = isPausedRef.current ? 0.1 : 1.0;
+      // If paused, reduce movement significantly or skip rendering
+      const pauseFactor = isPausedRef.current ? 0.05 : 1.0;
+      
+      // Skip most of the animation work when paused
+      if (isPausedRef.current) {
+        renderer.render({ scene });
+        return;
+      }
 
       lines.forEach(line => {
         if (!isPausedRef.current) {
@@ -296,6 +340,9 @@ const Ribbons: React.FC<RibbonsProps> = ({
       container.removeEventListener('touchmove', updateMouse);
       document.removeEventListener('mousemove', updateMouseGlobal);
       document.removeEventListener('mouseover', checkInteractiveElements);
+      document.removeEventListener('mouseout', handleMouseOut);
+      document.removeEventListener('focusin', handleFocusIn);
+      document.removeEventListener('focusout', handleFocusOut);
       cancelAnimationFrame(frameId);
       if (gl.canvas && gl.canvas.parentNode === container) {
         container.removeChild(gl.canvas);
