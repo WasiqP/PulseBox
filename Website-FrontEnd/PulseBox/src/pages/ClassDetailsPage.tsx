@@ -30,7 +30,7 @@ import './DashboardPage.css';
 const ClassDetailsPage = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const { classes, getClassById, deleteClass } = useClasses();
+  const { classes, getClassById, deleteClass, getChildClasses, getParentClass } = useClasses();
   const { getAttendanceByClass } = useAttendance();
   const { getHomeworksByClass } = useHomework();
   
@@ -39,6 +39,8 @@ const ClassDetailsPage = () => {
 
   const classData = id ? getClassById(id) : null;
   const attendanceRecords = id ? getAttendanceByClass(id) : [];
+  const parentClass = classData ? getParentClass(classData.id) : null;
+  const childClasses = classData && classData.classType === 'multi-subject' ? getChildClasses(classData.id) : [];
   
   // Mock quizzes/tests/assignments data (in a real app, this would come from a QuizzesContext)
   const allQuizzes = [
@@ -161,6 +163,99 @@ const ClassDetailsPage = () => {
             </div>
           </motion.div>
         </div>
+
+        {/* Parent/Child Class Navigation */}
+        {(parentClass || childClasses.length > 0) && (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.1 }}
+            style={{ marginBottom: '2rem' }}
+          >
+            <Card glass={true}>
+              {parentClass && (
+                <div style={{ marginBottom: childClasses.length > 0 ? '1.5rem' : '0' }}>
+                  <h3 style={{ fontSize: '0.875rem', fontWeight: 600, color: 'var(--color-text-muted)', marginBottom: '0.75rem' }}>
+                    Parent Class
+                  </h3>
+                  <Link 
+                    to={`/app/classes/${parentClass.id}`}
+                    style={{ 
+                      textDecoration: 'none',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '0.75rem',
+                      padding: '0.75rem',
+                      borderRadius: '8px',
+                      background: 'rgba(160, 96, 255, 0.1)',
+                      border: '1px solid rgba(160, 96, 255, 0.2)',
+                      transition: 'all 0.2s'
+                    }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.background = 'rgba(160, 96, 255, 0.15)';
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.background = 'rgba(160, 96, 255, 0.1)';
+                    }}
+                  >
+                    <FiBook style={{ color: 'var(--color-primary)' }} />
+                    <span style={{ color: 'var(--color-text)', fontWeight: 500 }}>{parentClass.name}</span>
+                    <FiArrowLeft style={{ marginLeft: 'auto', transform: 'rotate(180deg)', color: 'var(--color-text-muted)' }} />
+                  </Link>
+                </div>
+              )}
+              {childClasses.length > 0 && (
+                <div>
+                  <h3 style={{ fontSize: '0.875rem', fontWeight: 600, color: 'var(--color-text-muted)', marginBottom: '0.75rem' }}>
+                    Subject Classes ({childClasses.length})
+                  </h3>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                    {childClasses.map((child) => (
+                      <Link 
+                        key={child.id}
+                        to={`/app/classes/${child.id}`}
+                        style={{ 
+                          textDecoration: 'none',
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '0.75rem',
+                          padding: '0.75rem',
+                          borderRadius: '8px',
+                          background: 'rgba(160, 96, 255, 0.05)',
+                          border: '1px solid rgba(160, 96, 255, 0.1)',
+                          transition: 'all 0.2s'
+                        }}
+                        onMouseEnter={(e) => {
+                          e.currentTarget.style.background = 'rgba(160, 96, 255, 0.1)';
+                          e.currentTarget.style.borderColor = 'rgba(160, 96, 255, 0.3)';
+                        }}
+                        onMouseLeave={(e) => {
+                          e.currentTarget.style.background = 'rgba(160, 96, 255, 0.05)';
+                          e.currentTarget.style.borderColor = 'rgba(160, 96, 255, 0.1)';
+                        }}
+                      >
+                        <FiBook style={{ color: 'var(--color-primary)', fontSize: '0.875rem' }} />
+                        <span style={{ color: 'var(--color-text)', fontSize: '0.9rem' }}>{child.name}</span>
+                        {child.subject && (
+                          <span style={{ 
+                            marginLeft: 'auto',
+                            fontSize: '0.75rem',
+                            padding: '0.25rem 0.5rem',
+                            background: 'rgba(160, 96, 255, 0.1)',
+                            borderRadius: '4px',
+                            color: 'var(--color-primary)'
+                          }}>
+                            {child.subject}
+                          </span>
+                        )}
+                      </Link>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </Card>
+          </motion.div>
+        )}
 
         {/* Quick Stats */}
         <motion.div

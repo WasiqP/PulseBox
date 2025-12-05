@@ -60,8 +60,8 @@ const HeroSection = () => {
         const positions = [
             { top: '10%', left: '5%' },           // Top left corner
             { top: '12%', right: '5%' },          // Top right corner
-            { bottom: '15%', left: '4%' },        // Bottom left corner
-            { bottom: '12%', right: '6%' }         // Bottom right corner
+            { bottom: '25%', left: '4%' },        // Bottom left corner
+            { bottom: '22%', right: '6%' }         // Bottom right corner
         ];
         return positions[index] || { top: '50%', left: '50%' };
     };

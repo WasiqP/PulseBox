@@ -4,6 +4,7 @@ import { ClassesProvider } from './context/ClassesContext';
 import { AttendanceProvider } from './context/AttendanceContext';
 import { HomeworkProvider } from './context/HomeworkContext';
 import { TasksProvider } from './context/TasksContext';
+import { ScheduleProvider } from './context/ScheduleContext';
 import { ConfirmModalProvider } from './context/ConfirmModalContext';
 import { AlertModalProvider } from './context/AlertModalContext';
 import ScrollToTop from './components/ScrollToTop';
@@ -30,6 +31,7 @@ import CreateTaskPage from './pages/CreateTaskPage';
 import QuestionsScreen from './pages/QuestionsScreen';
 import PublishingScreen from './pages/PublishingScreen';
 import TaskDetailsPage from './pages/TaskDetailsPage';
+import SchedulePage from './pages/SchedulePage';
 import './App.css';
 
 function AppContent() {
@@ -62,6 +64,7 @@ function AppContent() {
         <Route path="/app/attendance" element={<AttendancePage />} />
         <Route path="/app/homework" element={<AssignHomeworkPage />} />
         <Route path="/app/analytics" element={<AnalyticsPage />} />
+        <Route path="/app/schedule" element={<SchedulePage />} />
         <Route path="/app/profile" element={<ProfilePage />} />
         <Route path="/app/settings" element={<SettingsPage />} />
       </Routes>
@@ -77,14 +80,16 @@ function App() {
         <AttendanceProvider>
           <HomeworkProvider>
             <TasksProvider>
-              <ConfirmModalProvider>
-                <AlertModalProvider>
+              <ScheduleProvider>
+                <ConfirmModalProvider>
+                  <AlertModalProvider>
                   <Router>
                     <ScrollToTop />
                     <AppContent />
                   </Router>
-                </AlertModalProvider>
-              </ConfirmModalProvider>
+                  </AlertModalProvider>
+                </ConfirmModalProvider>
+              </ScheduleProvider>
             </TasksProvider>
           </HomeworkProvider>
         </AttendanceProvider>

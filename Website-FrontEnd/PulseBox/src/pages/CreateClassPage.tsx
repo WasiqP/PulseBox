@@ -18,7 +18,7 @@ interface Student {
 const CreateClassPage = () => {
   const navigate = useNavigate();
   const { id } = useParams<{ id?: string }>();
-  const { addClass, updateClass, getClassById } = useClasses();
+  const { addClass, updateClass, getClassById, classes } = useClasses();
   const isEditMode = Boolean(id);
   const existingClass = id ? getClassById(id) : null;
 
@@ -168,7 +168,50 @@ const CreateClassPage = () => {
     if (isEditMode && id) {
       updateClass(id, classData);
     } else {
-      addClass(classData);
+      // If it's a multi-subject class, create parent class and child classes
+      if (classType === 'multi-subject' && subjects.length > 0) {
+        // Create parent class first
+        const parentClassId = Date.now().toString();
+        const childClassIds: string[] = [];
+        
+        // Create child classes for each subject
+        subjects.forEach((subject, index) => {
+          const childClassId = `${parentClassId}-${index}`;
+          childClassIds.push(childClassId);
+          
+          const childClass: any = {
+            id: childClassId,
+            name: `${classData.name} - ${subject.name}`,
+            classType: 'single-subject',
+            subject: subject.name,
+            parentId: parentClassId,
+            educationLevel: classData.educationLevel,
+            gradeLevel: classData.gradeLevel,
+            schedule: classData.schedule,
+            institutionName: classData.institutionName,
+            location: classData.location,
+            roomNumber: classData.roomNumber,
+            students: classData.students,
+            studentCount: classData.studentCount,
+            createdAt: new Date().toISOString()
+          };
+          
+          addClass(childClass);
+        });
+        
+        // Create parent class with child IDs
+        const parentClass: any = {
+          ...classData,
+          id: parentClassId,
+          childClassIds: childClassIds,
+          createdAt: new Date().toISOString()
+        };
+        
+        addClass(parentClass);
+      } else {
+        // Single subject class - just add it normally
+        addClass(classData);
+      }
     }
     navigate('/app/classes');
   };

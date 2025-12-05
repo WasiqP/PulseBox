@@ -26,6 +26,8 @@ export interface ClassData {
   classType: 'single-subject' | 'multi-subject';
   subject?: string; // For single-subject classes
   subjects?: Subject[]; // For multi-subject classes
+  parentId?: string; // ID of parent class (if this is a child/subject class)
+  childClassIds?: string[]; // IDs of child classes (if this is a parent class)
   educationLevel: 'school' | 'college' | 'high-school' | 'university' | 'virtual' | 'other';
   gradeLevel: string;
   schedule: ClassSchedule | string; // Support both new format and legacy string format
@@ -43,6 +45,9 @@ interface ClassesContextType {
   updateClass: (id: string, classData: Partial<ClassData>) => void;
   deleteClass: (id: string) => void;
   getClassById: (id: string) => ClassData | undefined;
+  getChildClasses: (parentId: string) => ClassData[];
+  getParentClass: (childId: string) => ClassData | undefined;
+  getTopLevelClasses: () => ClassData[]; // Get classes that are not children
 }
 
 const ClassesContext = createContext<ClassesContextType | undefined>(undefined);
@@ -141,12 +146,15 @@ export const ClassesProvider: React.FC<ClassesProviderProps> = ({ children }) =>
     localStorage.setItem('pulsebox-classes', JSON.stringify(classes));
   }, [classes]);
 
-  const addClass = (classData: Omit<ClassData, 'id' | 'createdAt'>) => {
-    const newClass: ClassData = {
-      ...classData,
-      id: Date.now().toString(),
-      createdAt: new Date().toISOString()
-    };
+  const addClass = (classData: Omit<ClassData, 'id' | 'createdAt'> | ClassData) => {
+    // If classData already has an id, use it (for child classes)
+    const newClass: ClassData = 'id' in classData && classData.id
+      ? { ...classData, createdAt: classData.createdAt || new Date().toISOString() }
+      : {
+          ...classData,
+          id: Date.now().toString(),
+          createdAt: new Date().toISOString()
+        };
     setClasses(prev => [...prev, newClass]);
   };
 
@@ -157,15 +165,57 @@ export const ClassesProvider: React.FC<ClassesProviderProps> = ({ children }) =>
   };
 
   const deleteClass = (id: string) => {
-    setClasses(prev => prev.filter(cls => cls.id !== id));
+    setClasses(prev => {
+      const classToDelete = prev.find(cls => cls.id === id);
+      // If deleting a parent class, also delete all child classes
+      if (classToDelete?.childClassIds && classToDelete.childClassIds.length > 0) {
+        return prev.filter(cls => cls.id !== id && !classToDelete.childClassIds?.includes(cls.id));
+      }
+      // If deleting a child class, remove its ID from parent's childClassIds
+      if (classToDelete?.parentId) {
+        return prev.map(cls => {
+          if (cls.id === classToDelete.parentId && cls.childClassIds) {
+            return {
+              ...cls,
+              childClassIds: cls.childClassIds.filter(childId => childId !== id)
+            };
+          }
+          return cls;
+        }).filter(cls => cls.id !== id);
+      }
+      return prev.filter(cls => cls.id !== id);
+    });
   };
 
   const getClassById = (id: string) => {
     return classes.find(cls => cls.id === id);
   };
 
+  const getChildClasses = (parentId: string) => {
+    return classes.filter(cls => cls.parentId === parentId);
+  };
+
+  const getParentClass = (childId: string) => {
+    const childClass = getClassById(childId);
+    if (!childClass || !childClass.parentId) return undefined;
+    return getClassById(childClass.parentId);
+  };
+
+  const getTopLevelClasses = () => {
+    return classes.filter(cls => !cls.parentId);
+  };
+
   return (
-    <ClassesContext.Provider value={{ classes, addClass, updateClass, deleteClass, getClassById }}>
+    <ClassesContext.Provider value={{ 
+      classes, 
+      addClass, 
+      updateClass, 
+      deleteClass, 
+      getClassById,
+      getChildClasses,
+      getParentClass,
+      getTopLevelClasses
+    }}>
       {children}
     </ClassesContext.Provider>
   );
