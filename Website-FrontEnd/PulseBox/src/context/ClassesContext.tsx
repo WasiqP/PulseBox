@@ -44,6 +44,7 @@ interface ClassesContextType {
   addClass: (classData: Omit<ClassData, 'id' | 'createdAt'>) => void;
   updateClass: (id: string, classData: Partial<ClassData>) => void;
   deleteClass: (id: string) => void;
+  removeStudentFromClass: (classId: string, studentId: string) => void;
   getClassById: (id: string) => ClassData | undefined;
   getChildClasses: (parentId: string) => ClassData[];
   getParentClass: (childId: string) => ClassData | undefined;
@@ -187,6 +188,22 @@ export const ClassesProvider: React.FC<ClassesProviderProps> = ({ children }) =>
     });
   };
 
+  const removeStudentFromClass = (classId: string, studentId: string) => {
+    setClasses(prev =>
+      prev.map(cls => {
+        if (cls.id === classId) {
+          const updatedStudents = cls.students.filter(student => student.id !== studentId);
+          return {
+            ...cls,
+            students: updatedStudents,
+            studentCount: updatedStudents.length
+          };
+        }
+        return cls;
+      })
+    );
+  };
+
   const getClassById = (id: string) => {
     return classes.find(cls => cls.id === id);
   };
@@ -210,7 +227,8 @@ export const ClassesProvider: React.FC<ClassesProviderProps> = ({ children }) =>
       classes, 
       addClass, 
       updateClass, 
-      deleteClass, 
+      deleteClass,
+      removeStudentFromClass,
       getClassById,
       getChildClasses,
       getParentClass,

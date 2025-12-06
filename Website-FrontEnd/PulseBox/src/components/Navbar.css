@@ -37,6 +37,14 @@
 .navbar-logo-image {
   height: 40px;
   width: auto;
+  transition: filter var(--transition-fast);
+  display: block;
+}
+
+/* In light theme, add a subtle outline/shadow to make white parts visible */
+[data-theme="light"] .navbar-logo-image {
+  filter: drop-shadow(0 0 2px rgba(160, 96, 255, 0.4)) 
+          drop-shadow(0 2px 4px rgba(0, 0, 0, 0.15));
 }
 
 .navbar-brand-text {

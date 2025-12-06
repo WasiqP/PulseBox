@@ -30,11 +30,12 @@ import './DashboardPage.css';
 const ClassDetailsPage = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const { classes, getClassById, deleteClass, getChildClasses, getParentClass } = useClasses();
+  const { classes, getClassById, deleteClass, removeStudentFromClass, getChildClasses, getParentClass } = useClasses();
   const { getAttendanceByClass } = useAttendance();
   const { getHomeworksByClass } = useHomework();
   
   const [deleteModal, setDeleteModal] = useState({ isOpen: false, classId: '', className: '' });
+  const [deleteStudentModal, setDeleteStudentModal] = useState({ isOpen: false, studentId: '', studentName: '' });
   const [showStudentsModal, setShowStudentsModal] = useState(false);
 
   const classData = id ? getClassById(id) : null;
@@ -87,6 +88,21 @@ const ClassDetailsPage = () => {
   const handleDeleteConfirm = () => {
     deleteClass(classData.id);
     navigate('/app/classes');
+  };
+
+  const handleDeleteStudent = (studentId: string, studentName: string) => {
+    setDeleteStudentModal({
+      isOpen: true,
+      studentId,
+      studentName
+    });
+  };
+
+  const handleDeleteStudentConfirm = () => {
+    if (classData && deleteStudentModal.studentId) {
+      removeStudentFromClass(classData.id, deleteStudentModal.studentId);
+      setDeleteStudentModal({ isOpen: false, studentId: '', studentName: '' });
+    }
   };
 
   // Calculate attendance stats
@@ -420,6 +436,19 @@ const ClassDetailsPage = () => {
                             <span className="student-name-detailed">{student.name}</span>
                             <span className="student-email-detailed">{student.email}</span>
                           </div>
+                          {!isBlurred && (
+                            <button
+                              className="delete-student-btn"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleDeleteStudent(student.id, student.name);
+                              }}
+                              aria-label={`Delete ${student.name}`}
+                              title={`Delete ${student.name}`}
+                            >
+                              <FiTrash2 />
+                            </button>
+                          )}
                         </div>
                       );
                     })}
@@ -528,6 +557,18 @@ const ClassDetailsPage = () => {
                       <span className="student-name-detailed">{student.name}</span>
                       <span className="student-email-detailed">{student.email}</span>
                     </div>
+                    <button
+                      className="delete-student-btn"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleDeleteStudent(student.id, student.name);
+                        setShowStudentsModal(false);
+                      }}
+                      aria-label={`Delete ${student.name}`}
+                      title={`Delete ${student.name}`}
+                    >
+                      <FiTrash2 />
+                    </button>
                   </div>
                 ))}
               </div>
@@ -542,6 +583,17 @@ const ClassDetailsPage = () => {
           title="Delete Class"
           message={`Are you sure you want to delete "${deleteModal.className}"? This action cannot be undone and all associated data will be permanently removed.`}
           confirmText="Delete Class"
+          cancelText="Cancel"
+          type="danger"
+        />
+
+        <ConfirmModal
+          isOpen={deleteStudentModal.isOpen}
+          onClose={() => setDeleteStudentModal({ isOpen: false, studentId: '', studentName: '' })}
+          onConfirm={handleDeleteStudentConfirm}
+          title="Delete Student"
+          message={`Are you sure you want to remove "${deleteStudentModal.studentName}" from this class? This action cannot be undone.`}
+          confirmText="Delete Student"
           cancelText="Cancel"
           type="danger"
         />

@@ -1,5 +1,5 @@
 import React from 'react';
-import { motion } from 'framer-motion';
+import { motion, type Variants } from 'framer-motion';
 import {
     FiFileText,
     FiBarChart2,
@@ -12,19 +12,19 @@ import Card from '../ui/Card';
 import './FeaturesSection.css';
 
 const FeaturesSection = () => {
-    const fadeInUp = {
+    const fadeInUp: Variants = {
         hidden: { opacity: 0, y: 60 },
         visible: {
             opacity: 1,
             y: 0,
             transition: {
                 duration: 0.6,
-                ease: [0.6, -0.05, 0.01, 0.99]
+                ease: [0.6, -0.05, 0.01, 0.99] as any
             }
         }
     };
 
-    const staggerContainer = {
+    const staggerContainer: Variants = {
         hidden: { opacity: 0 },
         visible: {
             opacity: 1,

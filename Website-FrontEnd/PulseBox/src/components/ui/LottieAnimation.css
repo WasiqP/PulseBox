@@ -1,0 +1,11 @@
+.lottie-animation-wrapper {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+}
+
+.lottie-animation-wrapper svg {
+    width: 100%;
+    height: 100%;
+}

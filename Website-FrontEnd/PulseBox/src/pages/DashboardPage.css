@@ -3415,6 +3415,44 @@
   font-size: 0.85rem;
 }
 
+.delete-student-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border: none;
+  background: rgba(255, 107, 107, 0.1);
+  color: #FF6B6B;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+  margin-left: auto;
+}
+
+.delete-student-btn:hover {
+  background: rgba(255, 107, 107, 0.2);
+  color: #FF5252;
+  transform: scale(1.05);
+}
+
+.delete-student-btn:active {
+  transform: scale(0.95);
+}
+
+.delete-student-btn svg {
+  font-size: 1rem;
+}
+
+[data-theme="light"] .delete-student-btn {
+  background: rgba(255, 107, 107, 0.15);
+}
+
+[data-theme="light"] .delete-student-btn:hover {
+  background: rgba(255, 107, 107, 0.25);
+}
+
 .empty-students-state {
   padding: 3rem 2rem;
   text-align: center;

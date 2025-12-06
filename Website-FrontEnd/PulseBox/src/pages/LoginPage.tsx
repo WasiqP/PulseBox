@@ -15,6 +15,29 @@ const LoginPage = () => {
   const [showPassword, setShowPassword] = useState(false);
   const navigate = useNavigate();
   const formRef = useRef<HTMLFormElement>(null);
+  const formContainerRef = useRef<HTMLDivElement>(null);
+
+  // Disable ribbons when mouse is on right container (form side)
+  useEffect(() => {
+    const formContainer = formContainerRef.current;
+    if (!formContainer) return;
+
+    const handleMouseEnter = () => {
+      document.body.setAttribute('data-ribbons-disabled', 'true');
+    };
+
+    const handleMouseLeave = () => {
+      document.body.removeAttribute('data-ribbons-disabled');
+    };
+
+    formContainer.addEventListener('mouseenter', handleMouseEnter);
+    formContainer.addEventListener('mouseleave', handleMouseLeave);
+
+    return () => {
+      formContainer.removeEventListener('mouseenter', handleMouseEnter);
+      formContainer.removeEventListener('mouseleave', handleMouseLeave);
+    };
+  }, []);
 
   // Pause ribbons when inputs are focused
   useEffect(() => {
@@ -118,7 +141,7 @@ const LoginPage = () => {
         </div>
 
         {/* Right Side - Form */}
-        <div className="auth-form-container">
+        <div className="auth-form-container" ref={formContainerRef}>
           <motion.div
             className="auth-form-wrapper"
             initial={{ opacity: 0, x: 30 }}

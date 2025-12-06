@@ -4,6 +4,9 @@
 }
 
 .integrations-section .section-title {
+    font-size: 4rem;
+    font-weight: 800;
+    font-family: 'Poppins', sans-serif;
     color: #FFFFFF;
     text-align: center;
     margin-bottom: 1rem;

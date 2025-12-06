@@ -230,10 +230,9 @@ const Ribbons: React.FC<RibbonsProps> = ({
         return;
       }
       
-      // Check if target or its parent is an interactive element
+      // Check if target or its parent is an interactive element (only actual interactive elements, not containers)
       const isInteractive = target.matches('input, button, a, label, textarea, select') ||
-                            target.closest('input, button, a, label, textarea, select') !== null ||
-                            target.closest('.form-group, .auth-form, .auth-actions') !== null;
+                            target.closest('input, button, a, label, textarea, select') !== null;
       
       isPausedRef.current = isInteractive;
     }
@@ -242,9 +241,13 @@ const Ribbons: React.FC<RibbonsProps> = ({
     function checkInputFocus() {
       const hasFocusedInput = document.body.hasAttribute('data-input-focused') ||
                               document.activeElement?.matches('input, textarea, select');
-      if (hasFocusedInput) {
-        isPausedRef.current = true;
-      }
+      // Set pause state based on focus - both true and false
+      isPausedRef.current = hasFocusedInput;
+    }
+    
+    // Check if ribbons should be disabled (when on right container)
+    function checkRibbonsDisabled() {
+      return document.body.hasAttribute('data-ribbons-disabled');
     }
     
     const handleMouseOut = (e: MouseEvent) => {
@@ -286,6 +289,12 @@ const Ribbons: React.FC<RibbonsProps> = ({
     let lastTime = performance.now();
     function update() {
       frameId = requestAnimationFrame(update);
+      
+      // Check if ribbons are disabled (when on right container)
+      if (checkRibbonsDisabled()) {
+        // Completely stop rendering when disabled
+        return;
+      }
       
       // Check input focus state on each frame
       checkInputFocus();
