@@ -41,7 +41,7 @@ function AppContent() {
   const isAppPage = location.pathname.startsWith('/app');
 
   return (
-    <div className="app">
+    <div className={`app ${isAuthPage ? 'auth-page' : ''}`}>
       {!isAuthPage && !isAppPage && <Navbar />}
       <Routes>
         <Route path="/" element={<HomePage />} />

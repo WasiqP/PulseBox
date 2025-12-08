@@ -50,3 +50,4 @@ This folder is for Lottie animation JSON files that will replace the static onbo
 - Choose animations that match your brand colors (purple/violet theme)
 - Test animations in both light and dark themes
 - Ensure animations loop smoothly
+

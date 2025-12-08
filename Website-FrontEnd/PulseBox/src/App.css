@@ -9,3 +9,8 @@
   overflow-x: hidden;
   padding-top: 5rem; /* Account for fixed navbar with margin */
 }
+
+.app.auth-page {
+  padding-top: 0;
+  overflow: hidden;
+}

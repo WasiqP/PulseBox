@@ -1,264 +1,100 @@
-import { useState, useCallback, useRef, useEffect } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import { motion } from 'framer-motion';
-import { FiArrowLeft, FiEye, FiEyeOff } from 'react-icons/fi';
-import Button from '../components/ui/Button';
-import Ribbons from '../components/Ribbons';
+import { Link } from 'react-router-dom';
+import { FiMail, FiLock, FiUser, FiArrowLeft } from 'react-icons/fi';
+import { FcGoogle } from 'react-icons/fc';
+import { FaFacebook } from 'react-icons/fa';
+import ChatAnimation from '../components/ui/ChatAnimation';
+import LottieAnimation from '../components/ui/LottieAnimation';
+import chatbotAnimation from '../assets/Chatbot With Character Animation.json';
 import './AuthPage.css';
 
 const SignUpPage = () => {
-  const [formData, setFormData] = useState({
-    name: '',
-    email: '',
-    password: '',
-    confirmPassword: ''
-  });
-  const [isLoading, setIsLoading] = useState(false);
-  const [showPassword, setShowPassword] = useState(false);
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-  const navigate = useNavigate();
-  const formRef = useRef<HTMLFormElement>(null);
-  const formContainerRef = useRef<HTMLDivElement>(null);
-
-  // Disable ribbons when mouse is on right container (form side)
-  useEffect(() => {
-    const formContainer = formContainerRef.current;
-    if (!formContainer) return;
-
-    const handleMouseEnter = () => {
-      document.body.setAttribute('data-ribbons-disabled', 'true');
-    };
-
-    const handleMouseLeave = () => {
-      document.body.removeAttribute('data-ribbons-disabled');
-    };
-
-    formContainer.addEventListener('mouseenter', handleMouseEnter);
-    formContainer.addEventListener('mouseleave', handleMouseLeave);
-
-    return () => {
-      formContainer.removeEventListener('mouseenter', handleMouseEnter);
-      formContainer.removeEventListener('mouseleave', handleMouseLeave);
-    };
-  }, []);
-
-  // Pause ribbons when inputs are focused
-  useEffect(() => {
-    const form = formRef.current;
-    if (!form) return;
-
-    const handleFocus = () => {
-      document.body.setAttribute('data-input-focused', 'true');
-    };
-
-    const handleBlur = () => {
-      document.body.removeAttribute('data-input-focused');
-    };
-
-    const inputs = form.querySelectorAll('input');
-    inputs.forEach(input => {
-      input.addEventListener('focus', handleFocus);
-      input.addEventListener('blur', handleBlur);
-    });
-
-    return () => {
-      inputs.forEach(input => {
-        input.removeEventListener('focus', handleFocus);
-        input.removeEventListener('blur', handleBlur);
-      });
-    };
-  }, []);
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (formData.password !== formData.confirmPassword) {
-      alert('Passwords do not match');
-      return;
-    }
-    setIsLoading(true);
-    // Simulate API call
-    await new Promise(resolve => setTimeout(resolve, 1500));
-    console.log('Signup:', formData);
-    setIsLoading(false);
-    navigate('/app');
-  };
-
-  const handleChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    setFormData(prev => ({
-      ...prev,
-      [name]: value
-    }));
-  }, []);
 
   return (
-    <div className="auth-page">
-      {/* Full Screen Ribbons */}
-      <div className="auth-ribbons-fullscreen">
-        <Ribbons
-          baseThickness={30}
-          colors={['#A060FF']}
-          speedMultiplier={0.5}
-          maxAge={500}
-          enableFade={false}
-          enableShaderEffect={false}
-        />
-        <Ribbons
-          baseThickness={30}
-          colors={['#ffffff']}
-          speedMultiplier={0.5}
-          maxAge={500}
-          enableFade={false}
-          enableShaderEffect={false}
-        />
-      </div>
-      <div className="auth-container">
-        {/* Left Side - Visual */}
-        <div className="auth-visual">
-          <div className="auth-background-pattern"></div>
-          <Link to="/" className="auth-back-button">
-            <FiArrowLeft />
-            <span>Back to Home</span>
-          </Link>
-          <motion.div
-            className="auth-visual-content"
-            initial={{ opacity: 0, x: -30 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.8, delay: 0.2 }}
-          >
-            <h2 className="auth-visual-title">Join <span className="auth-brand-highlight">PulseBox</span> Today</h2>
-            <p className="auth-visual-text">
-              Start saving time, automate admin tasks, and focus on what matters most—teaching.
-            </p>
-            <div className="auth-features-list">
-              <div className="auth-feature-item">
-                <div className="auth-feature-icon">✓</div>
-                <span>Save 10+ Hours Per Week</span>
-              </div>
-              <div className="auth-feature-item">
-                <div className="auth-feature-icon">✓</div>
-                <span>AI Lesson Plan Generator</span>
-              </div>
-              <div className="auth-feature-item">
-                <div className="auth-feature-icon">✓</div>
-                <span>Complete Class Management</span>
-              </div>
+    <div className="auth-shell">
+      <div className="auth-card">
+        <div className="auth-panel">
+          <div className="auth-back-row">
+            <Link to="/" className="auth-back">
+              <FiArrowLeft />
+              <span>Back to Home</span>
+            </Link>
+            <div className="auth-logo-inline">PulseBox</div>
+          </div>
+          
+          <div className="auth-panel-header">
+            <div className="auth-welcome">
+              <p className="auth-greeting">Create your account to get started.</p>
             </div>
-          </motion.div>
+          </div>
+
+          <form className="auth-form-compact">
+            <label htmlFor="name">Full Name</label>
+            <div className="auth-input">
+              <FiUser />
+              <input id="name" name="name" type="text" placeholder="John Doe" required />
+            </div>
+            <label htmlFor="email">Email</label>
+            <div className="auth-input">
+              <FiMail />
+              <input id="email" name="email" type="email" placeholder="your.email@example.com" required />
+            </div>
+            <label htmlFor="password">Password</label>
+            <div className="auth-input">
+              <FiLock />
+              <input id="password" name="password" type="password" placeholder="Create a password" required />
+            </div>
+            <label htmlFor="confirmPassword">Confirm Password</label>
+            <div className="auth-input">
+              <FiLock />
+              <input id="confirmPassword" name="confirmPassword" type="password" placeholder="Confirm password" required />
+            </div>
+            <div className="auth-actions-row">
+              <label className="auth-checkbox">
+                <input type="checkbox" required />
+                <span>I agree to the Terms and Privacy Policy</span>
+              </label>
+            </div>
+            <button type="submit" className="auth-cta primary">Sign Up</button>
+          </form>
+
+          <div className="auth-divider">
+            <span>or</span>
+          </div>
+
+          <div className="auth-social-buttons">
+            <button type="button" className="auth-social-btn auth-social-google">
+              <FcGoogle />
+              <span>Sign up with Google</span>
+            </button>
+            <button type="button" className="auth-social-btn auth-social-facebook">
+              <FaFacebook />
+              <span>Sign up with Facebook</span>
+            </button>
+          </div>
+
+          <div className="auth-switch">
+            <span>Already with us?</span>
+            <Link to="/login">Sign in</Link>
+          </div>
+
+          <p className="auth-legal">By creating an account, you agree to our terms of service and privacy policy.</p>
         </div>
 
-        {/* Right Side - Form */}
-        <div className="auth-form-container">
-          <motion.div
-            className="auth-form-wrapper"
-            initial={{ opacity: 0, x: 30 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.8 }}
-          >
-            <div className="auth-header">
-              <Link to="/" className="auth-logo">
-                <span className="logo-pulse">Pulse</span>
-                <span className="logo-box">Box</span>
-              </Link>
-              <h1 className="auth-title">Create Account</h1>
-              <p className="auth-subtitle">Get started with your free account</p>
+        <div className="auth-hero">
+          <div className="auth-hero-card auth-hero-signup">
+            <div className="auth-hero-lottie-background">
+              <LottieAnimation animationData={chatbotAnimation} loop autoplay speed={1} />
             </div>
-
-            <form ref={formRef} className="auth-form" onSubmit={handleSubmit}>
-              <div className="form-group">
-                <label htmlFor="name">Full Name</label>
-                <input
-                  type="text"
-                  id="name"
-                  name="name"
-                  value={formData.name}
-                  onChange={handleChange}
-                  required
-                  placeholder="John Doe"
-                />
-              </div>
-
-              <div className="form-group">
-                <label htmlFor="email">Email</label>
-                <input
-                  type="email"
-                  id="email"
-                  name="email"
-                  value={formData.email}
-                  onChange={handleChange}
-                  required
-                  placeholder="your.email@example.com"
-                />
-              </div>
-
-              <div className="form-group">
-                <label htmlFor="password">Password</label>
-                <div className="password-input-wrapper">
-                  <input
-                    type={showPassword ? "text" : "password"}
-                    id="password"
-                    name="password"
-                    value={formData.password}
-                    onChange={handleChange}
-                    required
-                    placeholder="Create a password"
-                  />
-                  <button
-                    type="button"
-                    className="password-toggle-btn"
-                    onClick={() => setShowPassword(!showPassword)}
-                    aria-label={showPassword ? "Hide password" : "Show password"}
-                  >
-                    {showPassword ? <FiEyeOff /> : <FiEye />}
-                  </button>
-                </div>
-              </div>
-
-              <div className="form-group">
-                <label htmlFor="confirmPassword">Confirm Password</label>
-                <div className="password-input-wrapper">
-                  <input
-                    type={showConfirmPassword ? "text" : "password"}
-                    id="confirmPassword"
-                    name="confirmPassword"
-                    value={formData.confirmPassword}
-                    onChange={handleChange}
-                    required
-                    placeholder="Confirm your password"
-                  />
-                  <button
-                    type="button"
-                    className="password-toggle-btn"
-                    onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                    aria-label={showConfirmPassword ? "Hide password" : "Show password"}
-                  >
-                    {showConfirmPassword ? <FiEyeOff /> : <FiEye />}
-                  </button>
-                </div>
-              </div>
-
-              <div className="form-options">
-                <label className="checkbox-label">
-                  <input type="checkbox" required />
-                  <span>I agree to the <Link to="/terms" style={{ color: '#A060FF' }}>Terms</Link> and <Link to="/privacy" style={{ color: '#A060FF' }}>Privacy Policy</Link></span>
-                </label>
-              </div>
-
-              <Button
-                type="submit"
-                variant="primary"
-                fullWidth
-                size="lg"
-                isLoading={isLoading}
-              >
-                Create Account
-              </Button>
-            </form>
-
-            <p className="auth-footer">
-              Already have an account? <Link to="/login">Sign in</Link>
-            </p>
-          </motion.div>
+            <div className="auth-hero-chat-wrapper">
+              <ChatAnimation messages={[
+                { id: 1, sender: 'bot', text: 'Welcome! 🎉 Ready to start your teaching journey?', delay: 500 },
+                { id: 2, sender: 'teacher', text: 'Yes! I\'m excited to join PulseBox.', delay: 2000 },
+                { id: 3, sender: 'bot', text: 'Perfect! I\'ll help you create lesson plans, manage classes, and track everything in one place.', delay: 3500 },
+                { id: 4, sender: 'teacher', text: 'That\'s exactly what I need! Let\'s get started.', delay: 5000 },
+                { id: 5, sender: 'bot', text: 'Awesome! Create your account and I\'ll be your personal teaching assistant. Let\'s make teaching easier! ✨', delay: 6500 },
+              ]} />
+            </div>
+          </div>
         </div>
       </div>
     </div>
