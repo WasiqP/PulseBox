@@ -92,3 +92,4 @@ const ChatAnimation: React.FC<ChatAnimationProps> = ({ messages = defaultMessage
 };
 
 export default ChatAnimation;
+
