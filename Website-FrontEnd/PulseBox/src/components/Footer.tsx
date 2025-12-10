@@ -41,7 +41,7 @@ const Footer = () => {
 
         <div className="footer-bottom">
           <p className="footer-copyright">
-            © {new Date().getFullYear()} PulseBox. All rights reserved.
+            © {new Date().getFullYear()} Raviro. All rights reserved.
           </p>
           <div className="footer-social">
             {/* Add social media links here */}

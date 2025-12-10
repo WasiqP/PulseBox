@@ -48,10 +48,27 @@
 }
 
 .navbar-brand-text {
-  font-size: 1.5rem;
-  font-weight: 700;
+  display: inline-flex;
+  align-items: baseline;
+  gap: 0.1rem;
+  font-size: 1.75rem;
+  font-weight: 600;
   color: var(--color-text);
   font-family: 'Poppins', sans-serif;
+  letter-spacing: -0.4px;
+}
+
+.navbar-brand-text .brand-r {
+  color: var(--color-primary);
+  font-weight: 800;
+  font-size: 2.65rem;
+  line-height: 1;
+}
+
+.navbar-brand-text .brand-dot {
+  color: var(--color-primary);
+  font-weight: 800;
+  margin-left: 0.05rem;
 }
 
 .navbar-menu {

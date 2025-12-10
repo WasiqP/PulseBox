@@ -45,8 +45,9 @@ const Sidebar = () => {
         >
             <div className="sidebar-header">
                 <Link to="/" className="sidebar-logo">
-                    <span className="logo-pulse">Pulse</span>
-                    <span className="logo-box">Box</span>
+                    <span className="navbar-brand-text">
+                        <span className="brand-r">R</span>aviro<span className="brand-dot">.</span>
+                    </span>
                 </Link>
             </div>
 

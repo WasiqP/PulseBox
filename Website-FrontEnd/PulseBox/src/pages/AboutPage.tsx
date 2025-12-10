@@ -35,7 +35,7 @@ const AboutPage = () => {
         variants={staggerContainer}
       >
         <motion.h1 className="about-title" variants={fadeInUp}>
-          About <span className="highlight">PulseBox</span>
+          About <span className="highlight">Raviro</span>
         </motion.h1>
         <motion.p className="about-subtitle" variants={fadeInUp}>
           Empowering teachers to save time, reduce stress, and focus on what matters most—teaching
@@ -55,7 +55,7 @@ const AboutPage = () => {
               Our Mission
             </motion.h2>
             <motion.p className="section-text" variants={fadeInUp}>
-              At PulseBox, we understand that teachers are the 2nd most stressed professionals in the world, 
+              At Raviro, we understand that teachers are the 2nd most stressed professionals in the world, 
               largely due to overwhelming administrative tasks. Our mission is to provide teachers with an 
               AI-powered personal assistant that automates these tasks, saves 10+ hours per week, and allows 
               educators to focus on what they do best—inspiring and teaching students.
@@ -126,12 +126,12 @@ const AboutPage = () => {
             variants={staggerContainer}
           >
             <motion.h2 className="section-heading" variants={fadeInUp}>
-              Why Choose PulseBox?
+              Why Choose Raviro?
             </motion.h2>
             <motion.p className="section-text" variants={fadeInUp}>
-              We've built PulseBox specifically for teachers, with one goal in mind: to reduce 
+              We've built Raviro specifically for teachers, with one goal in mind: to reduce 
               administrative burden and maximize teaching time. Whether you teach elementary, 
-              middle, or high school, whether you have one class or ten, PulseBox adapts to your 
+              middle, or high school, whether you have one class or ten, Raviro adapts to your 
               needs. Our AI-powered features automate 70% of admin tasks, saving you 10+ hours 
               per week and allowing you to focus on what truly matters—your students.
             </motion.p>

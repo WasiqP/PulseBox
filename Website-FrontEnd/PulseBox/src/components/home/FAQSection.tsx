@@ -34,20 +34,20 @@ const FAQSection = () => {
             answer: 'Simply input your subject, topic, grade level, and duration. Our AI generates comprehensive lesson plans with learning objectives, activities, materials, and assessment suggestions. You can customize and refine the generated plans to match your teaching style.'
         },
         {
-            question: 'Can I use PulseBox for multiple classes?',
-            answer: 'Yes! PulseBox is designed to handle multiple classes simultaneously. You can organize classes by subject, grade level, or schedule. Each class has its own attendance tracking, student list, and assignment management.'
+            question: 'Can I use Raviro for multiple classes?',
+            answer: 'Yes! Raviro is designed to handle multiple classes simultaneously. You can organize classes by subject, grade level, or schedule. Each class has its own attendance tracking, student list, and assignment management.'
         },
         {
             question: 'How secure is student data?',
             answer: 'We take data security seriously. All student information is encrypted and stored securely. We comply with educational data protection regulations and ensure your students\' privacy is protected at all times.'
         },
         {
-            question: 'Can I use PulseBox on my phone?',
-            answer: 'Absolutely! PulseBox is available as a mobile app for iOS and Android, as well as a web application. You can mark attendance, create quizzes, and access your classes from anywhere, anytime.'
+            question: 'Can I use Raviro on my phone?',
+            answer: 'Absolutely! Raviro is available as a mobile app for iOS and Android, as well as a web application. You can mark attendance, create quizzes, and access your classes from anywhere, anytime.'
         },
         {
-            question: 'How much time will PulseBox save me?',
-            answer: 'Teachers using PulseBox report saving 10+ hours per week on administrative tasks. The AI lesson planner alone can save 2-3 hours per week, and automated attendance tracking saves additional time every day.'
+            question: 'How much time will Raviro save me?',
+            answer: 'Teachers using Raviro report saving 10+ hours per week on administrative tasks. The AI lesson planner alone can save 2-3 hours per week, and automated attendance tracking saves additional time every day.'
         }
     ];
 
