@@ -4,11 +4,12 @@ import { motion } from 'framer-motion';
 import Sidebar from '../components/dashboard/Sidebar';
 import Card from '../components/ui/Card';
 import Button from '../components/ui/Button';
+import ShareTaskModal from '../components/ui/ShareTaskModal';
 import { useHomework } from '../context/HomeworkContext';
 import { useClasses } from '../context/ClassesContext';
 import { useTasks } from '../context/TasksContext';
 import { useConfirm } from '../context/ConfirmModalContext';
-import { FiFileText, FiSearch, FiPlus, FiClock, FiUsers, FiCheckCircle, FiBook, FiTrash2 } from 'react-icons/fi';
+import { FiFileText, FiSearch, FiPlus, FiClock, FiUsers, FiCheckCircle, FiBook, FiTrash2, FiEye, FiShare2 } from 'react-icons/fi';
 import './DashboardPage.css';
 
 type TaskType = 'quiz' | 'assignment' | 'test' | 'homework';
@@ -25,11 +26,18 @@ interface Task {
   dueDate: string;
   status: 'active' | 'completed';
   isHomework?: boolean; // Flag to identify homework tasks
+  published?: boolean; // Flag to identify published tasks
+  createdAt?: string; // Creation date for sorting
+  publishedAt?: string; // Publication date for sorting
+  isDraft?: boolean; // Flag to identify draft tasks
+  shareLink?: string; // Share link for published tasks
 }
 
 const MyTasksPage = () => {
   const [searchQuery, setSearchQuery] = useState('');
-  const [filter, setFilter] = useState<'all' | 'quiz' | 'assignment' | 'test' | 'homework'>('all');
+  const [filter, setFilter] = useState<'all' | 'quiz' | 'assignment' | 'test' | 'homework' | 'drafts'>('all');
+  const [shareModalOpen, setShareModalOpen] = useState(false);
+  const [selectedTaskId, setSelectedTaskId] = useState<string | null>(null);
   const { homeworks, deleteHomework } = useHomework();
   const { classes } = useClasses();
   const { tasks, deleteTask } = useTasks();
@@ -48,7 +56,8 @@ const MyTasksPage = () => {
         submissions: hw.submissions.length,
         totalStudents: hw.totalStudents,
         dueDate: hw.dueDate,
-        status: new Date(hw.dueDate) < new Date() ? 'completed' : 'active'
+        status: new Date(hw.dueDate) < new Date() ? 'completed' : 'active',
+        createdAt: hw.createdAt
       };
     });
   }, [homeworks, classes]);
@@ -58,6 +67,7 @@ const MyTasksPage = () => {
     return tasks
       .map(t => {
         const classData = classes.find(c => c.id === t.classId);
+        const isDraft = !t.published || t.questions.length === 0;
         return {
           id: t.id,
           title: t.name,
@@ -68,7 +78,12 @@ const MyTasksPage = () => {
           submissions: 0, // TODO: Get actual submissions count from context
           totalStudents: classData?.studentCount || 0,
           dueDate: t.dueDate,
-          status: new Date(t.dueDate) < new Date() ? 'completed' : 'active'
+          status: new Date(t.dueDate) < new Date() ? 'completed' : 'active',
+          published: t.published || false,
+          createdAt: t.createdAt,
+          publishedAt: t.publishedAt,
+          isDraft: isDraft,
+          shareLink: t.shareLink || (t.published ? `${window.location.origin}/task/${t.id}` : undefined)
         };
       });
   }, [tasks, classes]);
@@ -76,12 +91,33 @@ const MyTasksPage = () => {
   // Combine all tasks (published tasks + homeworks)
   const allTasks = [...publishedTasks, ...homeworkTasks];
 
-  const filteredTasks = allTasks.filter(task => {
-    const matchesSearch = task.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                         task.class.toLowerCase().includes(searchQuery.toLowerCase());
-    const matchesFilter = filter === 'all' || task.type === filter;
-    return matchesSearch && matchesFilter;
-  });
+  const filteredTasks = useMemo(() => {
+    const filtered = allTasks.filter(task => {
+      const matchesSearch = task.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                           task.class.toLowerCase().includes(searchQuery.toLowerCase());
+      
+      let matchesFilter = false;
+      if (filter === 'all') {
+        // Exclude draft tasks from "All" filter
+        matchesFilter = task.isDraft !== true;
+      } else if (filter === 'drafts') {
+        // Show only draft tasks (unpublished or incomplete)
+        matchesFilter = task.isDraft === true;
+      } else {
+        // Filter by task type (also exclude drafts)
+        matchesFilter = task.type === filter && task.isDraft !== true;
+      }
+      
+      return matchesSearch && matchesFilter;
+    });
+
+    // Sort by most recent first (publishedAt if published, otherwise createdAt)
+    return filtered.sort((a, b) => {
+      const dateA = a.publishedAt ? new Date(a.publishedAt) : (a.createdAt ? new Date(a.createdAt) : new Date(0));
+      const dateB = b.publishedAt ? new Date(b.publishedAt) : (b.createdAt ? new Date(b.createdAt) : new Date(0));
+      return dateB.getTime() - dateA.getTime(); // Most recent first
+    });
+  }, [allTasks, searchQuery, filter]);
 
   const getTypeColor = (type: TaskType) => {
     switch (type) {
@@ -126,6 +162,24 @@ const MyTasksPage = () => {
         }
       },
     });
+  };
+
+  const handleShare = (e: React.MouseEvent, task: Task) => {
+    e.preventDefault();
+    e.stopPropagation();
+    
+    if (!task.published) {
+      alert('Please publish the task first before sharing.');
+      return;
+    }
+
+    setSelectedTaskId(task.id);
+    setShareModalOpen(true);
+  };
+
+  const handleCloseShareModal = () => {
+    setShareModalOpen(false);
+    setSelectedTaskId(null);
   };
 
   return (
@@ -200,6 +254,12 @@ const MyTasksPage = () => {
             >
               Homework
             </button>
+            <button
+              className={`filter-btn ${filter === 'drafts' ? 'active' : ''}`}
+              onClick={() => setFilter('drafts')}
+            >
+              Drafts
+            </button>
           </div>
         </motion.div>
 
@@ -214,7 +274,11 @@ const MyTasksPage = () => {
               <div className="empty-state">
                 <FiFileText className="empty-icon" />
                 <h3>No tasks found</h3>
-                <p>Create your first task to get started</p>
+                <p>
+                  {filter === 'drafts' 
+                    ? 'You have no draft tasks. Drafts are tasks that are unpublished or incomplete.' 
+                    : 'Create your first task to get started'}
+                </p>
                 <Link to="/app/tasks/create">
                   <Button variant="primary" size="md" leftIcon={<FiPlus />}>
                     Create Task
@@ -232,9 +296,58 @@ const MyTasksPage = () => {
                       {task.type.charAt(0).toUpperCase() + task.type.slice(1)}
                     </div>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                      <span className={`quiz-status status-${task.status}`}>
-                        {task.status}
-                      </span>
+                      {task.isDraft && !task.isHomework && (
+                        <span className="quiz-status" style={{ 
+                          background: 'rgba(255, 211, 61, 0.15)', 
+                          color: '#FFD93D',
+                          padding: '0.25rem 0.75rem',
+                          borderRadius: '6px',
+                          fontSize: '0.75rem',
+                          fontWeight: 600,
+                          textTransform: 'uppercase'
+                        }}>
+                          Draft
+                        </span>
+                      )}
+                      {!task.isDraft && (
+                        <span className={`quiz-status status-${task.status}`}>
+                          {task.status}
+                        </span>
+                      )}
+                      {task.published && !task.isHomework && (
+                        <button
+                          className="task-preview-btn"
+                          onClick={(e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            window.open(`/task/${task.id}`, '_blank');
+                          }}
+                          title="Preview Task"
+                          style={{
+                            background: 'transparent',
+                            border: '1px solid rgba(160, 96, 255, 0.3)',
+                            color: 'var(--color-primary, #a060ff)',
+                            cursor: 'pointer',
+                            padding: '0.5rem',
+                            borderRadius: 'var(--radius-md)',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            transition: 'all var(--transition-fast)',
+                            fontSize: '1.1rem'
+                          }}
+                          onMouseEnter={(e) => {
+                            e.currentTarget.style.background = 'rgba(160, 96, 255, 0.1)';
+                            e.currentTarget.style.borderColor = 'var(--color-primary, #a060ff)';
+                          }}
+                          onMouseLeave={(e) => {
+                            e.currentTarget.style.background = 'transparent';
+                            e.currentTarget.style.borderColor = 'rgba(160, 96, 255, 0.3)';
+                          }}
+                        >
+                          <FiEye />
+                        </button>
+                      )}
                       <button
                         className="task-delete-btn"
                         onClick={(e) => handleDelete(e, task)}
@@ -276,9 +389,43 @@ const MyTasksPage = () => {
                       <FiUsers />
                       <span>{task.submissions}/{task.totalStudents} Submissions</span>
                     </div>
-                    <div className="quiz-stat-item">
-                      <FiClock />
-                      <span>Due: {new Date(task.dueDate).toLocaleDateString()}</span>
+                    <div className="quiz-stat-item" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%' }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                        <FiClock />
+                        <span>Due: {new Date(task.dueDate).toLocaleDateString()}</span>
+                      </div>
+                      {task.published && !task.isHomework && (
+                        <button
+                          className="task-share-btn"
+                          onClick={(e) => handleShare(e, task)}
+                          title="Share Task"
+                          style={{
+                            background: 'transparent',
+                            border: '1px solid rgba(160, 96, 255, 0.3)',
+                            color: 'var(--color-primary, #a060ff)',
+                            cursor: 'pointer',
+                            padding: '0.4rem 0.6rem',
+                            borderRadius: 'var(--radius-md)',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            transition: 'all var(--transition-fast)',
+                            fontSize: '0.9rem',
+                            gap: '0.25rem'
+                          }}
+                          onMouseEnter={(e) => {
+                            e.currentTarget.style.background = 'rgba(160, 96, 255, 0.1)';
+                            e.currentTarget.style.borderColor = 'var(--color-primary, #a060ff)';
+                          }}
+                          onMouseLeave={(e) => {
+                            e.currentTarget.style.background = 'transparent';
+                            e.currentTarget.style.borderColor = 'rgba(160, 96, 255, 0.3)';
+                          }}
+                        >
+                          <FiShare2 />
+                          <span style={{ fontSize: '0.75rem' }}>Share</span>
+                        </button>
+                      )}
                     </div>
                   </div>
                   <div className="quiz-progress">
@@ -298,6 +445,15 @@ const MyTasksPage = () => {
             ))
           )}
         </motion.div>
+
+        {/* Share Task Modal */}
+        {selectedTaskId && (
+          <ShareTaskModal
+            isOpen={shareModalOpen}
+            onClose={handleCloseShareModal}
+            taskId={selectedTaskId}
+          />
+        )}
       </main>
     </div>
   );

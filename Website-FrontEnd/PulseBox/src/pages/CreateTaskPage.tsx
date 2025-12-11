@@ -7,7 +7,7 @@ import Button from '../components/ui/Button';
 import { useClasses } from '../context/ClassesContext';
 import { useTasks } from '../context/TasksContext';
 import { useAlert } from '../context/AlertModalContext';
-import { FiFileText, FiBook, FiClock, FiLock, FiArrowLeft, FiCheck, FiX, FiAward, FiPercent, FiMinus, FiGlobe, FiUsers } from 'react-icons/fi';
+import { FiFileText, FiBook, FiClock, FiLock, FiArrowLeft, FiCheck, FiX, FiAward, FiPercent, FiMinus, FiGlobe, FiUsers, FiUser, FiArrowRight, FiLayers } from 'react-icons/fi';
 import './DashboardPage.css';
 
 type TaskType = 'quiz' | 'test' | 'assignment' | 'homework';
@@ -31,6 +31,8 @@ interface TaskFormData {
   expectedTime: number;
   timeUnit: 'minutes' | 'hours';
   visibility: 'public' | 'class-only'; // Task visibility/sharing preference
+  requireIdentification: boolean; // Whether guests/students need to provide identification
+  displayMode: 'single' | 'form'; // Question presentation preference
   markingCriteria?: MarkingCriteria;
   permissions: {
     lockScreen: boolean;
@@ -65,6 +67,8 @@ const CreateTaskPage = () => {
     expectedTime: 30,
     timeUnit: 'minutes',
     visibility: 'public',
+    requireIdentification: false,
+    displayMode: 'single',
     markingCriteria: {
       totalMarks: 100,
       passingMarks: 40,
@@ -202,6 +206,8 @@ const CreateTaskPage = () => {
       expectedTime: formData.expectedTime,
       timeUnit: formData.timeUnit,
       visibility: formData.visibility,
+      requireIdentification: formData.requireIdentification,
+      displayMode: formData.displayMode || 'single',
       markingCriteria: formData.markingCriteria,
       permissions: formData.permissions,
     });
@@ -504,6 +510,106 @@ const CreateTaskPage = () => {
                   </button>
                 </div>
               </div>
+
+              {/* Identification Requirement */}
+              <div className="form-section">
+                <div className="section-header">
+                  <h2 className="section-title">Identification Requirement</h2>
+                  <p className="section-description">Choose whether students/guests need to provide identification before accessing the task</p>
+                </div>
+                <div className="permission-item">
+                  <div className="permission-info">
+                    <div className="permission-header">
+                      <FiUser className="permission-icon" />
+                      <div>
+                        <h3 className="permission-title">Require Identification</h3>
+                        <p className="permission-description">
+                          Students/guests will need to provide their name and email before starting the task
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                  <label className="toggle-switch">
+                    <input
+                      type="checkbox"
+                      checked={formData.requireIdentification}
+                      onChange={(e) => setFormData(prev => ({ ...prev, requireIdentification: e.target.checked }))}
+                    />
+                    <span className="toggle-slider"></span>
+                  </label>
+                </div>
+                {!formData.requireIdentification && (
+                  <p className="field-hint" style={{ marginTop: '0.5rem', color: 'var(--color-text-muted)' }}>
+                    The task will be open for all - anyone with the link can access it without providing identification.
+                  </p>
+                )}
+              </div>
+
+            {/* Question Display Mode */}
+            <div className="form-section">
+              <div className="section-header">
+                <h2 className="section-title">Question Display Mode</h2>
+                <p className="section-description">Pick how students experience the task.</p>
+              </div>
+
+              <div className="display-mode-layout">
+                <div className="display-mode-summary">
+                  <h4>Choose what fits the task:</h4>
+                  <ul>
+                    <li><strong>One-by-one</strong>: Keeps focus; great for timed/controlled flows.</li>
+                    <li><strong>Show all</strong>: Best for surveys/assignments where context matters.</li>
+                  </ul>
+                </div>
+
+                <div className="display-mode-grid">
+                  <label className={`display-mode-tile ${formData.displayMode === 'single' ? 'selected' : ''}`}>
+                    <div className="display-mode-top">
+                      <input
+                        type="radio"
+                        name="displayMode"
+                        value="single"
+                        checked={formData.displayMode === 'single'}
+                        onChange={() => setFormData(prev => ({ ...prev, displayMode: 'single' }))}
+                      />
+                      <div>
+                        <h3>One-by-one (Next/Previous)</h3>
+                        <p>One question at a time with navigation controls.</p>
+                      </div>
+                    </div>
+                    <div className="display-mode-preview">
+                      <div className="dm-chip-row">
+                        <span className="dm-chip active">Q1</span>
+                        <span className="dm-chip">Q2</span>
+                        <span className="dm-chip">Q3</span>
+                      </div>
+                      <div className="dm-mini-hint">Progress bar + Next/Previous buttons</div>
+                    </div>
+                  </label>
+
+                  <label className={`display-mode-tile ${formData.displayMode === 'form' ? 'selected' : ''}`}>
+                    <div className="display-mode-top">
+                      <input
+                        type="radio"
+                        name="displayMode"
+                        value="form"
+                        checked={formData.displayMode === 'form'}
+                        onChange={() => setFormData(prev => ({ ...prev, displayMode: 'form' }))}
+                      />
+                      <div>
+                        <h3>Show all (Form-style)</h3>
+                        <p>All questions on one page, answered in one go.</p>
+                      </div>
+                    </div>
+                    <div className="display-mode-preview stacked">
+                      <div className="dm-block">Q1 text…</div>
+                      <div className="dm-block">Q2 options…</div>
+                      <div className="dm-block">Q3 text…</div>
+                      <div className="dm-mini-hint">Scroll, answer everything, submit once</div>
+                    </div>
+                  </label>
+                </div>
+              </div>
+            </div>
 
               {/* Marking Criteria - Only for Quiz, Test, Assignment */}
               {showMarkingCriteria && (
