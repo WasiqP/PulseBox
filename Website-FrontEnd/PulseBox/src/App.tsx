@@ -7,6 +7,7 @@ import { TasksProvider } from './context/TasksContext';
 import { ScheduleProvider } from './context/ScheduleContext';
 import { ConfirmModalProvider } from './context/ConfirmModalContext';
 import { AlertModalProvider } from './context/AlertModalContext';
+import { ResponsesProvider } from './context/ResponsesContext';
 import ScrollToTop from './components/ScrollToTop';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
@@ -35,6 +36,7 @@ import TaskDetailsPage from './pages/TaskDetailsPage';
 import SchedulePage from './pages/SchedulePage';
 import PreviewTask from './pages/PreviewTask';
 import MainTask from './pages/MainTask';
+import ResponsesPage from './pages/ResponsesPage';
 import './App.css';
 
 function AppContent() {
@@ -42,11 +44,14 @@ function AppContent() {
   const isAuthPage = location.pathname === '/login' || location.pathname === '/signup';
   const isAppPage = location.pathname.startsWith('/app');
   const isPreviewTask = location.pathname.startsWith('/task/') && !location.pathname.includes('/take');
-  const isMainTask = location.pathname.includes('/task/') && location.pathname.includes('/take');
+  const isMainTask = location.pathname.startsWith('/task/') && location.pathname.includes('/take');
+
+  // Don't show navbar on auth pages, app pages, preview task, or main task (taking task) screens
+  const shouldShowNavbar = !isAuthPage && !isAppPage && !isPreviewTask && !isMainTask;
 
   return (
     <div className={`app ${isAuthPage ? 'auth-page' : ''}`}>
-      {!isAuthPage && !isAppPage && !isPreviewTask && !isMainTask && <Navbar />}
+      {shouldShowNavbar && <Navbar />}
       <Routes>
         <Route path="/" element={<HomePage />} />
         <Route path="/about" element={<AboutPage />} />
@@ -71,12 +76,13 @@ function AppContent() {
         <Route path="/app/homework" element={<AssignHomeworkPage />} />
         <Route path="/app/analytics" element={<AnalyticsPage />} />
         <Route path="/app/schedule" element={<SchedulePage />} />
+        <Route path="/app/responses" element={<ResponsesPage />} />
         <Route path="/app/profile" element={<ProfilePage />} />
         <Route path="/app/settings" element={<SettingsPage />} />
         <Route path="/task/:taskId" element={<PreviewTask />} />
         <Route path="/task/:taskId/take" element={<MainTask />} />
       </Routes>
-      {!isAuthPage && !isAppPage && !isPreviewTask && !isMainTask && <Footer />}
+      {shouldShowNavbar && <Footer />}
     </div>
   );
 }
@@ -88,16 +94,18 @@ function App() {
         <AttendanceProvider>
           <HomeworkProvider>
             <TasksProvider>
-              <ScheduleProvider>
-                <ConfirmModalProvider>
-                  <AlertModalProvider>
-                  <Router>
-                    <ScrollToTop />
-                    <AppContent />
-                  </Router>
-                  </AlertModalProvider>
-                </ConfirmModalProvider>
-              </ScheduleProvider>
+              <ResponsesProvider>
+                <ScheduleProvider>
+                  <ConfirmModalProvider>
+                    <AlertModalProvider>
+                    <Router>
+                      <ScrollToTop />
+                      <AppContent />
+                    </Router>
+                    </AlertModalProvider>
+                  </ConfirmModalProvider>
+                </ScheduleProvider>
+              </ResponsesProvider>
             </TasksProvider>
           </HomeworkProvider>
         </AttendanceProvider>

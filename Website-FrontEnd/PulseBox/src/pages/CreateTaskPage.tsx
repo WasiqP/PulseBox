@@ -7,7 +7,8 @@ import Button from '../components/ui/Button';
 import { useClasses } from '../context/ClassesContext';
 import { useTasks } from '../context/TasksContext';
 import { useAlert } from '../context/AlertModalContext';
-import { FiFileText, FiBook, FiClock, FiLock, FiArrowLeft, FiCheck, FiX, FiAward, FiPercent, FiMinus, FiGlobe, FiUsers, FiUser, FiArrowRight, FiLayers } from 'react-icons/fi';
+import { FiFileText, FiBook, FiClock, FiLock, FiArrowLeft, FiCheck, FiX, FiAward, FiPercent, FiMinus, FiGlobe, FiUsers, FiUser } from 'react-icons/fi';
+import QuestionDisplayMode from '../components/QuestionDisplayMode';
 import './DashboardPage.css';
 
 type TaskType = 'quiz' | 'test' | 'assignment' | 'homework';
@@ -547,68 +548,10 @@ const CreateTaskPage = () => {
 
             {/* Question Display Mode */}
             <div className="form-section">
-              <div className="section-header">
-                <h2 className="section-title">Question Display Mode</h2>
-                <p className="section-description">Pick how students experience the task.</p>
-              </div>
-
-              <div className="display-mode-layout">
-                <div className="display-mode-summary">
-                  <h4>Choose what fits the task:</h4>
-                  <ul>
-                    <li><strong>One-by-one</strong>: Keeps focus; great for timed/controlled flows.</li>
-                    <li><strong>Show all</strong>: Best for surveys/assignments where context matters.</li>
-                  </ul>
-                </div>
-
-                <div className="display-mode-grid">
-                  <label className={`display-mode-tile ${formData.displayMode === 'single' ? 'selected' : ''}`}>
-                    <div className="display-mode-top">
-                      <input
-                        type="radio"
-                        name="displayMode"
-                        value="single"
-                        checked={formData.displayMode === 'single'}
-                        onChange={() => setFormData(prev => ({ ...prev, displayMode: 'single' }))}
-                      />
-                      <div>
-                        <h3>One-by-one (Next/Previous)</h3>
-                        <p>One question at a time with navigation controls.</p>
-                      </div>
-                    </div>
-                    <div className="display-mode-preview">
-                      <div className="dm-chip-row">
-                        <span className="dm-chip active">Q1</span>
-                        <span className="dm-chip">Q2</span>
-                        <span className="dm-chip">Q3</span>
-                      </div>
-                      <div className="dm-mini-hint">Progress bar + Next/Previous buttons</div>
-                    </div>
-                  </label>
-
-                  <label className={`display-mode-tile ${formData.displayMode === 'form' ? 'selected' : ''}`}>
-                    <div className="display-mode-top">
-                      <input
-                        type="radio"
-                        name="displayMode"
-                        value="form"
-                        checked={formData.displayMode === 'form'}
-                        onChange={() => setFormData(prev => ({ ...prev, displayMode: 'form' }))}
-                      />
-                      <div>
-                        <h3>Show all (Form-style)</h3>
-                        <p>All questions on one page, answered in one go.</p>
-                      </div>
-                    </div>
-                    <div className="display-mode-preview stacked">
-                      <div className="dm-block">Q1 text…</div>
-                      <div className="dm-block">Q2 options…</div>
-                      <div className="dm-block">Q3 text…</div>
-                      <div className="dm-mini-hint">Scroll, answer everything, submit once</div>
-                    </div>
-                  </label>
-                </div>
-              </div>
+              <QuestionDisplayMode
+                value={formData.displayMode}
+                onChange={(value) => setFormData(prev => ({ ...prev, displayMode: value }))}
+              />
             </div>
 
               {/* Marking Criteria - Only for Quiz, Test, Assignment */}

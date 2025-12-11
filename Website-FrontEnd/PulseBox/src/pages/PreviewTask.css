@@ -240,6 +240,14 @@
 .preview-identification-card,
 .preview-start-card {
   padding: 2rem !important;
+  position: relative;
+}
+
+.preview-start-toggle {
+  position: absolute;
+  top: 1.5rem;
+  right: 1.5rem;
+  z-index: 10;
 }
 
 .preview-identification-header {

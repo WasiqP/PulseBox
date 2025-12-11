@@ -125,7 +125,6 @@ const PreviewTask: React.FC = () => {
               <span className="brand-r">R</span>aviro<span className="brand-dot">.</span>
             </span>
           </div>
-          <ThemeToggle />
         </motion.div>
 
         {/* Main Content */}
@@ -285,6 +284,9 @@ const PreviewTask: React.FC = () => {
               </Card>
             ) : (
               <Card className="preview-start-card" glass={true}>
+                <div className="preview-start-toggle">
+                  <ThemeToggle />
+                </div>
                 <div className="preview-start-content">
                   <div className="preview-start-icon">
                     <FiFileText />

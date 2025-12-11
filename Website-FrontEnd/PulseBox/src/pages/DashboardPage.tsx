@@ -7,14 +7,16 @@ import { useClasses } from '../context/ClassesContext';
 import { useTasks } from '../context/TasksContext';
 import { useAttendance } from '../context/AttendanceContext';
 import { useSchedule } from '../context/ScheduleContext';
-import { FiBook, FiUsers, FiCheckCircle, FiCalendar, FiClock, FiFileText, FiActivity, FiPlus, FiAlertCircle, FiTarget, FiEye } from 'react-icons/fi';
+import { useResponses } from '../context/ResponsesContext';
+import { FiBook, FiUsers, FiCheckCircle, FiCalendar, FiClock, FiFileText, FiActivity, FiPlus, FiAlertCircle, FiTarget, FiEye, FiInbox, FiCheck, FiX, FiAward, FiUser } from 'react-icons/fi';
 import './DashboardPage.css';
 
 const DashboardPage = () => {
   const { classes, getClassById } = useClasses();
-  const { tasks } = useTasks();
+  const { tasks, getTaskById } = useTasks();
   const { records: attendanceRecords } = useAttendance();
   const { events } = useSchedule();
+  const { getLatestResponses } = useResponses();
   
   const totalStudents = classes.reduce((sum, cls) => sum + cls.studentCount, 0);
   
@@ -631,6 +633,124 @@ const DashboardPage = () => {
                             <FiEye />
                           </button>
                         </div>
+                      );
+                    })}
+                  </div>
+                </Card>
+              </motion.div>
+            );
+          }
+          return null;
+        })()}
+
+        {/* Latest Responses Section */}
+        {(() => {
+          const latestResponses = getLatestResponses(5);
+
+          if (latestResponses.length > 0) {
+            return (
+              <motion.div
+                className="latest-responses-section"
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5, delay: 0.8 }}
+                style={{ marginTop: '2rem' }}
+              >
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
+                  <h2 className="section-heading" style={{ margin: 0 }}>
+                    <FiInbox style={{ marginRight: '0.5rem' }} />
+                    Latest Responses
+                  </h2>
+                  <Link 
+                    to="/app/responses" 
+                    style={{ 
+                      color: 'var(--color-primary)', 
+                      textDecoration: 'none', 
+                      fontSize: '0.9rem',
+                      fontWeight: 600,
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '0.5rem'
+                    }}
+                  >
+                    View All
+                    <FiEye />
+                  </Link>
+                </div>
+                <Card className="latest-responses-card" glass={true}>
+                  <div className="latest-responses-list">
+                    {latestResponses.map((response) => {
+                      const task = getTaskById(response.taskId);
+                      const classData = getClassById(response.classId);
+                      const getTaskTypeColor = (type: string) => {
+                        const colors: Record<string, string> = {
+                          'quiz': '#A060FF',
+                          'test': '#FF6B6B',
+                          'assignment': '#4ECDC4',
+                          'homework': '#FFD93D'
+                        };
+                        return colors[type] || '#7F8C8D';
+                      };
+                      
+                      const taskColor = getTaskTypeColor(response.taskType);
+                      const timeAgo = formatRelativeTime(response.submittedAt);
+                      
+                      return (
+                        <Link
+                          key={response.id}
+                          to="/app/responses"
+                          style={{ textDecoration: 'none', display: 'block' }}
+                        >
+                          <div className="latest-response-item">
+                            <div className="response-icon-wrapper" style={{ background: `${taskColor}20`, color: taskColor }}>
+                              <FiInbox />
+                            </div>
+                            <div className="response-content">
+                              <div className="response-header">
+                                <h4 className="response-task-name">{response.taskName}</h4>
+                                <span className="response-type-badge" style={{ background: `${taskColor}20`, color: taskColor }}>
+                                  {response.taskType}
+                                </span>
+                              </div>
+                              <div className="response-meta-info">
+                                {response.studentInfo && (
+                                  <span className="response-student">
+                                    <FiUser style={{ fontSize: '0.85rem' }} />
+                                    {response.studentInfo.name}
+                                  </span>
+                                )}
+                                {classData && (
+                                  <span className="response-class">
+                                    {classData.name}
+                                  </span>
+                                )}
+                                <span className="response-time">{timeAgo}</span>
+                              </div>
+                              <div className="response-stats">
+                                <span className="response-stat-item">
+                                  {Object.keys(response.answers).length} / {task?.questions.length || 0} answered
+                                </span>
+                                {response.score !== undefined && task?.markingCriteria && (
+                                  <>
+                                    <span className="response-stat-item">
+                                      <FiAward style={{ fontSize: '0.85rem' }} />
+                                      {response.score.toFixed(1)} / {task.markingCriteria.totalMarks}
+                                    </span>
+                                    <span className={`response-status ${response.passed ? 'passed' : 'failed'}`}>
+                                      {response.passed ? <FiCheck /> : <FiX />}
+                                      {response.passed ? 'Passed' : 'Failed'}
+                                    </span>
+                                  </>
+                                )}
+                                {response.score === undefined && (
+                                  <span className="response-status pending">
+                                    Pending Review
+                                  </span>
+                                )}
+                              </div>
+                            </div>
+                          </div>
+                        </Link>
                       );
                     })}
                   </div>

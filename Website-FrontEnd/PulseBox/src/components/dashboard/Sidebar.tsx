@@ -16,7 +16,8 @@ import {
     FiChevronDown,
     FiChevronUp,
     FiX,
-    FiClock
+    FiClock,
+    FiInbox
 } from 'react-icons/fi';
 import './Sidebar.css';
 
@@ -28,6 +29,7 @@ const Sidebar = () => {
         { path: '/app', icon: FiHome, label: 'Overview' },
         { path: '/app/classes', icon: FiBook, label: 'My Classes' },
         { path: '/app/tasks', icon: FiFileText, label: 'My Tasks' },
+        { path: '/app/responses', icon: FiInbox, label: 'Responses' },
         { path: '/app/schedule', icon: FiClock, label: 'My Schedule' },
         { path: '/app/lesson-plans', icon: FiCalendar, label: 'Lesson Plans' },
         { path: '/app/attendance', icon: FiUsers, label: 'Attendance' },
