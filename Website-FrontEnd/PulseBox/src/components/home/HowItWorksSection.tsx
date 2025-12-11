@@ -485,12 +485,12 @@ const HowItWorksSection = () => {
                         Your Journey
                     </motion.span>
                     <h2 className="process-title">
-                        How PulseBox{' '}
+                        How Raviro{' '}
                         <span className="gradient-text">Works</span>
                     </h2>
                     <p className="process-subtitle">
                         Experience the simplicity of AI-powered teaching tools. From setup to success,
-                        see how PulseBox transforms your workflow in four seamless steps.
+                        see how Raviro transforms your workflow in four seamless steps.
                     </p>
                 </motion.div>
 
@@ -545,7 +545,7 @@ const HowItWorksSection = () => {
                         <FiZap className="cta-icon" />
                         <h3 className="cta-title">Ready to Transform Your Teaching?</h3>
                         <p className="cta-description">
-                            Join thousands of educators who've revolutionized their workflow with PulseBox
+                            Join thousands of educators who've revolutionized their workflow with Raviro
                         </p>
                     </div>
                 </motion.div>

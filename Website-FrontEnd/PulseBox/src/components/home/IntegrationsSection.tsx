@@ -50,7 +50,7 @@ const IntegrationsSection = () => {
                     className="section-subtitle"
                     variants={fadeInUp}
                 >
-                    Access PulseBox on any device—mobile app, web browser, or integrate with your existing teaching platforms
+                    Access Raviro on any device—mobile app, web browser, or integrate with your existing teaching platforms
                 </motion.p>
                 <div className="integrations-wall">
                     <div className="integrations-scroll">

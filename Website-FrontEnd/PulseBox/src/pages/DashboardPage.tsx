@@ -7,7 +7,7 @@ import { useClasses } from '../context/ClassesContext';
 import { useTasks } from '../context/TasksContext';
 import { useAttendance } from '../context/AttendanceContext';
 import { useSchedule } from '../context/ScheduleContext';
-import { FiBook, FiUsers, FiCheckCircle, FiCalendar, FiClock, FiFileText, FiActivity, FiPlus, FiAlertCircle, FiTarget } from 'react-icons/fi';
+import { FiBook, FiUsers, FiCheckCircle, FiCalendar, FiClock, FiFileText, FiActivity, FiPlus, FiAlertCircle, FiTarget, FiEye } from 'react-icons/fi';
 import './DashboardPage.css';
 
 const DashboardPage = () => {
@@ -599,26 +599,38 @@ const DashboardPage = () => {
                       const timeAgo = formatRelativeTime(publishedDate.toISOString());
                       
                       return (
-                        <Link 
-                          key={task.id} 
-                          to={`/app/tasks/${task.id}`} 
-                          style={{ textDecoration: 'none', display: 'block' }}
-                        >
-                          <div className="recent-task-item">
-                            <div className="recent-task-icon" style={{ background: `${taskColor}20`, color: taskColor }}>
-                              <FiFileText />
+                        <div key={task.id} className="recent-task-item-wrapper">
+                          <Link 
+                            to={`/app/tasks/${task.id}`} 
+                            style={{ textDecoration: 'none', display: 'block', flex: 1 }}
+                          >
+                            <div className="recent-task-item">
+                              <div className="recent-task-icon" style={{ background: `${taskColor}20`, color: taskColor }}>
+                                <FiFileText />
+                              </div>
+                              <div className="recent-task-info">
+                                <h4 className="recent-task-title">{task.name}</h4>
+                                <span className="recent-task-meta">
+                                  {classData?.name || 'Unknown Class'} • {task.questions.length} questions • {timeAgo}
+                                </span>
+                              </div>
+                              <div className="recent-task-badge" style={{ background: `${taskColor}20`, color: taskColor }}>
+                                {task.taskType}
+                              </div>
                             </div>
-                            <div className="recent-task-info">
-                              <h4 className="recent-task-title">{task.name}</h4>
-                              <span className="recent-task-meta">
-                                {classData?.name || 'Unknown Class'} • {task.questions.length} questions • {timeAgo}
-                              </span>
-                            </div>
-                            <div className="recent-task-badge" style={{ background: `${taskColor}20`, color: taskColor }}>
-                              {task.taskType}
-                            </div>
-                          </div>
-                        </Link>
+                          </Link>
+                          <button
+                            className="recent-task-preview-btn"
+                            onClick={(e) => {
+                              e.preventDefault();
+                              e.stopPropagation();
+                              window.open(`/task/${task.id}`, '_blank');
+                            }}
+                            title="Preview Task"
+                          >
+                            <FiEye />
+                          </button>
+                        </div>
                       );
                     })}
                   </div>

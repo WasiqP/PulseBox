@@ -12,12 +12,7 @@ const LoginPage = () => {
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    // Redirect to dashboard/overview
-    navigate('/app');
-  };
-
-  const handleSocialLogin = () => {
-    // Redirect to dashboard/overview
+    // Navigate to dashboard
     navigate('/app');
   };
 
@@ -30,7 +25,7 @@ const LoginPage = () => {
               <FiArrowLeft />
               <span>Back to Home</span>
             </Link>
-            <div className="auth-logo-inline">PulseBox</div>
+            <div className="auth-logo-inline">Raviro</div>
           </div>
           
           <div className="auth-panel-header">

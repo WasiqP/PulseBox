@@ -37,6 +37,7 @@ import {
   FiChevronDown,
   FiFileText,
   FiAlignLeft,
+  FiCopy,
 } from 'react-icons/fi';
 import './DashboardPage.css';
 
@@ -61,6 +62,7 @@ interface QuestionItemProps {
   index: number;
   onEdit: () => void;
   onDelete: () => void;
+  onDuplicate: () => void;
   showMarks: boolean;
   onMarksChange: (marks: number) => void;
 }
@@ -70,6 +72,7 @@ const QuestionItem: React.FC<QuestionItemProps> = ({
   index,
   onEdit,
   onDelete,
+  onDuplicate,
   showMarks,
   onMarksChange,
 }) => {
@@ -141,6 +144,16 @@ const QuestionItem: React.FC<QuestionItemProps> = ({
           </div>
         )}
         <div className="question-actions">
+          <button
+            className="question-action-btn"
+            onClick={(e) => {
+              e.stopPropagation();
+              onDuplicate();
+            }}
+            title="Duplicate question"
+          >
+            <FiCopy />
+          </button>
           <button
             className="question-action-btn"
             onClick={(e) => {
@@ -602,6 +615,31 @@ const QuestionsScreen: React.FC = () => {
     });
   }, [taskId, questions, deleteQuestion, confirm]);
 
+  const handleDuplicateQuestion = useCallback((questionId: string) => {
+    if (!taskId) return;
+    const questionToDuplicate = questions.find(q => q.id === questionId);
+    if (!questionToDuplicate) return;
+
+    // Create a duplicate with a new ID and updated title
+    const duplicatedQuestion: QuestionData = {
+      ...questionToDuplicate,
+      id: Date.now().toString() + Math.random().toString(36).substr(2, 9),
+      title: questionToDuplicate.title ? `${questionToDuplicate.title} (Copy)` : 'Untitled Question (Copy)',
+      // Deep copy options and correctAnswers arrays
+      options: questionToDuplicate.options ? [...questionToDuplicate.options] : [],
+      correctAnswers: questionToDuplicate.correctAnswers ? [...questionToDuplicate.correctAnswers] : [],
+    };
+
+    // Find the index of the original question and insert the duplicate right after it
+    const originalIndex = questions.findIndex(q => q.id === questionId);
+    const newQuestions = [...questions];
+    newQuestions.splice(originalIndex + 1, 0, duplicatedQuestion);
+    
+    // Update the questions state and add to task
+    setQuestions(newQuestions);
+    addQuestion(taskId, duplicatedQuestion);
+  }, [taskId, questions, addQuestion]);
+
   const handleDragStart = useCallback((event: any) => {
     setActiveId(event.active.id as string);
   }, []);
@@ -759,6 +797,7 @@ const QuestionsScreen: React.FC = () => {
                         index={index}
                         onEdit={() => handleEditQuestion(question)}
                         onDelete={() => handleDeleteQuestion(question.id)}
+                        onDuplicate={() => handleDuplicateQuestion(question.id)}
                         showMarks={isWeighted}
                         onMarksChange={(marks) => handleMarksChange(question.id, marks)}
                       />

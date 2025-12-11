@@ -25,7 +25,7 @@ interface ThemeProviderProps {
 export const ThemeProvider: React.FC<ThemeProviderProps> = ({ children }) => {
   const [theme, setThemeState] = useState<Theme>(() => {
     // Check localStorage first
-    const savedTheme = localStorage.getItem('pulsebox-theme') as Theme;
+    const savedTheme = localStorage.getItem('raviro-theme') as Theme;
     if (savedTheme) {
       return savedTheme;
     }
@@ -39,7 +39,7 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({ children }) => {
   useEffect(() => {
     // Apply theme to document
     document.documentElement.setAttribute('data-theme', theme);
-    localStorage.setItem('pulsebox-theme', theme);
+    localStorage.setItem('raviro-theme', theme);
   }, [theme]);
 
   const toggleTheme = () => {

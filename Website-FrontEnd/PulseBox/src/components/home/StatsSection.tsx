@@ -169,7 +169,7 @@ const StatsSection = () => {
                     </h2>
                     <p className="impact-subtitle">
                         Join thousands of educators who've revolutionized their teaching workflow
-                        with PulseBox's powerful automation and AI-driven tools
+                        with Raviro's powerful automation and AI-driven tools
                     </p>
                 </motion.div>
 

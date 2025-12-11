@@ -46,7 +46,7 @@ const TestimonialsSection = () => {
                     className="section-subtitle"
                     variants={fadeInUp}
                 >
-                    Join thousands of teachers who have transformed their workflow with PulseBox
+                    Join thousands of teachers who have transformed their workflow with Raviro
                 </motion.p>
 
                 <motion.div
@@ -69,7 +69,7 @@ const TestimonialsSection = () => {
                                 name: 'Sarah Mitchell',
                                 role: 'Mathematics Teacher',
                                 company: 'Springfield High School',
-                                content: 'PulseBox has completely transformed my workflow. The AI lesson planner saves me 3 hours every week, and I can mark attendance in seconds. I finally have time to focus on teaching!',
+                                content: 'Raviro has completely transformed my workflow. The AI lesson planner saves me 3 hours every week, and I can mark attendance in seconds. I finally have time to focus on teaching!',
                                 rating: 5,
                                 color: '#FFFFFF'
                             },
@@ -77,7 +77,7 @@ const TestimonialsSection = () => {
                                 name: 'Michael Chen',
                                 role: 'Science Teacher',
                                 company: 'Riverside Elementary',
-                                content: 'Managing 5 different classes used to be overwhelming. With PulseBox, everything is organized and accessible. The class management features are a lifesaver!',
+                                content: 'Managing 5 different classes used to be overwhelming. With Raviro, everything is organized and accessible. The class management features are a lifesaver!',
                                 rating: 5,
                                 color: '#FFFFFF'
                             },
@@ -101,7 +101,7 @@ const TestimonialsSection = () => {
                                 name: 'Lisa Wang',
                                 role: 'Elementary Teacher',
                                 company: 'Oakwood Primary',
-                                content: 'As a teacher with 30 students, attendance used to take forever. Now I can mark it in under a minute. PulseBox has given me back so much time!',
+                                content: 'As a teacher with 30 students, attendance used to take forever. Now I can mark it in under a minute. Raviro has given me back so much time!',
                                 rating: 5,
                                 color: '#FFFFFF'
                             },
@@ -109,7 +109,7 @@ const TestimonialsSection = () => {
                                 name: 'James Martinez',
                                 role: 'Substitute Teacher',
                                 company: 'Various Schools',
-                                content: 'PulseBox makes substitute teaching so much easier. I can quickly access class information, continue lesson plans, and mark attendance seamlessly. Essential tool!',
+                                content: 'Raviro makes substitute teaching so much easier. I can quickly access class information, continue lesson plans, and mark attendance seamlessly. Essential tool!',
                                 rating: 5,
                                 color: '#FFFFFF'
                             },
@@ -125,7 +125,7 @@ const TestimonialsSection = () => {
                                 name: 'Alex Kumar',
                                 role: 'Physics Teacher',
                                 company: 'Tech Prep High',
-                                content: 'I\'ve tried many teacher apps, but PulseBox is the only one that truly understands what teachers need. The combination of AI assistance and practical tools is perfect.',
+                                content: 'I\'ve tried many teacher apps, but Raviro is the only one that truly understands what teachers need. The combination of AI assistance and practical tools is perfect.',
                                 rating: 5,
                                 color: '#FFFFFF'
                             }

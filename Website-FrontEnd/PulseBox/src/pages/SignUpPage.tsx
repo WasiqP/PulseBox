@@ -1,4 +1,4 @@
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { FiMail, FiLock, FiUser, FiArrowLeft } from 'react-icons/fi';
 import { FcGoogle } from 'react-icons/fc';
 import { FaFacebook } from 'react-icons/fa';
@@ -8,6 +8,13 @@ import chatbotAnimation from '../assets/Chatbot With Character Animation.json';
 import './AuthPage.css';
 
 const SignUpPage = () => {
+  const navigate = useNavigate();
+
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    // Navigate to dashboard after signup
+    navigate('/app');
+  };
 
   return (
     <div className="auth-shell">
@@ -18,7 +25,7 @@ const SignUpPage = () => {
               <FiArrowLeft />
               <span>Back to Home</span>
             </Link>
-            <div className="auth-logo-inline">PulseBox</div>
+            <div className="auth-logo-inline">Raviro</div>
           </div>
           
           <div className="auth-panel-header">
@@ -27,7 +34,7 @@ const SignUpPage = () => {
             </div>
           </div>
 
-          <form className="auth-form-compact">
+          <form className="auth-form-compact" onSubmit={handleSubmit}>
             <label htmlFor="name">Full Name</label>
             <div className="auth-input">
               <FiUser />
@@ -88,7 +95,7 @@ const SignUpPage = () => {
             <div className="auth-hero-chat-wrapper">
               <ChatAnimation messages={[
                 { id: 1, sender: 'bot', text: 'Welcome! 🎉 Ready to start your teaching journey?', delay: 500 },
-                { id: 2, sender: 'teacher', text: 'Yes! I\'m excited to join PulseBox.', delay: 2000 },
+                    { id: 2, sender: 'teacher', text: 'Yes! I\'m excited to join Raviro.', delay: 2000 },
                 { id: 3, sender: 'bot', text: 'Perfect! I\'ll help you create lesson plans, manage classes, and track everything in one place.', delay: 3500 },
                 { id: 4, sender: 'teacher', text: 'That\'s exactly what I need! Let\'s get started.', delay: 5000 },
                 { id: 5, sender: 'bot', text: 'Awesome! Create your account and I\'ll be your personal teaching assistant. Let\'s make teaching easier! ✨', delay: 6500 },
