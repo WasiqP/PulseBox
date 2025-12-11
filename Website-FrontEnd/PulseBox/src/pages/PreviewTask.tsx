@@ -3,8 +3,10 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { useTasks } from '../context/TasksContext';
 import { useClasses } from '../context/ClassesContext';
+import { useTheme } from '../context/ThemeContext';
 import Card from '../components/ui/Card';
 import Button from '../components/ui/Button';
+import Ribbons from '../components/Ribbons';
 import {
   FiFileText,
   FiClock,
@@ -25,6 +27,7 @@ const PreviewTask: React.FC = () => {
   const navigate = useNavigate();
   const { getTaskById } = useTasks();
   const { classes } = useClasses();
+  const { theme } = useTheme();
   const [studentInfo, setStudentInfo] = useState({
     name: '',
     email: '',
@@ -33,6 +36,11 @@ const PreviewTask: React.FC = () => {
 
   const task = taskId ? getTaskById(taskId) : null;
   const classData = task ? classes.find(c => c.id === task.classId) : null;
+
+  // Ribbons colors based on theme
+  const ribbonsColors = theme === 'dark' 
+    ? ['#A060FF', '#FFFFFF'] // Primary purple and white for dark theme
+    : ['#A060FF', '#000000']; // Primary purple and black for light theme
 
   useEffect(() => {
     if (task) {
@@ -112,6 +120,7 @@ const PreviewTask: React.FC = () => {
 
   return (
     <div className="preview-task-container">
+      <Ribbons colors={ribbonsColors} />
       <div className="preview-task-content">
         {/* Header */}
         <motion.div

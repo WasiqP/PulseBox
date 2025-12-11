@@ -20,16 +20,16 @@ interface RibbonsProps {
 
 const Ribbons: React.FC<RibbonsProps> = ({
   colors = ['#ff9346', '#7cff67', '#ffee51', '#5227FF'],
-  baseSpring = 0.03,
+  baseSpring = 0.02,
   baseFriction = 0.9,
-  baseThickness = 30,
+  baseThickness = 50,
   offsetFactor = 0.05,
-  maxAge = 500,
-  pointCount = 50,
-  speedMultiplier = 0.6,
+  maxAge = 200,
+  pointCount = 20,
+  speedMultiplier = 0.4,
   enableFade = false,
   enableShaderEffect = false,
-  effectAmplitude = 2,
+  effectAmplitude = 1,
   backgroundColor = [0, 0, 0, 0]
 }) => {
   const containerRef = useRef<HTMLDivElement>(null);
