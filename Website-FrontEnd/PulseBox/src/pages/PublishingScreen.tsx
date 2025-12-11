@@ -26,6 +26,7 @@ import {
   FiSend,
   FiChevronDown,
   FiChevronUp,
+  FiEye,
 } from 'react-icons/fi';
 import './DashboardPage.css';
 
@@ -245,6 +246,17 @@ const PublishingScreen: React.FC = () => {
                   <h3>Task Published Successfully!</h3>
                   <p>Your task is now live and accessible. Use the sections below to share with students or everyone.</p>
                 </div>
+              </div>
+              <div className="published-actions">
+                <Button
+                  variant="outline"
+                  size="md"
+                  leftIcon={<FiEye />}
+                  onClick={() => window.open(`/task/${taskId}`, '_blank')}
+                  style={{ width: '100%' }}
+                >
+                  Preview Task
+                </Button>
               </div>
             </Card>
           )}

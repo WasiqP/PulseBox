@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import logoImage from '../assets/back-remove.png';
+import removeBgLogo from '../assets/remove-bg-logo.png';
 import Button from './ui/Button';
 import ThemeToggle from './ThemeToggle';
 import './Navbar.css';
@@ -35,8 +35,10 @@ const Navbar = () => {
     >
       <div className="navbar-container">
         <Link to="/" className="navbar-logo">
-          <img src={logoImage} alt="PulseBox Logo" className="navbar-logo-image" />
-          <span className="navbar-brand-text">PulseBox</span>
+          {/* <img src={removeBgLogo} alt="Raviro Logo" className="navbar-logo-image" /> */}
+          <span className="navbar-brand-text">
+            <span className="brand-r">R</span>aviro<span className="brand-dot">.</span>
+          </span>
         </Link>
 
         {/* Desktop Menu */}

@@ -33,16 +33,20 @@ import QuestionsScreen from './pages/QuestionsScreen';
 import PublishingScreen from './pages/PublishingScreen';
 import TaskDetailsPage from './pages/TaskDetailsPage';
 import SchedulePage from './pages/SchedulePage';
+import PreviewTask from './pages/PreviewTask';
+import MainTask from './pages/MainTask';
 import './App.css';
 
 function AppContent() {
   const location = useLocation();
   const isAuthPage = location.pathname === '/login' || location.pathname === '/signup';
   const isAppPage = location.pathname.startsWith('/app');
+  const isPreviewTask = location.pathname.startsWith('/task/') && !location.pathname.includes('/take');
+  const isMainTask = location.pathname.includes('/task/') && location.pathname.includes('/take');
 
   return (
     <div className={`app ${isAuthPage ? 'auth-page' : ''}`}>
-      {!isAuthPage && !isAppPage && <Navbar />}
+      {!isAuthPage && !isAppPage && !isPreviewTask && !isMainTask && <Navbar />}
       <Routes>
         <Route path="/" element={<HomePage />} />
         <Route path="/about" element={<AboutPage />} />
@@ -69,8 +73,10 @@ function AppContent() {
         <Route path="/app/schedule" element={<SchedulePage />} />
         <Route path="/app/profile" element={<ProfilePage />} />
         <Route path="/app/settings" element={<SettingsPage />} />
+        <Route path="/task/:taskId" element={<PreviewTask />} />
+        <Route path="/task/:taskId/take" element={<MainTask />} />
       </Routes>
-      {!isAuthPage && !isAppPage && <Footer />}
+      {!isAuthPage && !isAppPage && !isPreviewTask && !isMainTask && <Footer />}
     </div>
   );
 }

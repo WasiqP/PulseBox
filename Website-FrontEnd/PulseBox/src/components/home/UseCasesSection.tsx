@@ -90,7 +90,7 @@ const UseCasesSection = () => {
                     className="section-subtitle"
                     variants={fadeInUp}
                 >
-                    Whether you teach elementary, high school, or specialize in a subject, PulseBox adapts to your needs
+                    Whether you teach elementary, high school, or specialize in a subject, Raviro adapts to your needs
                 </motion.p>
                 <div className="use-cases-masonry">
                     {useCases.map((useCase, index) => (

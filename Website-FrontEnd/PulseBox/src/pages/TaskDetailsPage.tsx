@@ -4,6 +4,7 @@ import { motion } from 'framer-motion';
 import Sidebar from '../components/dashboard/Sidebar';
 import Card from '../components/ui/Card';
 import Button from '../components/ui/Button';
+import ShareTaskModal from '../components/ui/ShareTaskModal';
 import { useTasks } from '../context/TasksContext';
 import { useClasses } from '../context/ClassesContext';
 import { useConfirm } from '../context/ConfirmModalContext';
@@ -24,6 +25,8 @@ import {
   FiChevronDown,
   FiType,
   FiAlignLeft,
+  FiEye,
+  FiShare2,
 } from 'react-icons/fi';
 import './DashboardPage.css';
 
@@ -33,6 +36,7 @@ const TaskDetailsPage: React.FC = () => {
   const { getTaskById, deleteTask } = useTasks();
   const { classes } = useClasses();
   const { confirm } = useConfirm();
+  const [shareModalOpen, setShareModalOpen] = useState(false);
 
   const task = taskId ? getTaskById(taskId) : null;
   const classData = task ? classes.find(c => c.id === task.classId) : null;
@@ -96,6 +100,19 @@ const TaskDetailsPage: React.FC = () => {
     // Navigate to questions screen first, then user can edit from there
     // Or we could create an edit mode in CreateTaskPage
     navigate(`/app/tasks/${task.id}/questions`);
+  };
+
+  const handleShare = () => {
+    if (!task || !task.published) {
+      alert('Please publish the task first before sharing.');
+      return;
+    }
+
+    setShareModalOpen(true);
+  };
+
+  const handleCloseShareModal = () => {
+    setShareModalOpen(false);
   };
 
   if (!task) {
@@ -170,6 +187,26 @@ const TaskDetailsPage: React.FC = () => {
                 <p className="dashboard-subtitle">{classData?.name || 'Unknown Class'}</p>
               </div>
               <div className="class-details-actions">
+                {task.published && (
+                  <>
+                    <Button
+                      variant="outline"
+                      size="md"
+                      leftIcon={<FiEye />}
+                      onClick={() => window.open(`/task/${task.id}`, '_blank')}
+                    >
+                      Preview
+                    </Button>
+                    <Button
+                      variant="outline"
+                      size="md"
+                      leftIcon={<FiShare2 />}
+                      onClick={handleShare}
+                    >
+                      Share
+                    </Button>
+                  </>
+                )}
                 <Button
                   variant="outline"
                   size="md"
@@ -369,6 +406,15 @@ const TaskDetailsPage: React.FC = () => {
             </Card>
           )}
         </motion.div>
+
+        {/* Share Task Modal */}
+        {taskId && (
+          <ShareTaskModal
+            isOpen={shareModalOpen}
+            onClose={handleCloseShareModal}
+            taskId={taskId}
+          />
+        )}
       </main>
     </div>
   );

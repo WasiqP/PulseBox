@@ -28,6 +28,7 @@ const AboutPage = () => {
     const isValuesInView = useInView(valuesRef, { once: true, margin: "-100px" });
     const isStatsInView = useInView(statsRef, { once: true, margin: "-100px" });
 
+<<<<<<< HEAD
     const fadeInUp: Variants = {
         hidden: { opacity: 0, y: 60 },
         visible: {
@@ -50,6 +51,43 @@ const AboutPage = () => {
             }
         }
     };
+=======
+  return (
+    <div className="about-page">
+      <motion.section 
+        className="about-hero"
+        initial="hidden"
+        animate="visible"
+        variants={staggerContainer}
+      >
+        <motion.h1 className="about-title" variants={fadeInUp}>
+          About <span className="highlight">Raviro</span>
+        </motion.h1>
+        <motion.p className="about-subtitle" variants={fadeInUp}>
+          Empowering teachers to save time, reduce stress, and focus on what matters most—teaching
+        </motion.p>
+      </motion.section>
+
+      <section className="about-content">
+        <div className="about-container">
+          <motion.div 
+            className="about-section"
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, margin: "-100px" }}
+            variants={staggerContainer}
+          >
+            <motion.h2 className="section-heading" variants={fadeInUp}>
+              Our Mission
+            </motion.h2>
+            <motion.p className="section-text" variants={fadeInUp}>
+              At Raviro, we understand that teachers are the 2nd most stressed professionals in the world, 
+              largely due to overwhelming administrative tasks. Our mission is to provide teachers with an 
+              AI-powered personal assistant that automates these tasks, saves 10+ hours per week, and allows 
+              educators to focus on what they do best—inspiring and teaching students.
+            </motion.p>
+          </motion.div>
+>>>>>>> cc12f29229db6759b4b5991214d2d8c4c9ed9b9d
 
     const values = [
         {
@@ -78,6 +116,7 @@ const AboutPage = () => {
         }
     ];
 
+<<<<<<< HEAD
     const stats = [
         { number: '10+', label: 'Hours Saved Per Week', icon: FiClock },
         { number: '70%', label: 'Admin Tasks Automated', icon: FiZap },
@@ -359,6 +398,26 @@ const AboutPage = () => {
                     </motion.div>
                 </div>
             </motion.section>
+=======
+          <motion.div 
+            className="about-section"
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, margin: "-100px" }}
+            variants={staggerContainer}
+          >
+            <motion.h2 className="section-heading" variants={fadeInUp}>
+              Why Choose Raviro?
+            </motion.h2>
+            <motion.p className="section-text" variants={fadeInUp}>
+              We've built Raviro specifically for teachers, with one goal in mind: to reduce 
+              administrative burden and maximize teaching time. Whether you teach elementary, 
+              middle, or high school, whether you have one class or ten, Raviro adapts to your 
+              needs. Our AI-powered features automate 70% of admin tasks, saving you 10+ hours 
+              per week and allowing you to focus on what truly matters—your students.
+            </motion.p>
+          </motion.div>
+>>>>>>> cc12f29229db6759b4b5991214d2d8c4c9ed9b9d
         </div>
     );
 };

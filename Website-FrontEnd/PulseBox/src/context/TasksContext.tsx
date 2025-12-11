@@ -30,6 +30,7 @@ export interface TaskData {
   expectedTime: number;
   timeUnit: 'minutes' | 'hours';
   visibility: 'public' | 'class-only'; // Task visibility/sharing preference
+  requireIdentification: boolean; // Whether guests/students need to provide identification
   markingCriteria?: {
     totalMarks: number;
     passingMarks: number;
@@ -45,6 +46,7 @@ export interface TaskData {
     preventCopyPaste: boolean;
     showTimer: boolean;
   };
+  displayMode?: 'single' | 'form'; // single: one-by-one, form: all at once
   questions: QuestionData[];
   createdAt: string;
   published?: boolean;
@@ -96,6 +98,8 @@ export const TasksProvider: React.FC<TasksProviderProps> = ({ children }) => {
     const newTask: TaskData = {
       ...task,
       visibility: task.visibility || 'public', // Default to public for backward compatibility
+      requireIdentification: task.requireIdentification !== undefined ? task.requireIdentification : false, // Default to false for backward compatibility
+      displayMode: task.displayMode || 'single',
       id: Date.now().toString(),
       questions: [],
       createdAt: new Date().toISOString()
@@ -215,4 +219,7 @@ export const useTasks = () => {
   }
   return context;
 };
+
+// Re-export types for easier importing
+export type { QuestionData, TaskData };
 

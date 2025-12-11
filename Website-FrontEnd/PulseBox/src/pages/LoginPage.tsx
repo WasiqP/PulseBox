@@ -1,4 +1,4 @@
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { FiMail, FiLock, FiArrowLeft } from 'react-icons/fi';
 import { FcGoogle } from 'react-icons/fc';
 import { FaFacebook } from 'react-icons/fa';
@@ -8,6 +8,13 @@ import educationAnimation from '../assets/education.json';
 import './AuthPage.css';
 
 const LoginPage = () => {
+  const navigate = useNavigate();
+
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    // Navigate to dashboard
+    navigate('/app');
+  };
 
   return (
     <div className="auth-shell">
@@ -18,7 +25,7 @@ const LoginPage = () => {
               <FiArrowLeft />
               <span>Back to Home</span>
             </Link>
-            <div className="auth-logo-inline">PulseBox</div>
+            <div className="auth-logo-inline">Raviro</div>
           </div>
           
           <div className="auth-panel-header">
@@ -27,7 +34,7 @@ const LoginPage = () => {
             </div>
           </div>
 
-          <form className="auth-form-compact">
+          <form className="auth-form-compact" onSubmit={handleSubmit}>
             <label htmlFor="email">Email</label>
             <div className="auth-input">
               <FiMail />

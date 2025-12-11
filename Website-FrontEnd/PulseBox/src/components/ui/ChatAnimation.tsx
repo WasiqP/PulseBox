@@ -15,7 +15,7 @@ interface ChatAnimationProps {
 }
 
 const defaultMessages: Message[] = [
-  { id: 1, sender: 'bot', text: 'Hello! 👋 Welcome to PulseBox!', delay: 500 },
+  { id: 1, sender: 'bot', text: 'Hello! 👋 Welcome to Raviro!', delay: 500 },
   { id: 2, sender: 'teacher', text: 'Hi! I\'m excited to get started.', delay: 2000 },
   { id: 3, sender: 'bot', text: 'Great! I\'m here to help you manage your classes, create lesson plans, and save time.', delay: 3500 },
   { id: 4, sender: 'teacher', text: 'That sounds amazing! How do I begin?', delay: 5000 },
@@ -92,3 +92,5 @@ const ChatAnimation: React.FC<ChatAnimationProps> = ({ messages = defaultMessage
 };
 
 export default ChatAnimation;
+
+

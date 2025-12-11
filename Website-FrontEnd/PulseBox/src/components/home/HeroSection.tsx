@@ -58,7 +58,7 @@ const HeroSection = () => {
     // Generate positions for floating cards - spread across the screen
     const getRandomPosition = (index: number) => {
         const positions = [
-            { top: '10%', left: '5%' },           // Top left corner
+            { top: '10%', left: '12%' },          // Top left corner (nudged right)
             { top: '12%', right: '5%' },          // Top right corner
             { bottom: '25%', left: '4%' },        // Bottom left corner
             { bottom: '22%', right: '6%' }         // Bottom right corner
