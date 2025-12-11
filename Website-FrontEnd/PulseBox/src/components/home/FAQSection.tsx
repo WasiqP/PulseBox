@@ -1,18 +1,19 @@
-import React, { useState } from 'react';
-import { motion } from 'framer-motion';
+import { useState } from 'react';
+import { motion, type Variants } from 'framer-motion';
+import FAQBackground from './FAQBackground';
 import './FAQSection.css';
 
 const FAQSection = () => {
     const [openFaq, setOpenFaq] = useState<number | null>(null);
 
-    const fadeInUp = {
+    const fadeInUp: Variants = {
         hidden: { opacity: 0, y: 60 },
         visible: {
             opacity: 1,
             y: 0,
             transition: {
                 duration: 0.6,
-                ease: [0.6, -0.05, 0.01, 0.99]
+                ease: [0.6, -0.05, 0.01, 0.99] as [number, number, number, number]
             }
         }
     };
@@ -53,6 +54,7 @@ const FAQSection = () => {
 
     return (
         <section className="faq-section">
+            <FAQBackground />
             <motion.div
                 className="faq-container"
                 initial="hidden"

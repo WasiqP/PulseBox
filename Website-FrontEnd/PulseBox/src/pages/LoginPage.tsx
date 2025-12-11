@@ -1,4 +1,4 @@
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { FiMail, FiLock, FiArrowLeft } from 'react-icons/fi';
 import { FcGoogle } from 'react-icons/fc';
 import { FaFacebook } from 'react-icons/fa';
@@ -8,6 +8,18 @@ import educationAnimation from '../assets/education.json';
 import './AuthPage.css';
 
 const LoginPage = () => {
+  const navigate = useNavigate();
+
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    // Redirect to dashboard/overview
+    navigate('/app');
+  };
+
+  const handleSocialLogin = () => {
+    // Redirect to dashboard/overview
+    navigate('/app');
+  };
 
   return (
     <div className="auth-shell">
@@ -27,7 +39,7 @@ const LoginPage = () => {
             </div>
           </div>
 
-          <form className="auth-form-compact">
+          <form className="auth-form-compact" onSubmit={handleSubmit}>
             <label htmlFor="email">Email</label>
             <div className="auth-input">
               <FiMail />
@@ -53,11 +65,11 @@ const LoginPage = () => {
           </div>
 
           <div className="auth-social-buttons">
-            <button type="button" className="auth-social-btn auth-social-google">
+            <button type="button" className="auth-social-btn auth-social-google" onClick={handleSocialLogin}>
               <FcGoogle />
               <span>Sign in with Google</span>
             </button>
-            <button type="button" className="auth-social-btn auth-social-facebook">
+            <button type="button" className="auth-social-btn auth-social-facebook" onClick={handleSocialLogin}>
               <FaFacebook />
               <span>Sign in with Facebook</span>
             </button>

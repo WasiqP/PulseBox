@@ -1,15 +1,29 @@
 .features-section {
     padding: 100px 2rem;
     background: #FEFDFF;
+    position: relative;
+    overflow: hidden;
 }
 
 [data-theme="dark"] .features-section {
     background: #000000;
 }
 
+.features-particles {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 0;
+    pointer-events: none;
+}
+
 .features-container {
     max-width: 1200px;
     margin: 0 auto;
+    position: relative;
+    z-index: 1;
 }
 
 .section-title {

@@ -1,0 +1,55 @@
+.faq-background {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 0;
+    overflow: hidden;
+    pointer-events: none;
+}
+
+.faq-bg-gradient-1,
+.faq-bg-gradient-2 {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(100px);
+    opacity: 0.3;
+}
+
+.faq-bg-gradient-1 {
+    width: 500px;
+    height: 500px;
+    background: radial-gradient(circle, rgba(160, 96, 255, 0.2) 0%, transparent 70%);
+    top: -200px;
+    left: -200px;
+}
+
+.faq-bg-gradient-2 {
+    width: 600px;
+    height: 600px;
+    background: radial-gradient(circle, rgba(138, 77, 230, 0.15) 0%, transparent 70%);
+    bottom: -250px;
+    right: -250px;
+}
+
+[data-theme="dark"] .faq-bg-gradient-1 {
+    background: radial-gradient(circle, rgba(160, 96, 255, 0.15) 0%, transparent 70%);
+    opacity: 0.2;
+}
+
+[data-theme="dark"] .faq-bg-gradient-2 {
+    background: radial-gradient(circle, rgba(138, 77, 230, 0.1) 0%, transparent 70%);
+    opacity: 0.15;
+}
+
+[data-theme="light"] .faq-bg-gradient-1,
+[data-theme="light"] .faq-bg-gradient-2 {
+    opacity: 0.25;
+}
+
+/* Performance optimizations */
+.faq-background {
+    transform: translateZ(0);
+    backface-visibility: hidden;
+}

@@ -23,16 +23,43 @@ const Particles = ({
     const canvasSize = useRef<{ w: number; h: number }>({ w: 0, h: 0 });
     const dpr = typeof window !== 'undefined' ? window.devicePixelRatio : 1;
 
+    const animationFrameRef = useRef<number>();
+    const isVisibleRef = useRef(true);
+
     useEffect(() => {
         if (canvasRef.current) {
             context.current = canvasRef.current.getContext('2d');
         }
         initCanvas();
+        
+        // Use IntersectionObserver to pause when not visible
+        const observer = new IntersectionObserver(
+            (entries) => {
+                isVisibleRef.current = entries[0].isIntersecting;
+                if (isVisibleRef.current && !animationFrameRef.current) {
+                    animate();
+                }
+            },
+            { threshold: 0 }
+        );
+
+        if (canvasContainerRef.current) {
+            observer.observe(canvasContainerRef.current);
+        }
+
         animate();
-        window.addEventListener('resize', initCanvas);
+        
+        const handleResize = () => {
+            initCanvas();
+        };
+        window.addEventListener('resize', handleResize, { passive: true });
 
         return () => {
-            window.removeEventListener('resize', initCanvas);
+            window.removeEventListener('resize', handleResize);
+            observer.disconnect();
+            if (animationFrameRef.current) {
+                cancelAnimationFrame(animationFrameRef.current);
+            }
         };
     }, []);
 
@@ -47,19 +74,28 @@ const Particles = ({
 
     const onMouseMove = () => {
         if (canvasRef.current) {
-            window.addEventListener('mousemove', (e) => {
-                const rect = canvasRef.current?.getBoundingClientRect();
-                if (rect) {
-                    const { w, h } = canvasSize.current;
-                    const x = e.clientX - rect.left - w / 2;
-                    const y = e.clientY - rect.top - h / 2;
-                    const inside = x < w / 2 && x > -w / 2 && y < h / 2 && y > -h / 2;
-                    if (inside) {
-                        mouse.current.x = x;
-                        mouse.current.y = y;
+            let rafId: number;
+            const handleMouseMove = (e: MouseEvent) => {
+                if (rafId) cancelAnimationFrame(rafId);
+                rafId = requestAnimationFrame(() => {
+                    const rect = canvasRef.current?.getBoundingClientRect();
+                    if (rect) {
+                        const { w, h } = canvasSize.current;
+                        const x = e.clientX - rect.left - w / 2;
+                        const y = e.clientY - rect.top - h / 2;
+                        const inside = x < w / 2 && x > -w / 2 && y < h / 2 && y > -h / 2;
+                        if (inside) {
+                            mouse.current.x = x;
+                            mouse.current.y = y;
+                        }
                     }
-                }
-            });
+                });
+            };
+            window.addEventListener('mousemove', handleMouseMove, { passive: true });
+            return () => {
+                window.removeEventListener('mousemove', handleMouseMove);
+                if (rafId) cancelAnimationFrame(rafId);
+            };
         }
     };
 
@@ -150,6 +186,11 @@ const Particles = ({
     };
 
     const animate = () => {
+        if (!isVisibleRef.current) {
+            animationFrameRef.current = undefined;
+            return;
+        }
+        
         clearContext();
         circles.current.forEach((circle: any, i: number) => {
             // Handle the alpha value
@@ -206,7 +247,7 @@ const Particles = ({
                 );
             }
         });
-        window.requestAnimationFrame(animate);
+        animationFrameRef.current = window.requestAnimationFrame(animate);
     };
 
     const hexToRgb = (hex: string) => {

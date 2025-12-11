@@ -9,6 +9,7 @@ import {
     FiAward,
     FiZap
 } from 'react-icons/fi';
+import StatsBackground from './StatsBackground';
 import './StatsSection.css';
 
 interface MetricCard {
@@ -146,11 +147,7 @@ const StatsSection = () => {
 
     return (
         <section ref={sectionRef} className="impact-showcase">
-            <div className="impact-background">
-                <div className="impact-gradient-orb orb-1"></div>
-                <div className="impact-gradient-orb orb-2"></div>
-                <div className="impact-gradient-orb orb-3"></div>
-            </div>
+            <StatsBackground />
 
             <motion.div
                 className="impact-container"
