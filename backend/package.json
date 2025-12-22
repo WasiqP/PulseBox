@@ -1,0 +1,27 @@
+{
+  "name": "raviro",
+  "version": "1.0.0",
+  "description": "backend for Raviro",
+  "keywords": [
+    "backend"
+  ],
+  "license": "ISC",
+  "author": "wasiq",
+  "type": "commonjs",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "dev": "nodemon index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "dependencies": {
+    "bcryptjs": "^3.0.3",
+    "cors": "^2.8.5",
+    "dotenv": "^17.2.3",
+    "express": "^5.2.1",
+    "joi": "^18.0.2",
+    "jsonwebtoken": "^9.0.3",
+    "nodemailer": "^7.0.11",
+    "nodemon": "^3.1.11"
+  }
+}

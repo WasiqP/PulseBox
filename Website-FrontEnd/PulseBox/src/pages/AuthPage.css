@@ -528,3 +528,56 @@
     padding: 10px;
   }
 }
+
+/* Forgot Password Success State */
+.auth-success-icon {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background: rgba(76, 175, 80, 0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 1.5rem;
+  color: #4CAF50;
+  font-size: 2rem;
+}
+
+.auth-title {
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: #f3f1ff;
+  margin: 0 0 0.5rem 0;
+  text-align: center;
+}
+
+.auth-subtext {
+  font-size: 0.9rem;
+  color: rgba(255, 255, 255, 0.7);
+  line-height: 1.6;
+  margin-top: 1rem;
+  text-align: center;
+}
+
+.auth-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  margin-top: 1.5rem;
+}
+
+.auth-cta.secondary {
+  background: transparent;
+  border: 1.5px solid rgba(160, 96, 255, 0.4);
+  color: var(--color-primary, #a060ff);
+}
+
+.auth-cta.secondary:hover {
+  background: rgba(160, 96, 255, 0.1);
+  border-color: var(--color-primary, #a060ff);
+}
+
+.auth-cta:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}

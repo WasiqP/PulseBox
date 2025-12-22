@@ -6,6 +6,7 @@ import { useClasses } from '../context/ClassesContext';
 import { useTheme } from '../context/ThemeContext';
 import Card from '../components/ui/Card';
 import Button from '../components/ui/Button';
+import TaskWarningModal from '../components/ui/TaskWarningModal';
 import Ribbons from '../components/Ribbons';
 import {
   FiFileText,
@@ -33,6 +34,7 @@ const PreviewTask: React.FC = () => {
     email: '',
   });
   const [showIdentificationForm, setShowIdentificationForm] = useState(false);
+  const [showWarningModal, setShowWarningModal] = useState(false);
 
   const task = taskId ? getTaskById(taskId) : null;
   const classData = task ? classes.find(c => c.id === task.classId) : null;
@@ -103,6 +105,20 @@ const PreviewTask: React.FC = () => {
       alert('Please provide your name and email to continue.');
       return;
     }
+    
+    // Check if any security conditions are enabled
+    const hasSecurityConditions = Object.values(task.permissions).some(v => v);
+    
+    if (hasSecurityConditions) {
+      // Show warning modal first
+      setShowWarningModal(true);
+    } else {
+      // No security conditions, proceed directly
+      proceedToTask();
+    }
+  };
+
+  const proceedToTask = () => {
     // Navigate to MainTask screen with student info if required
     navigate(`/task/${taskId}/take`, {
       state: {
@@ -327,6 +343,18 @@ const PreviewTask: React.FC = () => {
           </motion.div>
         </div>
       </div>
+
+      {/* Task Warning Modal */}
+      {task && (
+        <TaskWarningModal
+          isOpen={showWarningModal}
+          onClose={() => setShowWarningModal(false)}
+          onConfirm={proceedToTask}
+          permissions={task.permissions}
+          expectedTime={task.expectedTime}
+          timeUnit={task.timeUnit}
+        />
+      )}
     </div>
   );
 };

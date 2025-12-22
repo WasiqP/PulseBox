@@ -197,28 +197,37 @@ const CreateTaskPage = () => {
 
     setIsLoading(true);
     
-    // Create task and get task ID
-    const taskId = addTask({
-      name: formData.name,
-      taskType: formData.taskType as 'quiz' | 'test' | 'assignment' | 'homework',
-      classId: formData.classId,
-      subjectId: formData.subjectId,
-      dueDate: formData.dueDate,
-      expectedTime: formData.expectedTime,
-      timeUnit: formData.timeUnit,
-      visibility: formData.visibility,
-      requireIdentification: formData.requireIdentification,
-      displayMode: formData.displayMode || 'single',
-      markingCriteria: formData.markingCriteria,
-      permissions: formData.permissions,
-    });
-    
-    setIsLoading(false);
-    
-    // Use setTimeout to ensure state has updated before navigation
-    setTimeout(() => {
-      navigate(`/app/tasks/${taskId}/questions`);
-    }, 100);
+    try {
+      // Create task and get task ID
+      const taskId = addTask({
+        name: formData.name,
+        taskType: formData.taskType as 'quiz' | 'test' | 'assignment' | 'homework',
+        classId: formData.classId,
+        subjectId: formData.subjectId,
+        dueDate: formData.dueDate,
+        expectedTime: formData.expectedTime,
+        timeUnit: formData.timeUnit,
+        visibility: formData.visibility,
+        requireIdentification: formData.requireIdentification,
+        displayMode: formData.displayMode || 'single',
+        markingCriteria: formData.markingCriteria,
+        permissions: formData.permissions,
+      });
+      
+      // Use setTimeout to ensure state has updated before navigation
+      setTimeout(() => {
+        navigate(`/app/tasks/${taskId}/questions`);
+      }, 100);
+    } catch (error) {
+      console.error('Error creating task:', error);
+      showAlert({
+        title: 'Error',
+        message: 'Failed to create task. Please try again.',
+        buttonText: 'OK'
+      });
+    } finally {
+      setIsLoading(false);
+    }
     
     return false;
   };

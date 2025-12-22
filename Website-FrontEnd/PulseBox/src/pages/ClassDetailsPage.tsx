@@ -429,13 +429,25 @@ const ClassDetailsPage = () => {
                       const isBlurred = classData.students.length > 4 && index >= 2;
                       return (
                         <div key={student.id} className={`student-item-detailed ${isBlurred ? 'student-item-blurred' : ''}`}>
-                          <div className="student-avatar-detailed">
-                            {student.name.charAt(0).toUpperCase()}
-                          </div>
-                          <div className="student-info-detailed">
-                            <span className="student-name-detailed">{student.name}</span>
-                            <span className="student-email-detailed">{student.email}</span>
-                          </div>
+                          <Link
+                            to={`/app/classes/${classData.id}/students/${student.id}`}
+                            style={{ 
+                              textDecoration: 'none', 
+                              display: 'flex', 
+                              alignItems: 'center', 
+                              gap: '1rem',
+                              flex: 1,
+                              cursor: 'pointer'
+                            }}
+                          >
+                            <div className="student-avatar-detailed">
+                              {student.name.charAt(0).toUpperCase()}
+                            </div>
+                            <div className="student-info-detailed">
+                              <span className="student-name-detailed">{student.name}</span>
+                              <span className="student-email-detailed">{student.email}</span>
+                            </div>
+                          </Link>
                           {!isBlurred && (
                             <button
                               className="delete-student-btn"
@@ -550,13 +562,25 @@ const ClassDetailsPage = () => {
               <div className="students-fullscreen-list">
                 {classData.students.map((student) => (
                   <div key={student.id} className="student-item-detailed">
-                    <div className="student-avatar-detailed">
-                      {student.name.charAt(0).toUpperCase()}
-                    </div>
-                    <div className="student-info-detailed">
-                      <span className="student-name-detailed">{student.name}</span>
-                      <span className="student-email-detailed">{student.email}</span>
-                    </div>
+                    <Link
+                      to={`/app/classes/${classData.id}/students/${student.id}`}
+                      style={{ 
+                        textDecoration: 'none', 
+                        display: 'flex', 
+                        alignItems: 'center', 
+                        gap: '1rem',
+                        flex: 1,
+                        cursor: 'pointer'
+                      }}
+                    >
+                      <div className="student-avatar-detailed">
+                        {student.name.charAt(0).toUpperCase()}
+                      </div>
+                      <div className="student-info-detailed">
+                        <span className="student-name-detailed">{student.name}</span>
+                        <span className="student-email-detailed">{student.email}</span>
+                      </div>
+                    </Link>
                     <button
                       className="delete-student-btn"
                       onClick={(e) => {

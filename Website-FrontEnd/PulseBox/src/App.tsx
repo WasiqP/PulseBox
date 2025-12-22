@@ -11,12 +11,14 @@ import { ResponsesProvider } from './context/ResponsesContext';
 import ScrollToTop from './components/ScrollToTop';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
+import ErrorBoundary from './components/ErrorBoundary';
 import HomePage from './pages/HomePage';
 import AboutPage from './pages/AboutPage';
 import PricingPage from './pages/PricingPage';
 import ContactPage from './pages/ContactPage';
 import LoginPage from './pages/LoginPage';
 import SignUpPage from './pages/SignUpPage';
+import ForgotPasswordPage from './pages/ForgotPasswordPage';
 import DashboardPage from './pages/DashboardPage';
 import ClassesPage from './pages/ClassesPage';
 import CreateClassPage from './pages/CreateClassPage';
@@ -37,11 +39,13 @@ import SchedulePage from './pages/SchedulePage';
 import PreviewTask from './pages/PreviewTask';
 import MainTask from './pages/MainTask';
 import ResponsesPage from './pages/ResponsesPage';
+import GradeResponsePage from './pages/GradeResponsePage';
+import StudentProfilePage from './pages/StudentProfilePage';
 import './App.css';
 
 function AppContent() {
   const location = useLocation();
-  const isAuthPage = location.pathname === '/login' || location.pathname === '/signup';
+  const isAuthPage = location.pathname === '/login' || location.pathname === '/signup' || location.pathname === '/forgot-password';
   const isAppPage = location.pathname.startsWith('/app');
   const isPreviewTask = location.pathname.startsWith('/task/') && !location.pathname.includes('/take');
   const isMainTask = location.pathname.startsWith('/task/') && location.pathname.includes('/take');
@@ -50,20 +54,23 @@ function AppContent() {
   const shouldShowNavbar = !isAuthPage && !isAppPage && !isPreviewTask && !isMainTask;
 
   return (
-    <div className={`app ${isAuthPage ? 'auth-page' : ''}`}>
-      {shouldShowNavbar && <Navbar />}
-      <Routes>
+    <ErrorBoundary>
+      <div className={`app ${isAuthPage ? 'auth-page' : ''}`}>
+        {shouldShowNavbar && <Navbar />}
+        <Routes>
         <Route path="/" element={<HomePage />} />
         <Route path="/about" element={<AboutPage />} />
         <Route path="/pricing" element={<PricingPage />} />
         <Route path="/contact" element={<ContactPage />} />
         <Route path="/login" element={<LoginPage />} />
         <Route path="/signup" element={<SignUpPage />} />
+        <Route path="/forgot-password" element={<ForgotPasswordPage />} />
         <Route path="/app" element={<DashboardPage />} />
         <Route path="/app/classes" element={<ClassesPage />} />
         <Route path="/app/classes/create" element={<CreateClassPage />} />
         <Route path="/app/classes/edit/:id" element={<CreateClassPage />} />
         <Route path="/app/classes/:id" element={<ClassDetailsPage />} />
+        <Route path="/app/classes/:classId/students/:studentId" element={<StudentProfilePage />} />
         <Route path="/app/mark-attendance" element={<MarkAttendancePage />} />
         <Route path="/app/tasks" element={<MyTasksPage />} />
         <Route path="/app/tasks/create" element={<CreateTaskPage />} />
@@ -77,40 +84,44 @@ function AppContent() {
         <Route path="/app/analytics" element={<AnalyticsPage />} />
         <Route path="/app/schedule" element={<SchedulePage />} />
         <Route path="/app/responses" element={<ResponsesPage />} />
+        <Route path="/app/responses/:responseId/grade" element={<GradeResponsePage />} />
         <Route path="/app/profile" element={<ProfilePage />} />
         <Route path="/app/settings" element={<SettingsPage />} />
         <Route path="/task/:taskId" element={<PreviewTask />} />
         <Route path="/task/:taskId/take" element={<MainTask />} />
-      </Routes>
-      {shouldShowNavbar && <Footer />}
-    </div>
+        </Routes>
+        {shouldShowNavbar && <Footer />}
+      </div>
+    </ErrorBoundary>
   );
 }
 
 function App() {
   return (
-    <ThemeProvider>
-      <ClassesProvider>
-        <AttendanceProvider>
-          <HomeworkProvider>
-            <TasksProvider>
-              <ResponsesProvider>
-                <ScheduleProvider>
-                  <ConfirmModalProvider>
-                    <AlertModalProvider>
-                    <Router>
-                      <ScrollToTop />
-                      <AppContent />
-                    </Router>
-                    </AlertModalProvider>
-                  </ConfirmModalProvider>
-                </ScheduleProvider>
-              </ResponsesProvider>
-            </TasksProvider>
-          </HomeworkProvider>
-        </AttendanceProvider>
-      </ClassesProvider>
-    </ThemeProvider>
+    <ErrorBoundary>
+      <ThemeProvider>
+        <ClassesProvider>
+          <AttendanceProvider>
+            <HomeworkProvider>
+              <TasksProvider>
+                <ResponsesProvider>
+                  <ScheduleProvider>
+                    <ConfirmModalProvider>
+                      <AlertModalProvider>
+                        <Router>
+                          <ScrollToTop />
+                          <AppContent />
+                        </Router>
+                      </AlertModalProvider>
+                    </ConfirmModalProvider>
+                  </ScheduleProvider>
+                </ResponsesProvider>
+              </TasksProvider>
+            </HomeworkProvider>
+          </AttendanceProvider>
+        </ClassesProvider>
+      </ThemeProvider>
+    </ErrorBoundary>
   );
 }
 

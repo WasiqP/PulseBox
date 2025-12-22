@@ -68,23 +68,29 @@ const MarkAttendancePage = () => {
 
     setIsSaving(true);
     
-    // Save attendance records
-    const recordsToSave = attendanceRecords.map(record => ({
-      classId: selectedClass.id,
-      date: attendanceDate,
-      studentId: record.studentId,
-      studentName: record.studentName,
-      studentEmail: record.studentEmail,
-      status: record.status
-    }));
+    try {
+      // Save attendance records
+      const recordsToSave = attendanceRecords.map(record => ({
+        classId: selectedClass.id,
+        date: attendanceDate,
+        studentId: record.studentId,
+        studentName: record.studentName,
+        studentEmail: record.studentEmail,
+        status: record.status
+      }));
 
-    addAttendanceRecords(recordsToSave);
-    
-    setTimeout(() => {
-      alert(`Attendance marked successfully for ${selectedClass.name} on ${attendanceDate}`);
+      addAttendanceRecords(recordsToSave);
+      
+      setTimeout(() => {
+        alert(`Attendance marked successfully for ${selectedClass.name} on ${attendanceDate}`);
+        setIsSaving(false);
+        navigate('/app/attendance');
+      }, 500);
+    } catch (error) {
+      console.error('Error saving attendance:', error);
+      alert('Failed to save attendance. Please try again.');
       setIsSaving(false);
-      navigate('/app/attendance');
-    }, 500);
+    }
   };
 
   const getStatusCounts = () => {

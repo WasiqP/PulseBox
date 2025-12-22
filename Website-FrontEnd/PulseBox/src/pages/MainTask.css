@@ -68,6 +68,21 @@
   transform: translateX(-2px);
 }
 
+.main-task-locked-indicator {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  background: rgba(255, 107, 107, 0.1);
+  border: 1px solid rgba(255, 107, 107, 0.3);
+  border-radius: 10px;
+  color: #FF6B6B;
+  font-size: 1rem;
+  flex-shrink: 0;
+  cursor: not-allowed;
+}
+
 .main-task-header-info {
   flex: 1;
   display: flex;

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useTasks, type QuestionData, type QuestionType } from '../context/TasksContext';
@@ -18,6 +18,7 @@ import {
   FiCheckSquare,
   FiChevronDown,
   FiUser,
+  FiLock,
 } from 'react-icons/fi';
 import './MainTask.css';
 
@@ -47,7 +48,26 @@ const MainTask: React.FC = () => {
   const [timeRemaining, setTimeRemaining] = useState<number | null>(null);
   const [showSubmissionModal, setShowSubmissionModal] = useState(false);
   const [submittedAt, setSubmittedAt] = useState<string | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const startTimeRef = useRef<number>(Date.now());
+  const tabSwitchCountRef = useRef<number>(0);
+  const hasSubmittedRef = useRef<boolean>(false);
+  const answersRef = useRef<Record<string, Answer>>({});
+  const taskRef = useRef(task);
+  const studentInfoRef = useRef(studentInfo);
+
+  // Keep refs in sync
+  useEffect(() => {
+    taskRef.current = task;
+  }, [task]);
+
+  useEffect(() => {
+    studentInfoRef.current = studentInfo;
+  }, [studentInfo]);
+
+  useEffect(() => {
+    answersRef.current = answers;
+  }, [answers]);
 
   useEffect(() => {
     const taskData = getTaskById(taskId || '');
@@ -56,6 +76,7 @@ const MainTask: React.FC = () => {
       return;
     }
     setTask(taskData);
+    taskRef.current = taskData;
 
     // Initialize timer if enabled
     if (taskData.permissions.showTimer && taskData.expectedTime) {
@@ -105,10 +126,53 @@ const MainTask: React.FC = () => {
     return Math.max(0, totalScore);
   };
 
-  const handleSubmit = () => {
-    if (!task) return;
+  // Auto-submit function (used for timer expiry, navigation attempts, etc.)
+  const autoSubmit = useCallback((reason: string = 'auto') => {
+    const currentTask = taskRef.current;
+    const currentAnswers = answersRef.current;
+    const currentStudentInfo = studentInfoRef.current;
+    
+    if (!currentTask || hasSubmittedRef.current || isSubmitting) return;
+    
+    setIsSubmitting(true);
+    hasSubmittedRef.current = true;
 
-    // Check required questions
+    const submittedAtTime = new Date().toISOString();
+    const timeSpent = Math.floor((Date.now() - startTimeRef.current) / 1000);
+    
+    // Calculate score if auto-grading is enabled
+    const score = calculateScore(currentTask, currentAnswers);
+    const percentage = score !== null && currentTask.markingCriteria
+      ? (score / currentTask.markingCriteria.totalMarks) * 100
+      : undefined;
+    const passed = score !== null && currentTask.markingCriteria
+      ? score >= currentTask.markingCriteria.passingMarks
+      : undefined;
+
+    // Save response
+    addResponse({
+      taskId: currentTask.id,
+      taskName: currentTask.name,
+      taskType: currentTask.taskType,
+      classId: currentTask.classId,
+      studentInfo: currentStudentInfo,
+      answers: currentAnswers,
+      submittedAt: submittedAtTime,
+      timeSpent,
+      score,
+      percentage,
+      passed,
+      isGraded: score !== undefined,
+    });
+
+    setSubmittedAt(submittedAtTime);
+    setShowSubmissionModal(true);
+  }, [addResponse, isSubmitting]);
+
+  const handleSubmit = () => {
+    if (!task || hasSubmittedRef.current || isSubmitting) return;
+
+    // Check required questions (only warn, don't block if timer expired or forced submit)
     const requiredQuestions = task.questions.filter(q => q.required);
     const unansweredRequired = requiredQuestions.filter(
       q => !answers[q.id] || 
@@ -120,79 +184,23 @@ const MainTask: React.FC = () => {
       const questionNumbers = unansweredRequired.map((q, idx) => 
         task.questions.findIndex(tq => tq.id === q.id) + 1
       ).join(', ');
-      alert(`Please answer all required questions. Missing: Question ${questionNumbers}`);
-      return;
+      if (!window.confirm(`You haven't answered all required questions (Question ${questionNumbers}). Submit anyway?`)) {
+        return;
+      }
     }
 
-    const submittedAtTime = new Date().toISOString();
-    const timeSpent = Math.floor((Date.now() - startTimeRef.current) / 1000);
-    
-    // Calculate score if auto-grading is enabled
-    const score = calculateScore(task, answers);
-    const percentage = score !== null && task.markingCriteria
-      ? (score / task.markingCriteria.totalMarks) * 100
-      : undefined;
-    const passed = score !== null && task.markingCriteria
-      ? score >= task.markingCriteria.passingMarks
-      : undefined;
-
-    // Save response
-    addResponse({
-      taskId: task.id,
-      taskName: task.name,
-      taskType: task.taskType,
-      classId: task.classId,
-      studentInfo,
-      answers,
-      submittedAt: submittedAtTime,
-      timeSpent,
-      score,
-      percentage,
-      passed,
-      isGraded: score !== undefined,
-    });
-
-    setSubmittedAt(submittedAtTime);
-    setShowSubmissionModal(true);
+    autoSubmit('manual');
   };
 
+  // Timer effect - auto-submit when timer reaches zero
   useEffect(() => {
-    if (timeRemaining === null || timeRemaining <= 0 || showSubmissionModal) return;
+    if (timeRemaining === null || timeRemaining <= 0 || showSubmissionModal || !task?.permissions.showTimer) return;
 
     const timer = setInterval(() => {
       setTimeRemaining(prev => {
         if (prev === null || prev <= 1) {
-          // Time's up - auto submit
-          if (task) {
-            const submittedAtTime = new Date().toISOString();
-            const timeSpent = Math.floor((Date.now() - startTimeRef.current) / 1000);
-            
-            const score = calculateScore(task, answers);
-            const percentage = score !== null && task.markingCriteria
-              ? (score / task.markingCriteria.totalMarks) * 100
-              : undefined;
-            const passed = score !== null && task.markingCriteria
-              ? score >= task.markingCriteria.passingMarks
-              : undefined;
-
-            addResponse({
-              taskId: task.id,
-              taskName: task.name,
-              taskType: task.taskType,
-              classId: task.classId,
-              studentInfo,
-              answers,
-              submittedAt: submittedAtTime,
-              timeSpent,
-              score,
-              percentage,
-              passed,
-              isGraded: score !== undefined,
-            });
-
-            setSubmittedAt(submittedAtTime);
-            setShowSubmissionModal(true);
-          }
+          // Time's up - force auto submit
+          autoSubmit('timer');
           return 0;
         }
         return prev - 1;
@@ -200,7 +208,140 @@ const MainTask: React.FC = () => {
     }, 1000);
 
     return () => clearInterval(timer);
-  }, [timeRemaining, showSubmissionModal, task]);
+  }, [timeRemaining, showSubmissionModal, task, autoSubmit]);
+
+  // Lock Screen: Prevent navigation away
+  useEffect(() => {
+    if (!task?.permissions.lockScreen || hasSubmittedRef.current) return;
+
+    const handleBeforeUnload = (e: BeforeUnloadEvent) => {
+      e.preventDefault();
+      e.returnValue = 'You are not allowed to leave this page. Your task will be submitted automatically.';
+      autoSubmit('navigation');
+      return e.returnValue;
+    };
+
+    const handlePopState = () => {
+      autoSubmit('navigation');
+      window.history.pushState(null, '', window.location.href);
+    };
+
+    // Prevent back button
+    window.history.pushState(null, '', window.location.href);
+    window.addEventListener('popstate', handlePopState);
+    window.addEventListener('beforeunload', handleBeforeUnload);
+
+    return () => {
+      window.removeEventListener('popstate', handlePopState);
+      window.removeEventListener('beforeunload', handleBeforeUnload);
+    };
+  }, [task?.permissions.lockScreen, autoSubmit]);
+
+  // Prevent Tab Switch: Detect tab/window switches
+  useEffect(() => {
+    if (!task?.permissions.preventTabSwitch || hasSubmittedRef.current) return;
+
+    let isPageVisible = true;
+    let warningShown = false;
+
+    const handleVisibilityChange = () => {
+      if (document.hidden) {
+        isPageVisible = false;
+        tabSwitchCountRef.current += 1;
+        
+        if (!warningShown) {
+          warningShown = true;
+          // Show warning when tab becomes visible again
+          setTimeout(() => {
+            if (!document.hidden && !hasSubmittedRef.current) {
+              const warning = window.confirm(
+                `Warning: You switched tabs/windows (${tabSwitchCountRef.current} time${tabSwitchCountRef.current > 1 ? 's' : ''}). ` +
+                `Switching tabs is not allowed. Your task will be submitted automatically if you continue.`
+              );
+              
+              if (!warning || tabSwitchCountRef.current >= 3) {
+                autoSubmit('tab_switch');
+              } else {
+                warningShown = false;
+              }
+            }
+          }, 100);
+        } else if (tabSwitchCountRef.current >= 3) {
+          // Auto-submit after 3 tab switches
+          autoSubmit('tab_switch');
+        }
+      } else {
+        isPageVisible = true;
+      }
+    };
+
+    const handleBlur = () => {
+      if (!document.hidden) return;
+      tabSwitchCountRef.current += 1;
+      
+      if (tabSwitchCountRef.current >= 3) {
+        autoSubmit('tab_switch');
+      }
+    };
+
+    const handleFocus = () => {
+      if (tabSwitchCountRef.current > 0 && !hasSubmittedRef.current) {
+        alert(`Warning: You switched away from this page ${tabSwitchCountRef.current} time(s). Please stay on this page.`);
+      }
+    };
+
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    window.addEventListener('blur', handleBlur);
+    window.addEventListener('focus', handleFocus);
+
+    return () => {
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+      window.removeEventListener('blur', handleBlur);
+      window.removeEventListener('focus', handleFocus);
+    };
+  }, [task?.permissions.preventTabSwitch, autoSubmit]);
+
+  // Prevent Copy/Paste: Disable copy and paste on input fields
+  useEffect(() => {
+    if (!task?.permissions.preventCopyPaste || hasSubmittedRef.current) return;
+
+    const preventCopyPaste = (e: ClipboardEvent) => {
+      e.preventDefault();
+      e.stopPropagation();
+      alert('Copy and paste is disabled for this task. Please type your answers manually.');
+      return false;
+    };
+
+    const preventContextMenu = (e: MouseEvent) => {
+      // Prevent right-click context menu which can be used for copy/paste
+      e.preventDefault();
+      return false;
+    };
+
+    const preventKeyboardShortcuts = (e: KeyboardEvent) => {
+      // Prevent Ctrl+C, Ctrl+V, Ctrl+X, Ctrl+A
+      if ((e.ctrlKey || e.metaKey) && (e.key === 'c' || e.key === 'v' || e.key === 'x' || e.key === 'a')) {
+        e.preventDefault();
+        e.stopPropagation();
+        alert('Copy and paste shortcuts are disabled. Please type your answers manually.');
+        return false;
+      }
+    };
+
+    document.addEventListener('copy', preventCopyPaste);
+    document.addEventListener('paste', preventCopyPaste);
+    document.addEventListener('cut', preventCopyPaste);
+    document.addEventListener('contextmenu', preventContextMenu);
+    document.addEventListener('keydown', preventKeyboardShortcuts);
+
+    return () => {
+      document.removeEventListener('copy', preventCopyPaste);
+      document.removeEventListener('paste', preventCopyPaste);
+      document.removeEventListener('cut', preventCopyPaste);
+      document.removeEventListener('contextmenu', preventContextMenu);
+      document.removeEventListener('keydown', preventKeyboardShortcuts);
+    };
+  }, [task?.permissions.preventCopyPaste]);
 
   const getQuestionTypeIcon = (type: QuestionType) => {
     switch (type) {
@@ -259,8 +400,17 @@ const MainTask: React.FC = () => {
   };
 
   const handleGoBack = () => {
-    if (window.confirm('Are you sure you want to leave? Your progress will be lost.')) {
-      navigate(-1);
+    if (!task) return;
+    
+    // If lock screen is enabled, auto-submit instead of allowing navigation
+    if (task.permissions.lockScreen) {
+      if (window.confirm('You cannot leave this page. Your task will be submitted automatically.')) {
+        autoSubmit('navigation');
+      }
+    } else {
+      if (window.confirm('Are you sure you want to leave? Your progress will be lost.')) {
+        navigate(-1);
+      }
     }
   };
 
@@ -306,9 +456,16 @@ const MainTask: React.FC = () => {
         animate={{ opacity: 1, y: 0 }}
       >
         <div className="main-task-header-content">
-          <button className="main-task-back-btn" onClick={handleGoBack} title="Go back">
-            <FiArrowLeft />
-          </button>
+          {!task.permissions.lockScreen && (
+            <button className="main-task-back-btn" onClick={handleGoBack} title="Go back">
+              <FiArrowLeft />
+            </button>
+          )}
+          {task.permissions.lockScreen && (
+            <div className="main-task-locked-indicator" title="Screen locked - cannot leave this page">
+              <FiLock style={{ color: '#FF6B6B' }} />
+            </div>
+          )}
           
           <div className="main-task-header-info">
             <div className="main-task-title-group">
@@ -402,6 +559,9 @@ const MainTask: React.FC = () => {
                               placeholder={question.placeholder || 'Type your answer here...'}
                               value={(answers[question.id]?.value as string) || ''}
                               onChange={(e) => handleAnswerChange(question.id, e.target.value)}
+                              onCopy={task?.permissions.preventCopyPaste ? (e) => e.preventDefault() : undefined}
+                              onPaste={task?.permissions.preventCopyPaste ? (e) => e.preventDefault() : undefined}
+                              onCut={task?.permissions.preventCopyPaste ? (e) => e.preventDefault() : undefined}
                               maxLength={question.maxLength}
                             />
                           )}
@@ -412,6 +572,9 @@ const MainTask: React.FC = () => {
                               placeholder={question.placeholder || 'Write your answer here...'}
                               value={(answers[question.id]?.value as string) || ''}
                               onChange={(e) => handleAnswerChange(question.id, e.target.value)}
+                              onCopy={task?.permissions.preventCopyPaste ? (e) => e.preventDefault() : undefined}
+                              onPaste={task?.permissions.preventCopyPaste ? (e) => e.preventDefault() : undefined}
+                              onCut={task?.permissions.preventCopyPaste ? (e) => e.preventDefault() : undefined}
                               maxLength={question.maxLength}
                               rows={6}
                             />
@@ -557,6 +720,9 @@ const MainTask: React.FC = () => {
                             placeholder={currentQuestion.placeholder || 'Type your answer here...'}
                             value={(answers[currentQuestion.id]?.value as string) || ''}
                             onChange={(e) => handleAnswerChange(currentQuestion.id, e.target.value)}
+                            onCopy={task?.permissions.preventCopyPaste ? (e) => e.preventDefault() : undefined}
+                            onPaste={task?.permissions.preventCopyPaste ? (e) => e.preventDefault() : undefined}
+                            onCut={task?.permissions.preventCopyPaste ? (e) => e.preventDefault() : undefined}
                             maxLength={currentQuestion.maxLength}
                           />
                         )}
@@ -567,6 +733,9 @@ const MainTask: React.FC = () => {
                             placeholder={currentQuestion.placeholder || 'Write your answer here...'}
                             value={(answers[currentQuestion.id]?.value as string) || ''}
                             onChange={(e) => handleAnswerChange(currentQuestion.id, e.target.value)}
+                            onCopy={task?.permissions.preventCopyPaste ? (e) => e.preventDefault() : undefined}
+                            onPaste={task?.permissions.preventCopyPaste ? (e) => e.preventDefault() : undefined}
+                            onCut={task?.permissions.preventCopyPaste ? (e) => e.preventDefault() : undefined}
                             maxLength={currentQuestion.maxLength}
                             rows={8}
                           />
